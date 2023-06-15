@@ -10,11 +10,21 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(100), unique=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
     grade = db.Column(db.Integer, nullable=False)
     profile_image = db.Column(db.String(100))
     nickname = db.Column(db.String(50))
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
+
+    def __init__(
+        self, username, password, email, grade, profile_image="", nickname=username
+    ):
+        self.username = username
+        self.password = password
+        self.email = email
+        self.grade = grade
+        self.profile_image = profile_image
+        self.nickname = nickname
 
 
 class Todo(db.Model):
