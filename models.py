@@ -42,6 +42,10 @@ class Todo(db.Model):
 
     user = db.relationship("User", backref=db.backref("todos", lazy=True))
 
+    def __init__(self, title, content, user_id):
+        self.title = title
+        self.content = content
+        self.user_id = user_id
 
 class Habit(db.Model):
     __tablename__ = "habit"
