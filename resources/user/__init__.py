@@ -127,3 +127,19 @@ class Refresh(Resource):
         access_token = create_access_token(identity=user_id)
 
         return {"access_token": access_token}, 200
+
+
+@user_namespace.route("/profile")
+class Profile(Resource):
+    @jwt_required()
+    def get(self):
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+
+        return {
+            "username": user.username,
+            "email": user.email,
+            "grade": user.grade,
+            "profile_image": user.profile_image,
+            "nickname": user.nickname,
+        }, 200
