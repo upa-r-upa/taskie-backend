@@ -129,8 +129,21 @@ class Refresh(Resource):
         return {"access_token": access_token}, 200
 
 
-@user_namespace.route("/profile")
-class Profile(Resource):
+user_update_model = user_namespace.model(
+    "UserUpdate",
+    {
+        "username": fields.String(required=True),
+        "password": fields.String(required=True),
+        "email": fields.String(required=False),
+        "grade": fields.Integer(required=False),
+        "profile_image": fields.String(required=False),
+        "nickname": fields.String(required=False),
+    },
+)
+
+
+@user_namespace.route("")
+class UserData(Resource):
     @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
@@ -143,3 +156,52 @@ class Profile(Resource):
             "profile_image": user.profile_image,
             "nickname": user.nickname,
         }, 200
+
+    @jwt_required()
+    @user_namespace.expect(user_update_model, validate=True)
+    def put(self):
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        data = request.get_json()
+
+        username = data.get("username")
+        password = data.get("password")
+
+        if not user:
+            return {"msg": "User does not exist"}, 400
+
+        if not username:
+            return {"msg": "Username is required"}, 400
+
+        if not password:
+            return {"msg": "Password is required"}, 400
+
+        if check_password_hash(user.password, password) == False:
+            return {"msg": "Password is wrong"}, 400
+
+        email = data.get("email")
+        grade = data.get("grade")
+        profile_image = data.get("profile_image")
+        nickname = data.get("nickname")
+
+        if email:
+            user.email = email
+
+        if grade:
+            user.grade = grade
+
+        if profile_image == "":
+            user.profile_image = None
+        elif profile_image:
+            user.profile_image = profile_image
+
+        if nickname:
+            user.nickname = nickname
+
+        try:
+            db.session.commit()
+            return {"msg": "User update successful"}, 200
+
+        except Exception as e:
+            db.session.rollback()
+            return {"msg": "An error occurred"}, 500
