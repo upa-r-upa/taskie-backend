@@ -1,9 +1,11 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_restx import Api
+from flask_jwt_extended import JWTManager
 
 migrate = Migrate()
 api = Api()
+jwt = JWTManager()
 
 
 def register_namespaces():
@@ -29,6 +31,7 @@ def create_app():
 
     migrate.init_app(app, db)
     api.init_app(app)
+    jwt.init_app(app)
 
     register_namespaces()
 
