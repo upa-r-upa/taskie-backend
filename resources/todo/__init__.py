@@ -21,7 +21,10 @@ class TodoResource(Resource):
         if not todo:
             return {"msg": "Todo not found"}, 404
 
-        return {"id": todo.id, "title": todo.title, "content": todo.content}, 200
+        return {
+            "msg": "Todo found",
+            "todo": {"id": todo.id, "title": todo.title, "content": todo.content},
+        }, 200
 
 
 @todo_namespace.route("")
