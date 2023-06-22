@@ -12,6 +12,21 @@ todo_create_model = todo_namespace.model(
 )
 
 
+@todo_namespace.route("/<int:id>")
+class TodoResource(Resource):
+    @jwt_required()
+    def get(self, id):
+        todo = Todo.query.get(id)
+
+        if not todo:
+            return {"msg": "Todo not found"}, 404
+
+        return {
+            "msg": "Todo found",
+            "todo": {"id": todo.id, "title": todo.title, "content": todo.content},
+        }, 200
+
+
 @todo_namespace.route("")
 class TodoList(Resource):
     @todo_namespace.expect(todo_create_model, validate=True)
