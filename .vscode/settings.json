@@ -6,6 +6,7 @@
     "cSpell.words": [
         "restx",
         "sqlalchemy",
-        "taskie"
+        "taskie",
+        "uvicorn"
     ]
 }

@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "taskie-backend"
+version = "0.1.0"
+description = ""
+authors = ["upa-r-upa <duekthtjf783@gmail.com>"]
+readme = "README.md"
+packages = [{include = "taskie_backend"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.98.0"
+sqlalchemy = "^2.0.17"
+datetime = "^5.1"
+pyjwt = "^2.7.0"
+werkzeug = "^2.3.6"
+uvicorn = {extras = ["standard"], version = "^0.22.0"}
+alembic = "^1.11.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
