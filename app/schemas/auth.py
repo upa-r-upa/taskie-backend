@@ -65,3 +65,14 @@ class RefreshInput(BaseModel):
 
 class RefreshOutput(BaseModel):
     access_token: str
+
+class UserBase(BaseModel):
+    username: str
+    password: str
+    email: str
+    grade: int = 0
+    profile_image: str | None = None
+    nickname: str | None = None
+
+    class Config:
+        orm_mode = True
