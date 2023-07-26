@@ -1,11 +1,10 @@
 import os
 from datetime import timedelta
+import dotenv
 
-BASE_DIR = os.path.dirname(__file__)
+dotenv.load_dotenv()
 
-SQLALCHEMY_DATABASE_URI = "sqlite:///{}".format(
-    os.path.join(BASE_DIR, "db", "taskie.db")
-)
+SQLALCHEMY_DATABASE_URI = os.environ.get("TSK_SQLALCHEMY_URL")
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "비밀키")
