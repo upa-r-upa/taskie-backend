@@ -47,9 +47,6 @@ def update_me(
     if data.email:
         user.email = data.email
 
-    if data.grade:
-        user.grade = data.grade
-
     if data.profile_image == "":
         user.profile_image = None
     elif data.profile_image:

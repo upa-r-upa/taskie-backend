@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base, Session
 from app.schemas.auth import UserBase
 from app.database.db import get_db
 from app.models.models import User
-from app.core.auth import generate_refresh_token
+from app.core.auth import generate_access_token, generate_refresh_token
 from main import app as client_app
 
 engine = create_engine(os.environ.get("TSK_SQLALCHEMY_URL"))
@@ -71,7 +71,7 @@ def test_user_data() -> UserBase:
 
 
 @pytest.fixture
-def test_user(session: Session, test_user_data: UserBase):
+def create_test_user(session: Session, test_user_data: UserBase) -> User:
     user = User(
         username=test_user_data.username,
         password=generate_password_hash(test_user_data.password),
@@ -84,9 +84,14 @@ def test_user(session: Session, test_user_data: UserBase):
     session.add(user)
     session.commit()
 
-    yield test_user_data
+    yield user
 
 
 @pytest.fixture
-def refresh_token(test_user: User) -> str:
-    return generate_refresh_token(test_user.username)
+def refresh_token(test_user_data: User) -> str:
+    return generate_refresh_token(test_user_data.username)
+
+
+@pytest.fixture
+def access_token(test_user_data: UserBase) -> str:
+    return generate_access_token(test_user_data.username)
