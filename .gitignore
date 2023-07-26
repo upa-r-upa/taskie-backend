@@ -200,3 +200,4 @@ migrations/
 
 # env
 .env
+.env.test
