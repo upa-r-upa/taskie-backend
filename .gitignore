@@ -197,3 +197,6 @@ migrations/
 
 # PyJWT
 .pyjwt_cache/
+
+# env
+.env
