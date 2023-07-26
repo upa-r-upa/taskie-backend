@@ -17,7 +17,6 @@ class UserUpdateInput(BaseModel):
     username: str
     password: str
     email: str | None
-    grade: int | None
     profile_image: str | None
     nickname: str | None
 

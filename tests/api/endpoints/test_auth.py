@@ -44,9 +44,9 @@ def test_signup(client: TestClient, session: Session, test_user_data: UserBase):
     assert user.nickname == data.nickname
 
 
-def test_login(client: TestClient, test_user_data: UserBase, test_user: User):
+def test_login(client: TestClient, test_user_data: UserBase, create_test_user: User):
     data = LoginInput(
-        username=test_user.username,
+        username=create_test_user.username,
         password=test_user_data.password,
     )
 
