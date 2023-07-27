@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app.models.models import Todo
-from app.schemas.todo import TodoWithID, TodoBase
+from app.schemas.todo import TodoDetail, TodoBase
 
 
 def test_get_todo(client: TestClient, add_todo: Todo, access_token: str):
@@ -11,7 +11,7 @@ def test_get_todo(client: TestClient, add_todo: Todo, access_token: str):
         headers={"Authorization": f"Bearer {access_token}"},
     )
 
-    response_data = TodoWithID(**response.json().get("data"))
+    response_data = TodoDetail(**response.json().get("data"))
 
     assert response.status_code == 200
 
@@ -29,7 +29,7 @@ def test_create_todo(
         headers={"Authorization": f"Bearer {access_token}"},
     )
 
-    response_data = TodoWithID(**response.json().get("data"))
+    response_data = TodoDetail(**response.json().get("data"))
 
     assert response.status_code == 201
 
