@@ -77,3 +77,47 @@ def create_todo(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Cannot create todo",
         )
+
+
+@router.put(
+    "/{todo_id}",
+    response_model=Response[TodoDetail],
+    status_code=status.HTTP_200_OK,
+)
+def update_todo(
+    todo_id: int,
+    data: TodoBase,
+    db: Session = Depends(get_db),
+    username=Depends(get_current_user),
+):
+    user = get_user_by_username(db, username)
+    todo = (
+        db.query(Todo)
+        .filter(Todo.id == todo_id)
+        .filter(Todo.user_id == user.id)
+        .first()
+    )
+
+    if not todo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Todo not found",
+        )
+
+    todo.title = data.title
+    todo.content = data.content
+
+    try:
+        db.commit()
+
+        return Response(
+            status_code=status.HTTP_200_OK,
+            data=TodoDetail.from_orm(todo),
+            message="Todo updated successfully",
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Cannot create todo",
+        )

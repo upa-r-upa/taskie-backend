@@ -9,6 +9,12 @@ class TodoBase(BaseModel):
     class Config:
         orm_mode = True
 
+    @validator("title")
+    def title_must_not_be_empty(cls, v):
+        if not v:
+            raise ValueError("Title must not be empty")
+        return v
+
 
 class TodoDetail(TodoBase):
     id: int
