@@ -11,15 +11,15 @@ from app.schemas.auth import (
 )
 
 
-def test_signup(client: TestClient, session: Session, test_user_data: UserBase):
+def test_signup(client: TestClient, session: Session, user_data: UserBase):
     data = SignupInput(
-        username=test_user_data.username,
-        password=test_user_data.password,
-        password_confirm=test_user_data.password,
-        email=test_user_data.email,
-        grade=test_user_data.grade,
-        profile_image=test_user_data.profile_image,
-        nickname=test_user_data.nickname,
+        username=user_data.username,
+        password=user_data.password,
+        password_confirm=user_data.password,
+        email=user_data.email,
+        grade=user_data.grade,
+        profile_image=user_data.profile_image,
+        nickname=user_data.nickname,
     )
 
     expected_output = SignupOutput(
@@ -44,10 +44,10 @@ def test_signup(client: TestClient, session: Session, test_user_data: UserBase):
     assert user.nickname == data.nickname
 
 
-def test_login(client: TestClient, test_user_data: UserBase, create_test_user: User):
+def test_login(client: TestClient, user_data: UserBase, add_user: User):
     data = LoginInput(
-        username=create_test_user.username,
-        password=test_user_data.password,
+        username=add_user.username,
+        password=user_data.password,
     )
 
     response = client.post("/auth/login", json=data.dict())

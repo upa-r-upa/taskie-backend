@@ -9,9 +9,9 @@ from app.schemas.user import UserData, UserUpdateInput
 def test_get_me(
     client: TestClient,
     access_token: str,
-    create_test_user: User,
+    user_data: UserBase,
 ):
-    excepted_output = UserData.from_orm(create_test_user)
+    excepted_output = UserData.from_orm(user_data)
 
     response = client.get(
         "/user/me", headers={"Authorization": f"Bearer {access_token}"}
@@ -22,13 +22,9 @@ def test_get_me(
 
 
 def test_update_me(
-    client: TestClient,
-    session: Session,
-    access_token: str,
-    test_user_data: UserBase,
-    create_test_user: User,
+    client: TestClient, session: Session, access_token: str, user_data: UserBase
 ):
-    excepted_output = UserData.from_orm(create_test_user)
+    excepted_output = UserData.from_orm(user_data)
 
     excepted_output.nickname = "test_nickname"
     excepted_output.email = "test@test.com2"
@@ -36,7 +32,7 @@ def test_update_me(
 
     data = UserUpdateInput(
         username=excepted_output.username,
-        password=test_user_data.password,
+        password=user_data.password,
         email=excepted_output.email,
         profile_image=excepted_output.profile_image,
         nickname=excepted_output.nickname,
