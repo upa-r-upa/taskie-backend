@@ -37,3 +37,31 @@ def test_create_todo(
     assert response_data.content == todo.content
 
     assert session.query(Todo).filter(Todo.id == response_data.id).first()
+
+
+def test_update_todo(
+    client: TestClient, session: Session, add_todo: Todo, access_token: str
+):
+    request_data = TodoBase.from_orm(add_todo)
+
+    request_data.title = "Updated title"
+    request_data.content = "Updated content"
+
+    response = client.put(
+        f"/todo/{add_todo.id}",
+        json=request_data.dict(),
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    response_data = TodoDetail(**response.json().get("data"))
+
+    assert response.status_code == 200
+    assert TodoBase.from_orm(response_data) == TodoBase(**request_data.dict())
+
+    assert (
+        session.query(Todo)
+        .filter(Todo.id == add_todo.id)
+        .filter(Todo.title == request_data.title)
+        .filter(Todo.content == request_data.content)
+        .first()
+    )
