@@ -46,7 +46,7 @@ def get_todo(
 
 @router.post(
     "/create",
-    response_model=Response[TodoBase],
+    response_model=Response[TodoWithID],
     status_code=status.HTTP_201_CREATED,
 )
 def create_todo(
@@ -68,7 +68,7 @@ def create_todo(
 
         return Response(
             status_code=status.HTTP_201_CREATED,
-            data=TodoBase.from_orm(todo),
+            data=TodoWithID.from_orm(todo),
             message="Todo created successfully",
         )
     except Exception as e:
