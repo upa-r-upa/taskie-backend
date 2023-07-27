@@ -65,3 +65,16 @@ def test_update_todo(
         .filter(Todo.content == request_data.content)
         .first()
     )
+
+
+def test_delete_todo(
+    client: TestClient, session: Session, add_todo: Todo, access_token: str
+):
+    response = client.delete(
+        f"/todo/{add_todo.id}",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+
+    assert session.query(Todo).filter(Todo.id == add_todo.id).first() is None
