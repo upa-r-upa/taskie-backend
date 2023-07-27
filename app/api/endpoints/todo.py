@@ -5,7 +5,7 @@ from app.core.auth import get_current_user
 from app.core.utils import get_user_by_username
 from app.database.db import get_db
 from app.models.models import Todo
-from app.schemas.response import Response
+from app.schemas.response import Response, SimpleResponse
 from app.schemas.todo import TodoBase, TodoDetail
 
 router = APIRouter(
@@ -120,4 +120,44 @@ def update_todo(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Cannot create todo",
+        )
+
+
+@router.delete(
+    "/{todo_id}",
+    response_model=SimpleResponse,
+    status_code=status.HTTP_200_OK,
+)
+def delete_todo(
+    todo_id: int,
+    db: Session = Depends(get_db),
+    username=Depends(get_current_user),
+):
+    user = get_user_by_username(db, username)
+    todo = (
+        db.query(Todo)
+        .filter(Todo.id == todo_id)
+        .filter(Todo.user_id == user.id)
+        .first()
+    )
+
+    if not todo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Todo not found.",
+        )
+
+    try:
+        db.delete(todo)
+        db.commit()
+
+        return SimpleResponse(
+            status_code=status.HTTP_200_OK,
+            message="Todo deleted successfully",
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Cannot delete todo",
         )
