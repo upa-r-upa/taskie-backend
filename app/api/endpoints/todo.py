@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from app.core.auth import get_current_user
 from app.core.utils import get_user_by_username
 from app.database.db import get_db
-from app.models.models import Todo, User
+from app.models.models import Todo
 from app.schemas.response import Response
-from app.schemas.todo import TodoBase
+from app.schemas.todo import TodoBase, TodoWithID
 
 router = APIRouter(
     prefix="/todo",
@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 @router.get(
-    "/<int:todo_id>", response_model=Response[TodoBase], status_code=status.HTTP_200_OK
+    "/{todo_id}", response_model=Response[TodoWithID], status_code=status.HTTP_200_OK
 )
 def get_todo(
     todo_id: int,
@@ -31,15 +31,15 @@ def get_todo(
             status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found"
         )
 
-    # if todo.user_id != user.id:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="You don't have permission to access this todo",
-    #     )
+    if todo.user_id != user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to access this todo",
+        )
 
     return Response(
         status_code=status.HTTP_200_OK,
-        data=TodoBase(todo),
+        data=TodoWithID.from_orm(todo),
         message="Todo data retrieved successfully",
     )
 
