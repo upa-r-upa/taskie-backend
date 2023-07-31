@@ -80,7 +80,7 @@ class Routine(Base):
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
-    title = Column(Text, nullable=False, unique=True)
+    title = Column(Text, nullable=False)
     start_time_minutes = Column(Integer, nullable=False)
     completed = Column(Integer, default=0)
     active = Column(Integer, default=1)
