@@ -80,6 +80,12 @@ def create_routine(
         data=RoutineDetail(
             id=routine.id,
             created_at=routine.created_at,
+            updated_at=routine.updated_at,
+            title=routine.title,
+            start_time_minutes=routine.start_time_minutes,
+            repeat_days=data.repeat_days,
+            completed=False,
+            active=True,
             todo_items=[
                 RoutineItem(
                     title=todo_item.title,
