@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["upa-r-upa <duekthtjf783@gmail.com>"]
 readme = "README.md"
-packages = [{include = "taskie_backend"}]
+packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -19,6 +19,10 @@ pytest = "^7.4.0"
 httpx = "^0.24.1"
 python-dotenv = "^1.0.0"
 
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+flake8 = "^6.1.0"
 
 [build-system]
 requires = ["poetry-core"]

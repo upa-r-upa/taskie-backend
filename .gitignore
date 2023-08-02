@@ -201,3 +201,6 @@ migrations/
 # env
 .env
 .env.test
+
+# virtual env
+.venv
