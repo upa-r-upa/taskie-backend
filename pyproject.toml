@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["upa-r-upa <duekthtjf783@gmail.com>"]
 readme = "README.md"
-packages = [{include = "taskie_backend"}]
+packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
