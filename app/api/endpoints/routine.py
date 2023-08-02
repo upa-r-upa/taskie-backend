@@ -9,7 +9,9 @@ from app.schemas.response import Response
 from app.schemas.routine import RoutineCreateInput, RoutineDetail, RoutineItem
 
 router = APIRouter(
-    prefix="/routine", tags=["routine"], dependencies=[Depends(get_current_user)]
+    prefix="/routine",
+    tags=["routine"],
+    dependencies=[Depends(get_current_user)],
 )
 
 
@@ -47,10 +49,13 @@ def create_routine(
         for day in data.repeat_days
     ]
 
-    commit_and_catch_exception(db, lambda: db.bulk_save_objects(routine_repeat_days))
+    commit_and_catch_exception(
+        db, lambda: db.bulk_save_objects(routine_repeat_days)
+    )
 
     todo_items = [
-        Todo(title=todo_item.title, user_id=user.id) for todo_item in data.todo_items
+        Todo(title=todo_item.title, user_id=user.id)
+        for todo_item in data.todo_items
     ]
 
     commit_and_catch_exception(
