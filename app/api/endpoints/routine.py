@@ -4,7 +4,7 @@ from app.core.auth import get_current_user
 from app.core.utils import get_user_by_username
 
 from app.database.db import get_db
-from app.models.models import Routine, RoutineRepeatDay, Todo, TodoRoutine
+from app.models.models import Routine, RoutineElement
 from app.schemas.response import Response
 from app.schemas.routine import RoutineCreateInput, RoutineDetail, RoutineItem
 
@@ -36,65 +36,48 @@ def create_routine(
 ):
     user = get_user_by_username(db, username)
 
+    repeat_days = "".join([str(day) for day in data.repeat_days])
+
     routine = Routine(
         title=data.title,
         start_time_minutes=data.start_time_minutes,
+        repeat_days=repeat_days,
         user_id=user.id,
     )
 
     commit_and_catch_exception(db, lambda: db.add(routine))
 
-    routine_repeat_days = [
-        RoutineRepeatDay(routine_id=routine.id, day=day, user_id=user.id)
-        for day in data.repeat_days
-    ]
-
-    commit_and_catch_exception(
-        db, lambda: db.bulk_save_objects(routine_repeat_days)
-    )
-
-    todo_items = [
-        Todo(title=todo_item.title, user_id=user.id)
-        for todo_item in data.todo_items
-    ]
-
-    commit_and_catch_exception(
-        db, lambda: db.bulk_save_objects(todo_items, return_defaults=True)
-    )
-
-    routine_items = []
-
-    for index, todo_item in enumerate(data.todo_items):
-        routine_item = TodoRoutine(
+    routine_items = [
+        RoutineElement(
+            title=item.title,
+            order=item.order,
+            duration_minutes=item.duration_minutes,
             routine_id=routine.id,
-            todo_id=todo_items[index].id,
-            duration_minutes=todo_item.duration_minutes,
-            user_id=user.id,
         )
-
-        routine_items.append(routine_item)
+        for item in data.routine_items
+    ]
 
     commit_and_catch_exception(db, lambda: db.add_all(routine_items))
 
     return Response(
         data=RoutineDetail(
             id=routine.id,
-            created_at=routine.created_at,
-            updated_at=routine.updated_at,
             title=routine.title,
             start_time_minutes=routine.start_time_minutes,
             repeat_days=data.repeat_days,
-            completed=False,
-            active=True,
-            todo_items=[
+            created_at=routine.created_at,
+            updated_at=routine.updated_at,
+            routine_items=[
                 RoutineItem(
-                    title=todo_item.title,
-                    duration_minutes=routine_item.duration_minutes,
-                    id=routine_item.id,
-                    created_at=routine_item.created_at,
-                    updated_at=routine_item.updated_at,
+                    id=item.id,
+                    title=item.title,
+                    order=item.order,
+                    duration_minutes=item.duration_minutes,
+                    created_at=item.created_at,
+                    updated_at=item.updated_at,
+                    completed=False,
                 )
-                for routine_item, todo_item in zip(routine_items, todo_items)
+                for item in routine_items
             ],
         ),
         message="Routine created successfully",

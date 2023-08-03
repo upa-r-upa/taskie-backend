@@ -1,6 +1,5 @@
 import re
 from pydantic import BaseModel, validator
-from pydantic.generics import GenericModel
 
 
 class SignupInput(BaseModel):

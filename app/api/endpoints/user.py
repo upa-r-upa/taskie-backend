@@ -15,7 +15,9 @@ router = APIRouter(
 )
 
 
-@router.get("/me", response_model=Response[UserData], status_code=status.HTTP_200_OK)
+@router.get(
+    "/me", response_model=Response[UserData], status_code=status.HTTP_200_OK
+)
 def get_me(db: Session = Depends(get_db), username=Depends(get_current_user)):
     user = get_user_by_username(db, username)
 
@@ -26,7 +28,9 @@ def get_me(db: Session = Depends(get_db), username=Depends(get_current_user)):
     )
 
 
-@router.put("/me", response_model=Response[UserData], status_code=status.HTTP_200_OK)
+@router.put(
+    "/me", response_model=Response[UserData], status_code=status.HTTP_200_OK
+)
 def update_me(
     data: UserUpdateInput,
     db: Session = Depends(get_db),
@@ -36,12 +40,14 @@ def update_me(
 
     if data.username != user.username:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Username cannot be changed"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Username cannot be changed",
         )
 
     if check_password_hash(user.password, data.password) == False:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Password is wrong"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Password is wrong",
         )
 
     if data.email:
@@ -64,7 +70,7 @@ def update_me(
             message="User data updated successfully",
         )
 
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
