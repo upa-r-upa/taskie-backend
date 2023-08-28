@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from werkzeug.security import check_password_hash
 
 from app.core.auth import get_current_user
-from app.core.utils import get_user_by_username
 from app.database.db import get_db
 from app.schemas.response import Response
 from app.schemas.user import UserData, UserUpdateInput
@@ -18,9 +17,7 @@ router = APIRouter(
 @router.get(
     "/me", response_model=Response[UserData], status_code=status.HTTP_200_OK
 )
-def get_me(db: Session = Depends(get_db), username=Depends(get_current_user)):
-    user = get_user_by_username(db, username)
-
+def get_me(db: Session = Depends(get_db), user=Depends(get_current_user)):
     return Response(
         status_code=status.HTTP_200_OK,
         data=UserData.from_orm(user),
@@ -34,10 +31,8 @@ def get_me(db: Session = Depends(get_db), username=Depends(get_current_user)):
 def update_me(
     data: UserUpdateInput,
     db: Session = Depends(get_db),
-    username=Depends(get_current_user),
+    user=Depends(get_current_user),
 ):
-    user = get_user_by_username(db, username)
-
     if data.username != user.username:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

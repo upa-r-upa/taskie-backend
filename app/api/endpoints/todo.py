@@ -16,14 +16,15 @@ router = APIRouter(
 
 
 @router.get(
-    "/{todo_id}", response_model=Response[TodoDetail], status_code=status.HTTP_200_OK
+    "/{todo_id}",
+    response_model=Response[TodoDetail],
+    status_code=status.HTTP_200_OK,
 )
 def get_todo(
     todo_id: int,
     db: Session = Depends(get_db),
-    username=Depends(get_current_user),
+    user=Depends(get_current_user),
 ):
-    user = get_user_by_username(db, username)
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
 
     if not todo:
@@ -52,10 +53,8 @@ def get_todo(
 def create_todo(
     data: TodoBase,
     db: Session = Depends(get_db),
-    username=Depends(get_current_user),
+    user=Depends(get_current_user),
 ):
-    user = get_user_by_username(db, username)
-
     todo = Todo(
         title=data.title,
         content=data.content,
@@ -71,7 +70,8 @@ def create_todo(
             data=TodoDetail.from_orm(todo),
             message="Todo created successfully",
         )
-    except Exception as e:
+
+    except Exception:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -88,9 +88,8 @@ def update_todo(
     todo_id: int,
     data: TodoBase,
     db: Session = Depends(get_db),
-    username=Depends(get_current_user),
+    user=Depends(get_current_user),
 ):
-    user = get_user_by_username(db, username)
     todo = (
         db.query(Todo)
         .filter(Todo.id == todo_id)
@@ -115,7 +114,7 @@ def update_todo(
             data=TodoDetail.from_orm(todo),
             message="Todo updated successfully",
         )
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -131,9 +130,8 @@ def update_todo(
 def delete_todo(
     todo_id: int,
     db: Session = Depends(get_db),
-    username=Depends(get_current_user),
+    user=Depends(get_current_user),
 ):
-    user = get_user_by_username(db, username)
     todo = (
         db.query(Todo)
         .filter(Todo.id == todo_id)
@@ -155,7 +153,7 @@ def delete_todo(
             status_code=status.HTTP_200_OK,
             message="Todo deleted successfully",
         )
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

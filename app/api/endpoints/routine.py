@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from app.core.auth import get_current_user
-from app.core.utils import get_user_by_username
 
 from app.database.db import get_db
 from app.models.models import Routine, RoutineElement
@@ -32,10 +31,8 @@ def commit_and_catch_exception(db: Session, db_action: callable):
 def create_routine(
     data: RoutineCreateInput,
     db: Session = Depends(get_db),
-    username=Depends(get_current_user),
+    user=Depends(get_current_user),
 ):
-    user = get_user_by_username(db, username)
-
     repeat_days = "".join([str(day) for day in data.repeat_days])
 
     routine = Routine(
