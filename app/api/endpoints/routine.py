@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, status
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session, joinedload
 from app.core.auth import get_current_user
 
 from app.database.db import get_db
-from app.models.models import Routine, RoutineElement
+from app.models.models import Routine, RoutineElement, User
 from app.schemas.response import Response
 from app.schemas.routine import RoutineCreateInput, RoutineDetail, RoutineItem
 
@@ -44,17 +44,17 @@ def create_routine(
 
     commit_and_catch_exception(db, lambda: db.add(routine))
 
-    routine_items = [
+    routine_elements = [
         RoutineElement(
             title=item.title,
             order=item.order,
             duration_minutes=item.duration_minutes,
             routine_id=routine.id,
         )
-        for item in data.routine_items
+        for item in data.routine_elements
     ]
 
-    commit_and_catch_exception(db, lambda: db.add_all(routine_items))
+    commit_and_catch_exception(db, lambda: db.add_all(routine_elements))
 
     return Response(
         data=RoutineDetail(
@@ -64,7 +64,8 @@ def create_routine(
             repeat_days=data.repeat_days,
             created_at=routine.created_at,
             updated_at=routine.updated_at,
-            routine_items=[
+            deleted_at=None,
+            routine_elements=[
                 RoutineItem(
                     id=item.id,
                     title=item.title,
@@ -74,9 +75,55 @@ def create_routine(
                     updated_at=item.updated_at,
                     completed=False,
                 )
-                for item in routine_items
+                for item in routine_elements
             ],
         ),
         message="Routine created successfully",
         status_code=status.HTTP_201_CREATED,
     )
+
+
+@router.get(
+    "/{routine_id}",
+    response_model=Response[RoutineDetail],
+    status_code=status.HTTP_200_OK,
+)
+def get_routine(
+    routine_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    routine = db.query(Routine).options(
+        joinedload(Routine.routine_elements)).filter(
+        Routine.id == routine_id, Routine.user_id == user.id).first()
+
+    if not routine:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found")
+
+    response = Response(
+        data=RoutineDetail(
+            id=routine.id,
+            created_at=routine.created_at,
+            updated_at=routine.updated_at,
+            title=routine.title,
+            start_time_minutes=routine.start_time_minutes,
+            repeat_days=routine.repeat_days_to_list(),
+            routine_elements=[
+                RoutineItem(
+                    id=item.id,
+                    title=item.title,
+                    order=item.order,
+                    duration_minutes=item.duration_minutes,
+                    created_at=item.created_at,
+                    updated_at=item.updated_at,
+                    completed=False,
+                )
+                for item in routine.routine_elements
+            ]
+        ),
+        message="Routine retrieved successfully",
+        status_code=status.HTTP_200_OK,
+    )
+
+    return response
