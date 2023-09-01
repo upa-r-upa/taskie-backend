@@ -94,6 +94,9 @@ class Routine(Base):
     user = relationship("User", back_populates="routines")
     routine_elements = relationship("RoutineElement", back_populates="routine")
 
+    def repeat_days_to_list(self):
+        return [int(day) for day in self.repeat_days]
+
 
 class RoutineElement(Base):
     __tablename__ = "routine_element"

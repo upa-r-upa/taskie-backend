@@ -2,12 +2,20 @@ from functools import wraps
 from fastapi import Depends, HTTPException, status
 import jwt
 from datetime import datetime, timedelta
+from sqlalchemy.orm import Session
 from typing import Callable, Optional
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from app.core.utils import get_user_by_username
+from app.database import db
+
+from app.models.models import User
+
 from .config import JWT_SECRET_KEY, JWT_ALGORITHM
 
 
-def generate_token(username: str, expires_delta: Optional[timedelta] = None) -> str:
+def generate_token(
+    username: str, expires_delta: Optional[timedelta] = None
+) -> str:
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
@@ -60,17 +68,22 @@ security_scheme = HTTPBearer()
 
 
 def get_current_user(
+    db: Session = Depends(db.get_db),
     credentials: HTTPAuthorizationCredentials = Depends(security_scheme),
-):
+) -> User:
     token = credentials.credentials
     username = decode_token(token)
 
-    return username
+    user = get_user_by_username(db, username)
+
+    return user
 
 
 def jwt_required(func: Callable) -> Callable:
     @wraps(func)
-    async def wrapper(current_user: str = Depends(get_current_user), *args, **kwargs):
+    async def wrapper(
+        current_user: User = Depends(get_current_user), *args, **kwargs
+    ):
         if not current_user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

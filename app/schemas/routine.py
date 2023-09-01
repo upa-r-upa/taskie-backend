@@ -13,7 +13,7 @@ class RoutineCreateInput(BaseModel):
     title: str
     start_time_minutes: int
     repeat_days: List[int]
-    routine_items: List[RoutineItemBase]
+    routine_elements: List[RoutineItemBase]
 
     class Config:
         orm_mode = True
@@ -35,8 +35,8 @@ class RoutineCreateInput(BaseModel):
             raise ValueError("start_time_minutes must be between 0 and 1439")
         return v
 
-    @validator("routine_items")
-    def validate_routine_items(cls, v):
+    @validator("routine_elements")
+    def validate_routine_elements(cls, v):
         for item in v:
             if item.duration_minutes < 0:
                 raise ValueError("duration_minutes must be positive")
@@ -52,15 +52,15 @@ class RoutineCreateInput(BaseModel):
             raise ValueError("title must be less than 255 characters")
         return v
 
-    @validator("routine_items")
-    def validate_routine_items_order(cls, v):
+    @validator("routine_elements")
+    def validate_routine_elements_order(cls, v):
         order_list = []
         for item in v:
             order_list.append(item.order)
         order_list.sort()
         for i in range(len(order_list)):
             if order_list[i] != i + 1:
-                raise ValueError("routine_items order must be 1, 2, 3, ...")
+                raise ValueError("routine_elements order must be 1, 2, 3, ...")
         return v
 
 
@@ -82,12 +82,8 @@ class RoutineBase(BaseModel):
     start_time_minutes: int
     repeat_days: List[int]
 
-    class Config:
-        orm_mode = True
-
 
 class RoutineDetail(RoutineBase):
-    routine_items: List[RoutineItem]
+    deleted_at: datetime | None
 
-    class Config:
-        orm_mode = True
+    routine_elements: List[RoutineItem]
