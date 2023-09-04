@@ -5,7 +5,7 @@ from app.core.auth import get_current_user
 from app.core.utils import get_user_by_username
 from app.database.db import get_db
 from app.models.models import Todo
-from app.schemas.response import Response, SimpleResponse
+from app.schemas.response import Response
 from app.schemas.todo import TodoBase, TodoDetail
 
 router = APIRouter(
@@ -124,8 +124,8 @@ def update_todo(
 
 @router.delete(
     "/{todo_id}",
-    response_model=SimpleResponse,
-    status_code=status.HTTP_200_OK,
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_todo(
     todo_id: int,
@@ -149,10 +149,7 @@ def delete_todo(
         db.delete(todo)
         db.commit()
 
-        return SimpleResponse(
-            status_code=status.HTTP_200_OK,
-            message="Todo deleted successfully",
-        )
+        return None
     except Exception:
         db.rollback()
         raise HTTPException(

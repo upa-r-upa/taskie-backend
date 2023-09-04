@@ -75,6 +75,6 @@ def test_delete_todo(
         headers={"Authorization": f"Bearer {access_token}"},
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 204
 
     assert session.query(Todo).filter(Todo.id == add_todo.id).first() is None

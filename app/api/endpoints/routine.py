@@ -5,7 +5,7 @@ from app.core.auth import get_current_user
 
 from app.database.db import get_db
 from app.models.models import Routine, RoutineElement, User
-from app.schemas.response import Response, SimpleResponse
+from app.schemas.response import Response
 from app.schemas.routine import RoutineCreateInput, RoutineDetail, RoutineItem
 
 router = APIRouter(
