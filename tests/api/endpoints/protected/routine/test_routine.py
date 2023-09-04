@@ -64,3 +64,31 @@ def test_get_routine_invalid_id(
     )
 
     assert response.status_code == 404
+
+
+def test_delete_routine_valid_id(
+    client: TestClient,
+    access_token: str,
+    session: Session,
+    add_routine: RoutineDetail,
+):
+    response = client.delete(
+        "/routine/1",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 204
+
+    assert session.query(Routine).first().deleted_at is not None
+
+
+def test_delete_routine_invalid_id(
+    client: TestClient,
+    access_token: str,
+):
+    response = client.delete(
+        "/routine/1",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 404

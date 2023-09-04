@@ -11,11 +11,6 @@ class Response(GenericModel, Generic[T]):
     status_code: int
 
 
-class SimpleResponse(BaseModel):
-    message: str
-    status_code: int
-
-
 class InnerErrorResponse(BaseModel):
     message: str
     location: list[str]
