@@ -1,6 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from werkzeug.security import check_password_hash
+from app.api.strings import (
+    INVALID_LOGIN_ERROR,
+    SERVER_UNTRACKED_ERROR,
+    USERNAME_CANNOT_BE_CHANGED_ERROR,
+)
 
 from app.core.auth import get_current_user
 from app.database.db import get_db
@@ -36,13 +41,13 @@ def update_me(
     if data.username != user.username:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Username cannot be changed",
+            detail=USERNAME_CANNOT_BE_CHANGED_ERROR,
         )
 
-    if check_password_hash(user.password, data.password) == False:
+    if not check_password_hash(user.password, data.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Password is wrong",
+            detail=INVALID_LOGIN_ERROR,
         )
 
     if data.email:
@@ -60,14 +65,12 @@ def update_me(
         db.commit()
 
         return Response(
-            status_code=status.HTTP_200_OK,
-            data=UserData.from_orm(user),
-            message="User data updated successfully",
+            status_code=status.HTTP_200_OK, data=UserData.from_orm(user)
         )
 
     except Exception:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="User data update failed",
+            detail=SERVER_UNTRACKED_ERROR,
         )

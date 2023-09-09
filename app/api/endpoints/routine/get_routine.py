@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
+from app.api.strings import ROUTINE_DOES_NOT_EXIST_ERROR
 from app.core.auth import get_current_user
 
 from . import router
@@ -31,7 +32,8 @@ def get_routine(
 
     if not routine:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ROUTINE_DOES_NOT_EXIST_ERROR,
         )
 
     response = Response(
