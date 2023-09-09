@@ -1,6 +1,7 @@
 {
     "[python]": {
-        "editor.defaultFormatter": "ms-python.autopep8"
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
     },
     "python.testing.pytestArgs": [
         "tests",
@@ -12,8 +13,5 @@
     "editor.codeActionsOnSave": {
         "source.organizeImports": true
     },
-    "editor.defaultFormatter": "ms-python.python",
     "editor.formatOnSave": true,
-    "editor.formatOnPaste": true,
-    "editor.formatOnType": true
 }
