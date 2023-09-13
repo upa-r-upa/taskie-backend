@@ -1,6 +1,8 @@
 from datetime import datetime
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 from typing import List
+
+from app.models.models import Routine, RoutineElement
 
 
 class RoutineItemBase(BaseModel):
@@ -17,51 +19,6 @@ class RoutineCreateInput(BaseModel):
 
     class Config:
         orm_mode = True
-
-    @validator("repeat_days")
-    def validate_repeat_days(cls, v):
-        if len(v) == 0:
-            raise ValueError("repeat_days must not be empty")
-        for day in v:
-            if day not in range(1, 8):
-                raise ValueError(
-                    "repeat_days must be a list of integers between 1 and 7"
-                )
-        return v
-
-    @validator("start_time_minutes")
-    def validate_start_time_minutes(cls, v):
-        if v < 0 or v >= 1440:
-            raise ValueError("start_time_minutes must be between 0 and 1439")
-        return v
-
-    @validator("routine_elements")
-    def validate_routine_elements(cls, v):
-        for item in v:
-            if item.duration_minutes < 0:
-                raise ValueError("duration_minutes must be positive")
-            elif item.duration_minutes > 1440:
-                raise ValueError("duration_minutes must be less than 1440")
-        return v
-
-    @validator("title")
-    def validate_title(cls, v):
-        if len(v) == 0:
-            raise ValueError("title must not be empty")
-        elif len(v) > 255:
-            raise ValueError("title must be less than 255 characters")
-        return v
-
-    @validator("routine_elements")
-    def validate_routine_elements_order(cls, v):
-        order_list = []
-        for item in v:
-            order_list.append(item.order)
-        order_list.sort()
-        for i in range(len(order_list)):
-            if order_list[i] != i + 1:
-                raise ValueError("routine_elements order must be 1, 2, 3, ...")
-        return v
 
 
 class RoutineItem(RoutineItemBase):
@@ -87,3 +44,40 @@ class RoutineDetail(RoutineBase):
     deleted_at: datetime | None
 
     routine_elements: List[RoutineItem]
+
+    def from_routine(routine: Routine, routine_elements: List[RoutineElement]):
+        return RoutineDetail(
+            id=routine.id,
+            title=routine.title,
+            start_time_minutes=routine.start_time_minutes,
+            repeat_days=routine.repeat_days_to_list(),
+            created_at=routine.created_at,
+            updated_at=routine.updated_at,
+            deleted_at=routine.deleted_at,
+            routine_elements=[
+                RoutineItem(
+                    id=item.id,
+                    title=item.title,
+                    order=item.order,
+                    duration_minutes=item.duration_minutes,
+                    created_at=item.created_at,
+                    updated_at=item.updated_at,
+                    completed=False,
+                )
+                for item in routine_elements
+            ],
+        )
+
+
+class RoutineItemUpdate(RoutineItemBase):
+    id: int | None
+
+
+class RoutineUpdateInput(BaseModel):
+    routine_id: int
+
+    title: str | None
+    start_time_minutes: int | None
+    repeat_days: List[int] | None
+
+    routine_elements: List[RoutineItemUpdate] | None

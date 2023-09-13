@@ -16,3 +16,7 @@ EMAIL_ALREADY_EXISTS_ERROR = "Email already exists"
 TODO_DOES_NOT_EXIST_ERROR = "Todo does not exist"
 
 ROUTINE_DOES_NOT_EXIST_ERROR = "Routine does not exist"
+ROUTINE_ITEM_NOT_EXIST_ERROR = "Routine item does not exist"
+ROUTINE_ITEM_UPDATE_SAME_ROUTINE_ERROR = (
+    "Routine item does not belong to the routine"
+)

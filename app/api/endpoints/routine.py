@@ -8,6 +8,8 @@ from app.api.strings import (
 from app.core.auth import get_current_user
 from app.database.db import get_db
 from app.models.models import Routine, RoutineElement, User
+from app.repositories import get_routine_repository
+from app.repositories.routine_repository import RoutineRepository
 from app.schemas.response import Response
 from app.schemas.routine import (
     RoutineCreateInput,
@@ -46,6 +48,7 @@ def create_routine(
 
     routine_elements = [
         RoutineElement(
+            user_id=user.id,
             title=item.title,
             order=item.order,
             duration_minutes=item.duration_minutes,
@@ -176,3 +179,23 @@ def commit_and_catch_exception(db: Session, db_action: callable):
     except Exception as e:
         db.rollback()
         raise e
+
+
+@router.put(
+    "/{routine_id}",
+    response_model=Response[RoutineDetail],
+    status_code=status.HTTP_200_OK,
+)
+def update_routine(
+    routine_id: int,
+    data: RoutineUpdateInput,
+    repository: RoutineRepository = Depends(get_routine_repository),
+    user: User = Depends(get_current_user),
+):
+    routine = repository.update_routine(data)
+
+    return Response(
+        data=RoutineDetail.from_routine(routine, routine.routine_elements),
+        message="Routine updated successfully",
+        status_code=status.HTTP_200_OK,
+    )
