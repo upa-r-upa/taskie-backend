@@ -5,6 +5,10 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from typing import Callable, Optional
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from app.api.strings import (
+    USER_EXPIRED_AUTHENTICATED_ERROR,
+    USER_NOT_AUTHENTICATED_ERROR,
+)
 from app.core.utils import get_user_by_username
 from app.database import db
 
@@ -35,21 +39,14 @@ def decode_token(token: str) -> Optional[str]:
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token expired",
+            detail=USER_EXPIRED_AUTHENTICATED_ERROR,
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    except jwt.InvalidTokenError:
+    except (jwt.InvalidTokenError, jwt.DecodeError, Exception):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    except (jwt.DecodeError, Exception):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
+            detail=USER_NOT_AUTHENTICATED_ERROR,
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -87,7 +84,7 @@ def jwt_required(func: Callable) -> Callable:
         if not current_user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authentication credentials",
+                detail=USER_NOT_AUTHENTICATED_ERROR,
                 headers={"WWW-Authenticate": "Bearer"},
             )
         return await func(*args, **kwargs)

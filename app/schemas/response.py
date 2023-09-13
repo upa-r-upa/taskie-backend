@@ -7,7 +7,7 @@ T = TypeVar("T")
 
 class Response(GenericModel, Generic[T]):
     data: Optional[T] = None
-    message: str
+    message: str = ""
     status_code: int
 
 

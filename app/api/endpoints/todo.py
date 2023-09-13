@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from app.api.strings import SERVER_UNTRACKED_ERROR, TODO_DOES_NOT_EXIST_ERROR
 
 from app.core.auth import get_current_user
-from app.core.utils import get_user_by_username
 from app.database.db import get_db
-from app.models.models import Todo
+from app.models.models import Todo, User
 from app.schemas.response import Response
 from app.schemas.todo import TodoBase, TodoDetail
 
@@ -23,25 +23,22 @@ router = APIRouter(
 def get_todo(
     todo_id: int,
     db: Session = Depends(get_db),
-    user=Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ):
-    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    todo = (
+        db.query(Todo)
+        .filter(Todo.id == todo_id, Todo.user_id == user.id)
+        .first()
+    )
 
     if not todo:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found"
-        )
-
-    if todo.user_id != user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You don't have permission to access this todo",
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=TODO_DOES_NOT_EXIST_ERROR,
         )
 
     return Response(
-        status_code=status.HTTP_200_OK,
-        data=TodoDetail.from_orm(todo),
-        message="Todo data retrieved successfully",
+        status_code=status.HTTP_200_OK, data=TodoDetail.from_orm(todo)
     )
 
 
@@ -66,16 +63,14 @@ def create_todo(
         db.commit()
 
         return Response(
-            status_code=status.HTTP_201_CREATED,
-            data=TodoDetail.from_orm(todo),
-            message="Todo created successfully",
+            status_code=status.HTTP_201_CREATED, data=TodoDetail.from_orm(todo)
         )
 
     except Exception:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Cannot create todo",
+            detail=SERVER_UNTRACKED_ERROR,
         )
 
 
@@ -100,7 +95,7 @@ def update_todo(
     if not todo:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Todo not found",
+            detail=TODO_DOES_NOT_EXIST_ERROR,
         )
 
     todo.title = data.title
@@ -110,15 +105,13 @@ def update_todo(
         db.commit()
 
         return Response(
-            status_code=status.HTTP_200_OK,
-            data=TodoDetail.from_orm(todo),
-            message="Todo updated successfully",
+            status_code=status.HTTP_200_OK, data=TodoDetail.from_orm(todo)
         )
     except Exception:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Cannot create todo",
+            detail=SERVER_UNTRACKED_ERROR,
         )
 
 
@@ -142,7 +135,7 @@ def delete_todo(
     if not todo:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Todo not found.",
+            detail=TODO_DOES_NOT_EXIST_ERROR,
         )
 
     try:
@@ -154,5 +147,5 @@ def delete_todo(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Cannot delete todo",
+            detail=SERVER_UNTRACKED_ERROR,
         )

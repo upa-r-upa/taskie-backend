@@ -6,16 +6,18 @@ from werkzeug.security import generate_password_hash
 
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base, Session
+from sqlalchemy.orm import sessionmaker, Session
 
 from app.schemas.auth import UserBase
 from app.database.db import Base, get_db
 from app.models.models import User
 from app.core.auth import generate_access_token
-from main import app as client_app
+from app.main import app as client_app
 
 engine = create_engine(os.environ.get("TSK_SQLALCHEMY_URL"))
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestingSessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=engine
+)
 
 
 @pytest.fixture(autouse=True)

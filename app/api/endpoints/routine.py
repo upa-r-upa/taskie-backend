@@ -1,27 +1,28 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
+from app.api.strings import (
+    ROUTINE_DOES_NOT_EXIST_ERROR,
+    SERVER_UNTRACKED_ERROR,
+)
 from app.core.auth import get_current_user
-
 from app.database.db import get_db
 from app.models.models import Routine, RoutineElement, User
+from app.repositories import get_routine_repository
+from app.repositories.routine_repository import RoutineRepository
 from app.schemas.response import Response
-from app.schemas.routine import RoutineCreateInput, RoutineDetail, RoutineItem
+from app.schemas.routine import (
+    RoutineCreateInput,
+    RoutineDetail,
+    RoutineItem,
+    RoutineUpdateInput,
+)
 
 router = APIRouter(
     prefix="/routine",
     tags=["routine"],
     dependencies=[Depends(get_current_user)],
 )
-
-
-def commit_and_catch_exception(db: Session, db_action: callable):
-    try:
-        db_action()
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        raise e
 
 
 @router.post(
@@ -47,6 +48,7 @@ def create_routine(
 
     routine_elements = [
         RoutineElement(
+            user_id=user.id,
             title=item.title,
             order=item.order,
             duration_minutes=item.duration_minutes,
@@ -94,13 +96,18 @@ def get_routine(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    routine = db.query(Routine).options(
-        joinedload(Routine.routine_elements)).filter(
-        Routine.id == routine_id, Routine.user_id == user.id).first()
+    routine = (
+        db.query(Routine)
+        .options(joinedload(Routine.routine_elements))
+        .filter(Routine.id == routine_id, Routine.user_id == user.id)
+        .first()
+    )
 
     if not routine:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found")
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ROUTINE_DOES_NOT_EXIST_ERROR,
+        )
 
     response = Response(
         data=RoutineDetail(
@@ -121,7 +128,7 @@ def get_routine(
                     completed=False,
                 )
                 for item in routine.routine_elements
-            ]
+            ],
         ),
         message="Routine retrieved successfully",
         status_code=status.HTTP_200_OK,
@@ -140,12 +147,17 @@ def delete_routine(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    routine = db.query(Routine).filter(
-        Routine.id == routine_id, Routine.user_id == user.id).first()
+    routine = (
+        db.query(Routine)
+        .filter(Routine.id == routine_id, Routine.user_id == user.id)
+        .first()
+    )
 
     if not routine:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found")
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ROUTINE_DOES_NOT_EXIST_ERROR,
+        )
 
     try:
         routine.deleted_at = datetime.now()
@@ -156,5 +168,34 @@ def delete_routine(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Cannot delete Routine",
+            detail=SERVER_UNTRACKED_ERROR,
         )
+
+
+def commit_and_catch_exception(db: Session, db_action: callable):
+    try:
+        db_action()
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise e
+
+
+@router.put(
+    "/{routine_id}",
+    response_model=Response[RoutineDetail],
+    status_code=status.HTTP_200_OK,
+)
+def update_routine(
+    routine_id: int,
+    data: RoutineUpdateInput,
+    repository: RoutineRepository = Depends(get_routine_repository),
+    user: User = Depends(get_current_user),
+):
+    routine = repository.update_routine(data)
+
+    return Response(
+        data=RoutineDetail.from_routine(routine, routine.routine_elements),
+        message="Routine updated successfully",
+        status_code=status.HTTP_200_OK,
+    )

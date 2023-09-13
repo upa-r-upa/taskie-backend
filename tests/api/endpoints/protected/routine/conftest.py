@@ -6,33 +6,87 @@ from app.schemas.routine import (
     RoutineCreateInput,
     RoutineDetail,
     RoutineItem,
-    RoutineItemBase,
+    RoutineItemUpdate,
+    RoutineUpdateInput,
 )
 
 
 @pytest.fixture
-def routine() -> RoutineCreateInput:
+def routine_data() -> RoutineCreateInput:
     return RoutineCreateInput(
         title="아침 루틴",
         start_time_minutes=480,
         repeat_days=[1, 2, 3, 4, 5],
         routine_elements=[
-            RoutineItemBase(title="아침 물 마시기", duration_minutes=5, order=1),
-            RoutineItemBase(title="아침 운동하기", duration_minutes=30, order=2),
-            RoutineItemBase(title="아침 식사하기", duration_minutes=15, order=3),
+            RoutineItemUpdate(title="아침 물 마시기", duration_minutes=5, order=1),
+            RoutineItemUpdate(title="아침 운동하기", duration_minutes=30, order=2),
+            RoutineItemUpdate(title="아침 식사하기", duration_minutes=15, order=3),
+        ],
+    )
+
+
+@pytest.fixture()
+def update_routine_only_routine_data() -> RoutineUpdateInput:
+    return RoutineUpdateInput(
+        routine_id=1,
+        title="점심 루틴",
+        start_time_minutes=720,
+        repeat_days=[1, 2, 3],
+    )
+
+
+@pytest.fixture()
+def update_routine_empty_routine_elements() -> RoutineUpdateInput:
+    return RoutineUpdateInput(
+        routine_id=1,
+        routine_elements=[],
+    )
+
+
+@pytest.fixture()
+def update_routine_only_elements_data() -> RoutineUpdateInput:
+    return RoutineUpdateInput(
+        routine_id=1,
+        routine_elements=[
+            RoutineItemUpdate(
+                id=1, title="아침 물 마시기 업데이트", order=1, duration_minutes=5
+            ),
+            RoutineItemUpdate(
+                id=2, title="아침 운동하기 업데이트", order=2, duration_minutes=30
+            ),
+            RoutineItemUpdate(
+                title="추가된 루틴 아이템 1", duration_minutes=10, order=3
+            ),
+            RoutineItemUpdate(
+                title="추가된 루틴 아이템 2", duration_minutes=10, order=4
+            ),
+        ],
+    )
+
+
+@pytest.fixture
+def update_routine_all_data() -> RoutineUpdateInput:
+    return RoutineUpdateInput(
+        routine_id=1,
+        title="점심 루틴",
+        start_time_minutes=120,
+        repeat_days=[1, 2, 3],
+        routine_elements=[
+            RoutineItemUpdate(title="점심 물 마시기", duration_minutes=5, order=1),
+            RoutineItemUpdate(title="점심 운동하기", duration_minutes=30, order=2),
         ],
     )
 
 
 @pytest.fixture
 def add_routine(
-    session: Session, add_user: User, routine: RoutineCreateInput
+    session: Session, add_user: User, routine_data: RoutineCreateInput
 ) -> RoutineDetail:
-    repeat_days = "".join([str(day) for day in routine.repeat_days])
+    repeat_days = "".join([str(day) for day in routine_data.repeat_days])
 
     test_routine = Routine(
-        title=routine.title,
-        start_time_minutes=routine.start_time_minutes,
+        title=routine_data.title,
+        start_time_minutes=routine_data.start_time_minutes,
         repeat_days=repeat_days,
         user_id=add_user.id,
     )
@@ -42,12 +96,13 @@ def add_routine(
 
     routine_elements = [
         RoutineElement(
+            user_id=add_user.id,
             title=item.title,
             order=item.order,
             duration_minutes=item.duration_minutes,
             routine_id=test_routine.id,
         )
-        for item in routine.routine_elements
+        for item in routine_data.routine_elements
     ]
 
     session.add_all(routine_elements)
@@ -57,7 +112,7 @@ def add_routine(
         id=test_routine.id,
         title=test_routine.title,
         start_time_minutes=test_routine.start_time_minutes,
-        repeat_days=routine.repeat_days,
+        repeat_days=routine_data.repeat_days,
         created_at=test_routine.created_at,
         updated_at=test_routine.updated_at,
         routine_elements=[
