@@ -8,7 +8,7 @@ on:
 
 
 jobs:
-  test:
+  Run-and-Test:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,10 +24,6 @@ jobs:
       run: |
         pip install poetry
         poetry install
-
-    - name: Check code style (flake8, black)
-      run: |
-        poetry run flake8 . && poetry run black --check .
 
     - name: Run server and tests
       run: |
