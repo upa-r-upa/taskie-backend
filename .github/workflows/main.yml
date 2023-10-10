@@ -26,7 +26,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install poetry
-        poetry Install
+        poetry install
         poetry run
         
     - name: Set up the database folder
