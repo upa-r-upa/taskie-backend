@@ -99,7 +99,11 @@ def get_routine(
     routine = (
         db.query(Routine)
         .options(joinedload(Routine.routine_elements))
-        .filter(Routine.id == routine_id, Routine.user_id == user.id)
+        .filter(
+            Routine.id == routine_id,
+            Routine.user_id == user.id,
+            Routine.deleted_at is None,
+        )
         .first()
     )
 
@@ -149,7 +153,11 @@ def delete_routine(
 ):
     routine = (
         db.query(Routine)
-        .filter(Routine.id == routine_id, Routine.user_id == user.id)
+        .filter(
+            Routine.id == routine_id,
+            Routine.user_id == user.id,
+            Routine.deleted_at is None,
+        )
         .first()
     )
 
