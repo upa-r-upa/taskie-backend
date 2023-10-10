@@ -102,7 +102,7 @@ def get_routine(
         .filter(
             Routine.id == routine_id,
             Routine.user_id == user.id,
-            Routine.deleted_at is None,
+            Routine.deleted_at.is_(None),
         )
         .first()
     )
@@ -156,7 +156,7 @@ def delete_routine(
         .filter(
             Routine.id == routine_id,
             Routine.user_id == user.id,
-            Routine.deleted_at is None,
+            Routine.deleted_at.is_(None),
         )
         .first()
     )
