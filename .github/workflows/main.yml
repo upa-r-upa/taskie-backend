@@ -27,9 +27,12 @@ jobs:
       run: |
         pip install poetry
         poetry install
-
-    - name: Run server and tests
+        
+    - name: Set up the database folder
       run: |
-        poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
-        sleep 5 
-        poetry run pytest
+        mkdir db
+        echo "Initializing the database..."
+
+    - name: Run tests
+      run: |
+        pytest tests -v
