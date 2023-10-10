@@ -1,0 +1,36 @@
+name: Taskie tests
+
+on:
+  push:
+    tags: ["*"]
+  pull_request:
+    types: [ready_for_review, opened, reopened, auto_merge_enabled]
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ^3.10
+
+    - name: Install dependencies
+      run: |
+        pip install poetry
+        poetry install
+
+    - name: Check code style (flake8, black)
+      run: |
+        poetry run flake8 . && poetry run black --check .
+
+    - name: Run server and tests
+      run: |
+        poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
+        sleep 5 
+        poetry run pytest
