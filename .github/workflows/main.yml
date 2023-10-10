@@ -23,12 +23,18 @@ jobs:
       with:
         python-version: ^3.10
 
-    - name: Install dependencies
+    - name: Install poetry
       run: |
         pip install poetry
+    
+    - name: Install dependencies
+      run: |
         poetry install
-        poetry run
         
+    - name: Run env
+      run: |
+        poetry shell
+
     - name: Set up the database folder
       run: |
         mkdir db
