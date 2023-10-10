@@ -31,15 +31,11 @@ jobs:
       run: |
         poetry install
         
-    - name: Run env
-      run: |
-        poetry shell
-
     - name: Set up the database folder
       run: |
         mkdir db
         echo "Initializing the database..."
 
-    - name: Run tests
+    - name: Test with pytest
       run: |
-        pytest tests -v
+        poetry run pytest
