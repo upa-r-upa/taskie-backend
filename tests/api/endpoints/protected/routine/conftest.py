@@ -18,9 +18,9 @@ def routine_data() -> RoutineCreateInput:
         start_time_minutes=480,
         repeat_days=[1, 2, 3, 4, 5],
         routine_elements=[
-            RoutineItemUpdate(title="아침 물 마시기", duration_minutes=5, order=1),
-            RoutineItemUpdate(title="아침 운동하기", duration_minutes=30, order=2),
-            RoutineItemUpdate(title="아침 식사하기", duration_minutes=15, order=3),
+            RoutineItemUpdate(title="아침 물 마시기", duration_minutes=5),
+            RoutineItemUpdate(title="아침 운동하기", duration_minutes=30),
+            RoutineItemUpdate(title="아침 식사하기", duration_minutes=15),
         ],
     )
 
@@ -48,18 +48,10 @@ def update_routine_only_elements_data() -> RoutineUpdateInput:
     return RoutineUpdateInput(
         routine_id=1,
         routine_elements=[
-            RoutineItemUpdate(
-                id=1, title="아침 물 마시기 업데이트", order=1, duration_minutes=5
-            ),
-            RoutineItemUpdate(
-                id=2, title="아침 운동하기 업데이트", order=2, duration_minutes=30
-            ),
-            RoutineItemUpdate(
-                title="추가된 루틴 아이템 1", duration_minutes=10, order=3
-            ),
-            RoutineItemUpdate(
-                title="추가된 루틴 아이템 2", duration_minutes=10, order=4
-            ),
+            RoutineItemUpdate(id=1, title="아침 물 마시기 업데이트", duration_minutes=5),
+            RoutineItemUpdate(id=2, title="아침 운동하기 업데이트", duration_minutes=30),
+            RoutineItemUpdate(title="추가된 루틴 아이템 1", duration_minutes=10),
+            RoutineItemUpdate(title="추가된 루틴 아이템 2", duration_minutes=10),
         ],
     )
 
@@ -72,8 +64,8 @@ def update_routine_all_data() -> RoutineUpdateInput:
         start_time_minutes=120,
         repeat_days=[1, 2, 3],
         routine_elements=[
-            RoutineItemUpdate(title="점심 물 마시기", duration_minutes=5, order=1),
-            RoutineItemUpdate(title="점심 운동하기", duration_minutes=30, order=2),
+            RoutineItemUpdate(title="점심 물 마시기", duration_minutes=5),
+            RoutineItemUpdate(title="점심 운동하기", duration_minutes=30),
         ],
     )
 
@@ -98,11 +90,11 @@ def add_routine(
         RoutineElement(
             user_id=add_user.id,
             title=item.title,
-            order=item.order,
+            order=index,
             duration_minutes=item.duration_minutes,
             routine_id=test_routine.id,
         )
-        for item in routine_data.routine_elements
+        for index, item in enumerate(routine_data.routine_elements)
     ]
 
     session.add_all(routine_elements)
@@ -119,7 +111,6 @@ def add_routine(
             RoutineItem(
                 id=item.id,
                 title=item.title,
-                order=item.order,
                 duration_minutes=item.duration_minutes,
                 created_at=item.created_at,
                 updated_at=item.updated_at,

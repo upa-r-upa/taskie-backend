@@ -144,7 +144,8 @@ class Routine(Base):
     def repeat_days_to_list(self):
         return [int(day) for day in self.repeat_days]
 
-    def repeat_days_to_string(self, repeat_days):
+    @staticmethod
+    def repeat_days_to_string(repeat_days):
         return "".join([str(day) for day in repeat_days])
 
 

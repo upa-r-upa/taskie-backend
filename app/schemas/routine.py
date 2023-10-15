@@ -7,7 +7,6 @@ from app.models.models import Routine, RoutineElement
 
 class RoutineItemBase(BaseModel):
     title: str
-    order: int
     duration_minutes: int
 
 
@@ -58,7 +57,6 @@ class RoutineDetail(RoutineBase):
                 RoutineItem(
                     id=item.id,
                     title=item.title,
-                    order=item.order,
                     duration_minutes=item.duration_minutes,
                     created_at=item.created_at,
                     updated_at=item.updated_at,
