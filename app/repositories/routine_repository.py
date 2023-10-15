@@ -3,7 +3,11 @@ from sqlalchemy.orm import Session
 from app.dao.routine_dao import RoutineDAO
 from app.dao.routine_element_dao import RoutineElementDAO
 from app.models.models import Routine
-from app.schemas.routine import RoutineUpdateInput
+from app.schemas.routine import (
+    RoutineCreateInput,
+    RoutineDetail,
+    RoutineUpdateInput,
+)
 
 from .base import ProtectedBaseRepository
 
@@ -30,3 +34,19 @@ class RoutineRepository(ProtectedBaseRepository):
         )
 
         return updated_routine
+
+    def create_routine(self, routine: RoutineCreateInput) -> RoutineDetail:
+        new_routine = self.routine_dao.create_routine(
+            title=routine.title,
+            start_time_minutes=routine.start_time_minutes,
+            repeat_days=routine.repeat_days,
+        )
+
+        routine_elements = self.routine_element_dao.create_routine_elements(
+            routine_id=new_routine.id,
+            routine_elements=routine.routine_elements,
+        )
+
+        return RoutineDetail.from_routine(
+            routine=new_routine, routine_elements=routine_elements
+        )

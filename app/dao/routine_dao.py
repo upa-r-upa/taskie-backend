@@ -47,3 +47,26 @@ class RoutineDAO(ProtectedBaseDAO):
             self.db.rollback()
 
             raise Exception("Failed to update routine")
+
+    def create_routine(
+        self,
+        title: str,
+        start_time_minutes: int,
+        repeat_days: List[int],
+    ) -> Routine:
+        routine = Routine(
+            title=title,
+            start_time_minutes=start_time_minutes,
+            repeat_days=Routine.repeat_days_to_string(repeat_days),
+            user_id=self.user_id,
+        )
+
+        try:
+            self.db.add(routine)
+            self.db.commit()
+
+            return routine
+        except SQLAlchemyError:
+            self.db.rollback()
+
+            raise Exception("Failed to add routine")

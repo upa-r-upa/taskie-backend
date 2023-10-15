@@ -38,7 +38,6 @@ def test_create_routine(
     ):
         assert routine_item.title == todo_item.title
         assert routine_item.duration_minutes == todo_item.duration_minutes
-        assert routine_item.order == todo_item.order
 
     assert session.query(Routine).count() == 1
     assert session.query(RoutineElement).count() == len(
@@ -172,16 +171,8 @@ def test_update_routine_only_elements_data(
         == update_routine_only_elements_data.routine_elements[2].title
     )
     assert (
-        response_data.routine_elements[2].order
-        == update_routine_only_elements_data.routine_elements[2].order
-    )
-    assert (
         response_data.routine_elements[3].title
         == update_routine_only_elements_data.routine_elements[3].title
-    )
-    assert (
-        response_data.routine_elements[3].order
-        == update_routine_only_elements_data.routine_elements[3].order
     )
 
 
@@ -216,7 +207,6 @@ def test_update_routine_only_routine_data(
     ):
         assert routine_item.title == todo_item.title
         assert routine_item.duration_minutes == todo_item.duration_minutes
-        assert routine_item.order == todo_item.order
 
 
 def test_update_routine_empty_routine_elements(

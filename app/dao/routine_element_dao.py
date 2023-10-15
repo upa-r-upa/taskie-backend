@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from app.dao.base import ProtectedBaseDAO
 from app.api.strings import ROUTINE_ITEM_NOT_EXIST_ERROR
 from app.models.models import RoutineElement
-from app.schemas.routine import RoutineItemUpdate
+from app.schemas.routine import RoutineItemBase, RoutineItemUpdate
 
 
 class RoutineElementDAO(ProtectedBaseDAO):
@@ -130,7 +130,9 @@ class RoutineElementDAO(ProtectedBaseDAO):
             for routine_element in routine_elements
         }
 
-        for update_routine_element in updates_routine_elements:
+        for index, update_routine_element in enumerate(
+            updates_routine_elements
+        ):
             routine_element = routine_elements_dict.get(
                 update_routine_element.id
             )
@@ -139,7 +141,7 @@ class RoutineElementDAO(ProtectedBaseDAO):
                 self.update_routine_element(
                     routine_element=routine_element,
                     title=update_routine_element.title,
-                    order=update_routine_element.order,
+                    order=index,
                     duration_minutes=update_routine_element.duration_minutes,
                 )
 
@@ -148,7 +150,7 @@ class RoutineElementDAO(ProtectedBaseDAO):
                 self.create_routine_element(
                     routine_id=routine_id,
                     title=update_routine_element.title,
-                    order=update_routine_element.order,
+                    order=index,
                     duration_minutes=update_routine_element.duration_minutes,
                 )
             else:
@@ -161,3 +163,30 @@ class RoutineElementDAO(ProtectedBaseDAO):
             self.delete_routine_element(routine_element)
 
         return self.get_routine_elements_by_routine_id(routine_id)
+
+    def create_routine_elements(
+        self,
+        routine_id: int,
+        routine_elements: list[RoutineItemBase],
+    ) -> list[RoutineElement]:
+        elements = [
+            RoutineElement(
+                user_id=self.user_id,
+                title=item.title,
+                order=index,
+                duration_minutes=item.duration_minutes,
+                routine_id=routine_id,
+            )
+            for index, item in enumerate(routine_elements)
+        ]
+
+        try:
+            self.db.add_all(elements)
+            self.db.flush()
+        except SQLAlchemyError:
+            self.db.rollback()
+            raise Exception("Failed to create routine elements")
+        else:
+            self.db.commit()
+
+        return elements
