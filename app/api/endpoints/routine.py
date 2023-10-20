@@ -1,13 +1,10 @@
-from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session, joinedload
-from app.api.strings import (
-    ROUTINE_DOES_NOT_EXIST_ERROR,
-    SERVER_UNTRACKED_ERROR,
-)
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.orm import Session
 from app.core.auth import get_current_user
+from app.dao import get_routine_dao
+from app.dao.routine_dao import RoutineDAO
 from app.database.db import get_db
-from app.models.models import Routine, User
+from app.models.models import User
 from app.repositories import get_routine_repository
 from app.repositories.routine_repository import RoutineRepository
 from app.schemas.response import Response
@@ -53,23 +50,9 @@ def get_routine(
     routine_id: int,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    dao: RoutineDAO = Depends(get_routine_dao),
 ):
-    routine = (
-        db.query(Routine)
-        .options(joinedload(Routine.routine_elements))
-        .filter(
-            Routine.id == routine_id,
-            Routine.user_id == user.id,
-            Routine.deleted_at.is_(None),
-        )
-        .first()
-    )
-
-    if not routine:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=ROUTINE_DOES_NOT_EXIST_ERROR,
-        )
+    routine = dao.get_routine_with_elements_by_id(routine_id)
 
     response = Response(
         data=RoutineDetail.from_routine(routine, routine.routine_elements),
@@ -89,34 +72,11 @@ def delete_routine(
     routine_id: int,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    dao: RoutineDAO = Depends(get_routine_dao),
 ):
-    routine = (
-        db.query(Routine)
-        .filter(
-            Routine.id == routine_id,
-            Routine.user_id == user.id,
-            Routine.deleted_at.is_(None),
-        )
-        .first()
-    )
+    dao.soft_delete_routine(routine_id)
 
-    if not routine:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=ROUTINE_DOES_NOT_EXIST_ERROR,
-        )
-
-    try:
-        routine.deleted_at = datetime.now()
-        db.commit()
-
-        return None
-    except Exception:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=SERVER_UNTRACKED_ERROR,
-        )
+    return None
 
 
 @router.put(

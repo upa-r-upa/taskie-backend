@@ -119,7 +119,7 @@ class RoutineElementDAO(ProtectedBaseDAO):
 
         return routine_element
 
-    def update_routine_elements(
+    def _update_routine_elements(
         self,
         routine_id: int,
         routine_elements: list[RoutineElement],
@@ -164,7 +164,7 @@ class RoutineElementDAO(ProtectedBaseDAO):
 
         return self.get_routine_elements_by_routine_id(routine_id)
 
-    def create_routine_elements(
+    def _create_routine_elements(
         self,
         routine_id: int,
         routine_elements: list[RoutineItemBase],
@@ -186,7 +186,5 @@ class RoutineElementDAO(ProtectedBaseDAO):
         except SQLAlchemyError:
             self.db.rollback()
             raise Exception("Failed to create routine elements")
-        else:
-            self.db.commit()
 
         return elements
