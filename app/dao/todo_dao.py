@@ -84,13 +84,7 @@ class TodoDAO(ProtectedBaseDAO):
             user_id=self.user_id,
         )
 
-        try:
-            self.db.add(todo)
-            self.db.commit()
-
-        except Exception:
-            self.db.rollback()
-            raise
+        self.db.add(todo)
 
         return todo
 

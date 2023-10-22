@@ -28,7 +28,6 @@ def routine_data() -> RoutineCreateInput:
 @pytest.fixture()
 def update_routine_only_routine_data() -> RoutineUpdateInput:
     return RoutineUpdateInput(
-        routine_id=1,
         title="점심 루틴",
         start_time_minutes=720,
         repeat_days=[1, 2, 3],
@@ -38,7 +37,6 @@ def update_routine_only_routine_data() -> RoutineUpdateInput:
 @pytest.fixture()
 def update_routine_empty_routine_elements() -> RoutineUpdateInput:
     return RoutineUpdateInput(
-        routine_id=1,
         routine_elements=[],
     )
 
@@ -46,7 +44,6 @@ def update_routine_empty_routine_elements() -> RoutineUpdateInput:
 @pytest.fixture()
 def update_routine_only_elements_data() -> RoutineUpdateInput:
     return RoutineUpdateInput(
-        routine_id=1,
         routine_elements=[
             RoutineItemUpdate(id=1, title="아침 물 마시기 업데이트", duration_minutes=5),
             RoutineItemUpdate(id=2, title="아침 운동하기 업데이트", duration_minutes=30),
@@ -59,7 +56,6 @@ def update_routine_only_elements_data() -> RoutineUpdateInput:
 @pytest.fixture
 def update_routine_all_data() -> RoutineUpdateInput:
     return RoutineUpdateInput(
-        routine_id=1,
         title="점심 루틴",
         start_time_minutes=120,
         repeat_days=[1, 2, 3],

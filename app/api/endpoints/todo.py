@@ -39,11 +39,13 @@ def get_todo(
 def create_todo(
     data: TodoBase,
     dao: TodoDAO = Depends(get_todo_dao),
+    tx_manager: contextmanager = Depends(tx_manager),
 ):
-    todo = dao.create_todo(
-        title=data.title,
-        content=data.content,
-    )
+    with tx_manager:
+        todo = dao.create_todo(
+            title=data.title,
+            content=data.content,
+        )
 
     return Response(
         status_code=status.HTTP_201_CREATED, data=TodoDetail.from_orm(todo)
