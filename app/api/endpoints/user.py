@@ -1,14 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from werkzeug.security import check_password_hash
-from app.api.strings import (
-    INVALID_LOGIN_ERROR,
-    SERVER_UNTRACKED_ERROR,
-    USERNAME_CANNOT_BE_CHANGED_ERROR,
-)
+from contextlib import contextmanager
+from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
-from app.database.db import get_db
+from app.dao import get_user_dao
+from app.dao.user_dao import UserDAO
+from app.database.db import tx_manager
+from app.models.models import User
 from app.schemas.response import Response
 from app.schemas.user import UserData, UserUpdateInput
 
@@ -22,7 +19,7 @@ router = APIRouter(
 @router.get(
     "/me", response_model=Response[UserData], status_code=status.HTTP_200_OK
 )
-def get_me(db: Session = Depends(get_db), user=Depends(get_current_user)):
+def get_me(user: User = Depends(get_current_user)):
     return Response(
         status_code=status.HTTP_200_OK,
         data=UserData.from_orm(user),
@@ -35,42 +32,13 @@ def get_me(db: Session = Depends(get_db), user=Depends(get_current_user)):
 )
 def update_me(
     data: UserUpdateInput,
-    db: Session = Depends(get_db),
     user=Depends(get_current_user),
+    user_dao: UserDAO = Depends(get_user_dao),
+    tx_manager: contextmanager = Depends(tx_manager),
 ):
-    if data.username != user.username:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=USERNAME_CANNOT_BE_CHANGED_ERROR,
-        )
+    with tx_manager:
+        user = user_dao.update_me(data)
 
-    if not check_password_hash(user.password, data.password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=INVALID_LOGIN_ERROR,
-        )
-
-    if data.email:
-        user.email = data.email
-
-    if data.profile_image == "":
-        user.profile_image = None
-    elif data.profile_image:
-        user.profile_image = data.profile_image
-
-    if data.nickname:
-        user.nickname = data.nickname
-
-    try:
-        db.commit()
-
-        return Response(
-            status_code=status.HTTP_200_OK, data=UserData.from_orm(user)
-        )
-
-    except Exception:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=SERVER_UNTRACKED_ERROR,
-        )
+    return Response(
+        status_code=status.HTTP_200_OK, data=UserData.from_orm(user)
+    )

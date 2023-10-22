@@ -1,13 +1,9 @@
-from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session, joinedload
-from app.api.strings import (
-    ROUTINE_DOES_NOT_EXIST_ERROR,
-    SERVER_UNTRACKED_ERROR,
-)
+from contextlib import contextmanager
+from fastapi import APIRouter, Depends, status
 from app.core.auth import get_current_user
-from app.database.db import get_db
-from app.models.models import Routine, User
+from app.dao import get_routine_dao
+from app.dao.routine_dao import RoutineDAO
+from app.database.db import tx_manager
 from app.repositories import get_routine_repository
 from app.repositories.routine_repository import RoutineRepository
 from app.schemas.response import Response
@@ -31,11 +27,11 @@ router = APIRouter(
 )
 def create_routine(
     data: RoutineCreateInput,
-    db: Session = Depends(get_db),
     repository: RoutineRepository = Depends(get_routine_repository),
-    user: User = Depends(get_current_user),
+    tx_manager: contextmanager = Depends(tx_manager),
 ):
-    routine = repository.create_routine(data)
+    with tx_manager:
+        routine = repository.create_routine(data)
 
     return Response(
         data=routine,
@@ -49,27 +45,8 @@ def create_routine(
     response_model=Response[RoutineDetail],
     status_code=status.HTTP_200_OK,
 )
-def get_routine(
-    routine_id: int,
-    db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    routine = (
-        db.query(Routine)
-        .options(joinedload(Routine.routine_elements))
-        .filter(
-            Routine.id == routine_id,
-            Routine.user_id == user.id,
-            Routine.deleted_at.is_(None),
-        )
-        .first()
-    )
-
-    if not routine:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=ROUTINE_DOES_NOT_EXIST_ERROR,
-        )
+def get_routine(routine_id: int, dao: RoutineDAO = Depends(get_routine_dao)):
+    routine = dao.get_routine_with_elements_by_id(routine_id)
 
     response = Response(
         data=RoutineDetail.from_routine(routine, routine.routine_elements),
@@ -87,36 +64,13 @@ def get_routine(
 )
 def delete_routine(
     routine_id: int,
-    db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
+    dao: RoutineDAO = Depends(get_routine_dao),
+    tx_manager: contextmanager = Depends(tx_manager),
 ):
-    routine = (
-        db.query(Routine)
-        .filter(
-            Routine.id == routine_id,
-            Routine.user_id == user.id,
-            Routine.deleted_at.is_(None),
-        )
-        .first()
-    )
+    with tx_manager:
+        dao.soft_delete_routine(routine_id)
 
-    if not routine:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=ROUTINE_DOES_NOT_EXIST_ERROR,
-        )
-
-    try:
-        routine.deleted_at = datetime.now()
-        db.commit()
-
-        return None
-    except Exception:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=SERVER_UNTRACKED_ERROR,
-        )
+    return None
 
 
 @router.put(
@@ -128,9 +82,12 @@ def update_routine(
     routine_id: int,
     data: RoutineUpdateInput,
     repository: RoutineRepository = Depends(get_routine_repository),
-    user: User = Depends(get_current_user),
+    tx_manager: contextmanager = Depends(tx_manager),
 ):
-    routine = repository.update_routine(data)
+    with tx_manager:
+        routine = repository.update_routine(
+            routine_id=routine_id, routine=data
+        )
 
     return Response(
         data=RoutineDetail.from_routine(routine, routine.routine_elements),

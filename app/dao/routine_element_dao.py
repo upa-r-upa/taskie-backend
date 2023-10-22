@@ -1,4 +1,3 @@
-from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException, status
 
 from app.dao.base import ProtectedBaseDAO
@@ -47,18 +46,11 @@ class RoutineElementDAO(ProtectedBaseDAO):
         order: int | None,
         duration_minutes: int | None,
     ):
-        try:
-            routine_element.title = title or routine_element.title
-            routine_element.order = order or routine_element.order
-            routine_element.duration_minutes = (
-                duration_minutes or routine_element.duration_minutes
-            )
-            self.db.flush()
-        except SQLAlchemyError:
-            self.db.rollback()
-            raise Exception("Failed to update routine element")
-        else:
-            self.db.commit()
+        routine_element.title = title or routine_element.title
+        routine_element.order = order or routine_element.order
+        routine_element.duration_minutes = (
+            duration_minutes or routine_element.duration_minutes
+        )
 
         return routine_element
 
@@ -80,14 +72,7 @@ class RoutineElementDAO(ProtectedBaseDAO):
         return routine_element_result
 
     def delete_routine_element(self, routine_element: RoutineElement) -> None:
-        try:
-            self.db.delete(routine_element)
-            self.db.flush()
-        except SQLAlchemyError:
-            self.db.rollback()
-            raise Exception("Failed to delete routine element")
-        else:
-            self.db.commit()
+        self.db.delete(routine_element)
 
     def delete_routine_element_by_id(self, routine_element_id: int) -> None:
         routine_element = self.get_routine_element_by_id(routine_element_id)
@@ -100,22 +85,15 @@ class RoutineElementDAO(ProtectedBaseDAO):
         order: int,
         duration_minutes: int,
     ) -> RoutineElement:
-        try:
-            routine_element = RoutineElement(
-                user_id=self.user_id,
-                routine_id=routine_id,
-                title=title,
-                order=order,
-                duration_minutes=duration_minutes,
-            )
+        routine_element = RoutineElement(
+            user_id=self.user_id,
+            routine_id=routine_id,
+            title=title,
+            order=order,
+            duration_minutes=duration_minutes,
+        )
 
-            self.db.add(routine_element)
-            self.db.flush()
-        except SQLAlchemyError:
-            self.db.rollback()
-            raise Exception("Failed to create routine element")
-        else:
-            self.db.commit()
+        self.db.add(routine_element)
 
         return routine_element
 
@@ -180,13 +158,6 @@ class RoutineElementDAO(ProtectedBaseDAO):
             for index, item in enumerate(routine_elements)
         ]
 
-        try:
-            self.db.add_all(elements)
-            self.db.flush()
-        except SQLAlchemyError:
-            self.db.rollback()
-            raise Exception("Failed to create routine elements")
-        else:
-            self.db.commit()
+        self.db.add_all(elements)
 
         return elements

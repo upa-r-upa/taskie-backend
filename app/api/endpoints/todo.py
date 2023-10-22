@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from app.api.strings import SERVER_UNTRACKED_ERROR, TODO_DOES_NOT_EXIST_ERROR
+from contextlib import contextmanager
+from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
-from app.database.db import get_db
-from app.models.models import Todo, User
+from app.dao import get_todo_dao
+from app.dao.todo_dao import TodoDAO
+from app.database.db import tx_manager
 from app.schemas.response import Response
 from app.schemas.todo import TodoBase, TodoDetail
 
@@ -22,20 +22,9 @@ router = APIRouter(
 )
 def get_todo(
     todo_id: int,
-    db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
+    dao: TodoDAO = Depends(get_todo_dao),
 ):
-    todo = (
-        db.query(Todo)
-        .filter(Todo.id == todo_id, Todo.user_id == user.id)
-        .first()
-    )
-
-    if not todo:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=TODO_DOES_NOT_EXIST_ERROR,
-        )
+    todo = dao.get_todo_by_id(todo_id=todo_id)
 
     return Response(
         status_code=status.HTTP_200_OK, data=TodoDetail.from_orm(todo)
@@ -49,29 +38,18 @@ def get_todo(
 )
 def create_todo(
     data: TodoBase,
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user),
+    dao: TodoDAO = Depends(get_todo_dao),
+    tx_manager: contextmanager = Depends(tx_manager),
 ):
-    todo = Todo(
-        title=data.title,
-        content=data.content,
-        user_id=user.id,
+    with tx_manager:
+        todo = dao.create_todo(
+            title=data.title,
+            content=data.content,
+        )
+
+    return Response(
+        status_code=status.HTTP_201_CREATED, data=TodoDetail.from_orm(todo)
     )
-
-    try:
-        db.add(todo)
-        db.commit()
-
-        return Response(
-            status_code=status.HTTP_201_CREATED, data=TodoDetail.from_orm(todo)
-        )
-
-    except Exception:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=SERVER_UNTRACKED_ERROR,
-        )
 
 
 @router.put(
@@ -82,37 +60,19 @@ def create_todo(
 def update_todo(
     todo_id: int,
     data: TodoBase,
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user),
+    todo_dao: TodoDAO = Depends(get_todo_dao),
+    tx_manager: contextmanager = Depends(tx_manager),
 ):
-    todo = (
-        db.query(Todo)
-        .filter(Todo.id == todo_id)
-        .filter(Todo.user_id == user.id)
-        .first()
+    with tx_manager:
+        todo = todo_dao.update_todo(
+            todo_id=todo_id,
+            title=data.title,
+            content=data.content,
+        )
+
+    return Response(
+        status_code=status.HTTP_200_OK, data=TodoDetail.from_orm(todo)
     )
-
-    if not todo:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=TODO_DOES_NOT_EXIST_ERROR,
-        )
-
-    todo.title = data.title
-    todo.content = data.content
-
-    try:
-        db.commit()
-
-        return Response(
-            status_code=status.HTTP_200_OK, data=TodoDetail.from_orm(todo)
-        )
-    except Exception:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=SERVER_UNTRACKED_ERROR,
-        )
 
 
 @router.delete(
@@ -122,30 +82,12 @@ def update_todo(
 )
 def delete_todo(
     todo_id: int,
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user),
+    todo_dao: TodoDAO = Depends(get_todo_dao),
+    tx_manager: contextmanager = Depends(tx_manager),
 ):
-    todo = (
-        db.query(Todo)
-        .filter(Todo.id == todo_id)
-        .filter(Todo.user_id == user.id)
-        .first()
-    )
-
-    if not todo:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=TODO_DOES_NOT_EXIST_ERROR,
+    with tx_manager:
+        todo_dao.delete_todo(
+            todo_id=todo_id,
         )
 
-    try:
-        db.delete(todo)
-        db.commit()
-
-        return None
-    except Exception:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=SERVER_UNTRACKED_ERROR,
-        )
+    return None

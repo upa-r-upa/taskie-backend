@@ -72,8 +72,6 @@ class RoutineItemUpdate(RoutineItemBase):
 
 
 class RoutineUpdateInput(BaseModel):
-    routine_id: int
-
     title: str | None
     start_time_minutes: int | None
     repeat_days: List[int] | None

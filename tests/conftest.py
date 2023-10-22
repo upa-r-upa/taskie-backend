@@ -14,9 +14,9 @@ from app.models.models import User
 from app.core.auth import generate_access_token
 from app.main import app as client_app
 
-engine = create_engine(os.environ.get("TSK_SQLALCHEMY_URL"))
+engine = create_engine(os.environ.get("TSK_SQLALCHEMY_URL"), echo=True)
 TestingSessionLocal = sessionmaker(
-    autocommit=False, autoflush=False, bind=engine
+    bind=engine, autocommit=False, autoflush=False
 )
 
 
@@ -32,15 +32,11 @@ def app():
 
 @pytest.fixture
 def session(app: FastAPI):
-    connection = engine.connect()
-    transaction = connection.begin()
-    session = Session(bind=connection)
+    session = TestingSessionLocal()
 
     yield session
 
     session.close()
-    transaction.rollback()
-    connection.close()
 
 
 @pytest.fixture()
