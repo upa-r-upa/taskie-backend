@@ -34,6 +34,7 @@ class RoutineElementDAO(ProtectedBaseDAO):
                 RoutineElement.routine_id == routine_id,
                 RoutineElement.user_id == self.user_id,
             )
+            .order_by(RoutineElement.order.asc())
             .all()
         )
 

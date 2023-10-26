@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import List
 from fastapi import HTTPException, status
-from sqlalchemy.orm import joinedload
 from app.api.strings import ROUTINE_DOES_NOT_EXIST_ERROR
 from app.dao.base import ProtectedBaseDAO
 from app.models.models import Routine
@@ -30,7 +29,6 @@ class RoutineDAO(ProtectedBaseDAO):
     def get_routine_with_elements_by_id(self, routine_id: int) -> Routine:
         routine = (
             self.db.query(Routine)
-            .options(joinedload(Routine.routine_elements))
             .filter(
                 Routine.id == routine_id,
                 Routine.user_id == self.user_id,

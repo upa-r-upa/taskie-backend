@@ -94,7 +94,11 @@ class Routine(Base):
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
     user = relationship("User", back_populates="routines")
-    routine_elements = relationship("RoutineElement", back_populates="routine")
+    routine_elements = relationship(
+        "RoutineElement",
+        back_populates="routine",
+        order_by="RoutineElement.order.asc()",
+    )
 
     @validator("repeat_days")
     def validate_repeat_days(cls, v):
