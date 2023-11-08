@@ -1,6 +1,14 @@
 from datetime import datetime
 from pydantic import validator
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, TIMESTAMP
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Text,
+    ForeignKey,
+    TIMESTAMP,
+    func,
+)
 from sqlalchemy.orm import relationship
 
 from app.database.db import Base
@@ -16,7 +24,7 @@ class User(Base):
     grade = Column(Integer, nullable=False)
     profile_image = Column(String(100))
     nickname = Column(String(50))
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
+    created_at = Column(TIMESTAMP, default=func.now())
 
     todos = relationship("Todo", back_populates="user")
     habits = relationship("Habit", back_populates="user")
@@ -31,8 +39,8 @@ class Todo(Base):
     title = Column(String(100), nullable=False)
     content = Column(Text)
     completed = Column(Integer, default=0)
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
-    updated_at = Column(TIMESTAMP, default=datetime.utcnow)
+    created_at = Column(TIMESTAMP, default=func.now())
+    updated_at = Column(TIMESTAMP, default=func.now())
 
     user_id = Column(
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
@@ -50,10 +58,8 @@ class Habit(Base):
     active = Column(Integer, default=0)
     deleted_at = Column(TIMESTAMP)
 
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
-    updated_at = Column(
-        TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    created_at = Column(TIMESTAMP, default=func.now())
+    updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
 
     user_id = Column(
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
@@ -67,7 +73,7 @@ class HabitLog(Base):
 
     id = Column(Integer, primary_key=True)
 
-    completed_at = Column(TIMESTAMP)
+    completed_at = Column(TIMESTAMP, onupdate=func.now())
 
     habit_id = Column(
         Integer, ForeignKey("habit.id", ondelete="CASCADE"), nullable=False
@@ -85,10 +91,8 @@ class Routine(Base):
     repeat_days = Column(Text, nullable=False)
     deleted_at = Column(TIMESTAMP)
 
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
-    updated_at = Column(
-        TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    created_at = Column(TIMESTAMP, default=func.now())
+    updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
 
     user_id = Column(
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
@@ -162,10 +166,8 @@ class RoutineElement(Base):
     order = Column(Integer, nullable=False)
     duration_minutes = Column(Integer)
 
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
-    updated_at = Column(
-        TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    created_at = Column(TIMESTAMP, default=func.now())
+    updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
 
     deleted_at = Column(TIMESTAMP)
 
@@ -186,7 +188,7 @@ class RoutineLog(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
-    completed_at = Column(TIMESTAMP)
+    completed_at = Column(TIMESTAMP, default=func.now())
 
     routine_element_id = Column(
         Integer, ForeignKey("routine_element.id"), nullable=False
