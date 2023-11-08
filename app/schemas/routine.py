@@ -77,3 +77,8 @@ class RoutineUpdateInput(BaseModel):
     repeat_days: List[int] | None
 
     routine_elements: List[RoutineItemUpdate] | None
+
+
+class RoutineItemCompleteUpdate(BaseModel):
+    completed: bool
+    item_ids: List[int]

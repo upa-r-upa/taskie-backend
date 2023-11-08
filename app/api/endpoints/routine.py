@@ -1,8 +1,9 @@
 from contextlib import contextmanager
 from fastapi import APIRouter, Depends, status
 from app.core.auth import get_current_user
-from app.dao import get_routine_dao
+from app.dao import get_routine_dao, get_routine_log_dao
 from app.dao.routine_dao import RoutineDAO
+from app.dao.routine_log_dao import RoutineLogDAO
 from app.database.db import tx_manager
 from app.repositories import get_routine_repository
 from app.repositories.routine_repository import RoutineRepository
@@ -10,6 +11,7 @@ from app.schemas.response import Response
 from app.schemas.routine import (
     RoutineCreateInput,
     RoutineDetail,
+    RoutineItemCompleteUpdate,
     RoutineUpdateInput,
 )
 
@@ -35,7 +37,6 @@ def create_routine(
 
     return Response(
         data=routine,
-        message="Routine created successfully",
         status_code=status.HTTP_201_CREATED,
     )
 
@@ -50,7 +51,6 @@ def get_routine(routine_id: int, dao: RoutineDAO = Depends(get_routine_dao)):
 
     response = Response(
         data=RoutineDetail.from_routine(routine, routine.routine_elements),
-        message="Routine retrieved successfully",
         status_code=status.HTTP_200_OK,
     )
 
@@ -91,6 +91,23 @@ def update_routine(
 
     return Response(
         data=RoutineDetail.from_routine(routine, routine.routine_elements),
-        message="Routine updated successfully",
         status_code=status.HTTP_200_OK,
     )
+
+
+@router.put(
+    "/log/complete",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def update_routine_element_complete(
+    data: RoutineItemCompleteUpdate,
+    routine_log_dao: RoutineLogDAO = Depends(get_routine_log_dao),
+    tx_manager: contextmanager = Depends(tx_manager),
+):
+    with tx_manager:
+        routine_log_dao.update_logs_complete(
+            completed=data.completed, item_ids=data.item_ids
+        )
+
+    return None
