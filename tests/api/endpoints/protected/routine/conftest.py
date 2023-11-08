@@ -1,11 +1,13 @@
+from typing import List
 import pytest
 from sqlalchemy.orm import Session
-from app.models.models import Routine, RoutineElement, User
+from app.models.models import Routine, RoutineElement, RoutineLog, User
 
 from app.schemas.routine import (
     RoutineCreateInput,
     RoutineDetail,
     RoutineItem,
+    RoutineItemCompleteUpdate,
     RoutineItemUpdate,
     RoutineUpdateInput,
 )
@@ -25,7 +27,7 @@ def routine_data() -> RoutineCreateInput:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def update_routine_only_routine_data() -> RoutineUpdateInput:
     return RoutineUpdateInput(
         title="점심 루틴",
@@ -34,14 +36,14 @@ def update_routine_only_routine_data() -> RoutineUpdateInput:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def update_routine_empty_routine_elements() -> RoutineUpdateInput:
     return RoutineUpdateInput(
         routine_elements=[],
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def update_routine_only_elements_data() -> RoutineUpdateInput:
     return RoutineUpdateInput(
         routine_elements=[
@@ -115,3 +117,32 @@ def add_routine(
             for item in routine_elements
         ],
     )
+
+
+@pytest.fixture
+def add_routine_log__complete(
+    session: Session, add_routine: RoutineDetail
+) -> List[RoutineLog]:
+    routine_log = [
+        RoutineLog(
+            routine_element_id=1,
+        ),
+        RoutineLog(
+            routine_element_id=2,
+        ),
+    ]
+
+    session.add_all(routine_log)
+    session.commit()
+
+    return routine_log
+
+
+@pytest.fixture
+def update_log_data__complete() -> RoutineItemCompleteUpdate:
+    return RoutineItemCompleteUpdate(completed=True, item_ids=[1, 2, 3, 4])
+
+
+@pytest.fixture
+def update_log_data__incomplete() -> RoutineItemCompleteUpdate:
+    return RoutineItemCompleteUpdate(completed=False, item_ids=[1, 2, 3, 4])

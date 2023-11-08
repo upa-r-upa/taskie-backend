@@ -1,10 +1,13 @@
+from datetime import datetime
+from typing import List
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-from app.models.models import Routine, RoutineElement
+from app.models.models import Routine, RoutineElement, RoutineLog
 
 from app.schemas.routine import (
     RoutineCreateInput,
     RoutineDetail,
+    RoutineItemCompleteUpdate,
     RoutineUpdateInput,
 )
 
@@ -230,3 +233,115 @@ def test_update_routine_empty_routine_elements(
     assert response_data.repeat_days == add_routine.repeat_days
 
     assert len(response_data.routine_elements) == 0
+
+
+def is_timestamp_on_today(timestamp) -> bool:
+    today_date = datetime.now().date()
+
+    timestamp_date = timestamp.date()
+
+    return today_date == timestamp_date
+
+
+def test_update_routine_element_complete__complete(
+    client: TestClient,
+    session: Session,
+    access_token: str,
+    add_routine: RoutineDetail,
+    update_log_data__complete: RoutineItemCompleteUpdate,
+):
+    response = client.put(
+        "/routine/log/complete",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json=update_log_data__complete.dict(),
+    )
+
+    assert response.status_code == 204
+
+    assert (
+        session.query(RoutineLog)
+        .filter(
+            RoutineLog.routine_element_id == 1
+            and is_timestamp_on_today(RoutineLog.completed_at)
+        )
+        .first()
+    )
+
+    assert (
+        session.query(RoutineLog)
+        .filter(
+            RoutineLog.routine_element_id == 2
+            and is_timestamp_on_today(RoutineLog.completed_at)
+        )
+        .first()
+    )
+
+    assert (
+        session.query(RoutineLog)
+        .filter(
+            RoutineLog.routine_element_id == 3
+            and is_timestamp_on_today(RoutineLog.completed_at)
+        )
+        .first()
+    )
+
+    assert (
+        session.query(RoutineLog)
+        .filter(
+            RoutineLog.routine_element_id == 4
+            and is_timestamp_on_today(RoutineLog.completed_at)
+        )
+        .first()
+    )
+
+
+def test_update_routine_element_complete__incomplete(
+    client: TestClient,
+    session: Session,
+    access_token: str,
+    add_routine_log__complete: List[RoutineLog],
+    update_log_data__incomplete: RoutineItemCompleteUpdate,
+):
+    response = client.put(
+        "/routine/log/complete",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json=update_log_data__incomplete.dict(),
+    )
+
+    assert response.status_code == 204
+
+    assert (
+        session.query(RoutineLog)
+        .filter(
+            RoutineLog.routine_element_id == 1
+            and is_timestamp_on_today(RoutineLog.completed_at)
+        )
+        .first()
+    ) is None
+
+    assert (
+        session.query(RoutineLog)
+        .filter(
+            RoutineLog.routine_element_id == 2
+            and is_timestamp_on_today(RoutineLog.completed_at)
+        )
+        .first()
+    ) is None
+
+    assert (
+        session.query(RoutineLog)
+        .filter(
+            RoutineLog.routine_element_id == 3
+            and is_timestamp_on_today(RoutineLog.completed_at)
+        )
+        .first()
+    ) is None
+
+    assert (
+        session.query(RoutineLog)
+        .filter(
+            RoutineLog.routine_element_id == 4
+            and is_timestamp_on_today(RoutineLog.completed_at)
+        )
+        .first()
+    ) is None

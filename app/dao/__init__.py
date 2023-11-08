@@ -9,6 +9,7 @@ from .routine_element_dao import RoutineElementDAO
 from .todo_dao import TodoDAO
 from .auth_dao import AuthDAO
 from .user_dao import UserDAO
+from .routine_log_dao import RoutineLogDAO
 
 
 def get_routine_dao(
@@ -40,3 +41,9 @@ def get_user_dao(
     session: Session = Depends(get_db), user: User = Depends(get_current_user)
 ) -> UserDAO:
     return UserDAO(db=session, user=user)
+
+
+def get_routine_log_dao(
+    session: Session = Depends(get_db), user: User = Depends(get_current_user)
+) -> RoutineLogDAO:
+    return RoutineLogDAO(db=session, user=user)
