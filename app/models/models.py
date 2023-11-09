@@ -48,6 +48,12 @@ class Todo(Base):
     )
     user = relationship("User", back_populates="todos")
 
+    @validator("title")
+    def title_must_not_be_empty(cls, v):
+        if not v:
+            raise ValueError("Title must not be empty")
+        return v
+
 
 class Habit(Base):
     __tablename__ = "habit"

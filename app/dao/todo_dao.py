@@ -41,46 +41,13 @@ class TodoDAO(ProtectedBaseDAO):
     def create_todo(
         self,
         title: str,
+        order: int,
         content: str = None,
     ) -> Todo:
-        # def sql() -> Todo:
-        #     query = text(
-        #         """
-        #             INSERT INTO todo (
-        #                 title, content, user_id,
-        #                 completed, created_at, updated_at
-        #                 )
-        #             VALUES (
-        #                 :title, :content, :user_id, 0,
-        #                 datetime('now'), datetime('now')
-        #                 )
-        #         """
-        #     )
-
-        #     values = {
-        #         "title": title,
-        #         "content": content,
-        #         "user_id": self.user_id,
-        #     }
-        #     try:
-        #         self.db.execute(query, values)
-        #         self.db.flush()
-
-        #     except Exception:
-        #         self.db.rollback()
-        #         raise Exception("Failed to create todo")
-        #     else:
-        #         self.db.commit()
-
-        #         todo_id = self.db.execute(
-        #             text("SELECT last_insert_rowid()")
-        #         ).scalar()
-
-        #         return self.get_todo_by_id(todo_id=todo_id)
-
         todo = Todo(
             title=title,
             content=content,
+            order=order,
             user_id=self.user_id,
         )
 
