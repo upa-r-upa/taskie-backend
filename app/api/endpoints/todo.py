@@ -6,7 +6,12 @@ from app.dao import get_todo_dao
 from app.dao.todo_dao import TodoDAO
 from app.database.db import tx_manager
 from app.schemas.response import Response
-from app.schemas.todo import TodoBase, TodoDetail, TodoUpdateInput
+from app.schemas.todo import (
+    TodoBase,
+    TodoDetail,
+    TodoOrderUpdateInput,
+    TodoUpdateInput,
+)
 
 router = APIRouter(
     prefix="/todo",
@@ -51,6 +56,24 @@ def create_todo(
     return Response(
         status_code=status.HTTP_201_CREATED, data=TodoDetail.from_orm(todo)
     )
+
+
+@router.put(
+    "/order",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def update_todo_list_order(
+    data: TodoOrderUpdateInput,
+    dao: TodoDAO = Depends(get_todo_dao),
+    tx_manager: contextmanager = Depends(tx_manager),
+):
+    with tx_manager:
+        dao.update_todo_list_order(
+            todo_list=data.todo_list,
+        )
+
+    return None
 
 
 @router.put(

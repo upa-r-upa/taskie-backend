@@ -24,3 +24,12 @@ class TodoDetail(TodoBase):
 
     class Config:
         orm_mode = True
+
+
+class TodoOrderUpdate(BaseModel):
+    id: int
+    order: int
+
+
+class TodoOrderUpdateInput(BaseModel):
+    todo_list: list[TodoOrderUpdate]
