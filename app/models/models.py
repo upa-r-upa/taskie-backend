@@ -41,11 +41,18 @@ class Todo(Base):
     completed = Column(Integer, default=0)
     created_at = Column(TIMESTAMP, default=func.now())
     updated_at = Column(TIMESTAMP, default=func.now())
+    order = Column(Integer, nullable=False)
 
     user_id = Column(
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
     user = relationship("User", back_populates="todos")
+
+    @validator("title")
+    def title_must_not_be_empty(cls, v):
+        if not v:
+            raise ValueError("Title must not be empty")
+        return v
 
 
 class Habit(Base):

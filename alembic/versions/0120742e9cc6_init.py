@@ -71,6 +71,7 @@ def upgrade() -> None:
         sa.Column("created_at", sa.TIMESTAMP(), nullable=True),
         sa.Column("updated_at", sa.TIMESTAMP(), nullable=True),
         sa.Column("user_id", sa.Integer(), nullable=False),
+        sa.Column("order", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )

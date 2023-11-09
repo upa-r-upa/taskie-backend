@@ -1,6 +1,8 @@
+from typing import List
 from fastapi import HTTPException, status
 from app.api.strings import TODO_DOES_NOT_EXIST_ERROR
 from app.models.models import Todo
+from app.schemas.todo import TodoOrderUpdate
 
 from .base import ProtectedBaseDAO
 
@@ -41,46 +43,13 @@ class TodoDAO(ProtectedBaseDAO):
     def create_todo(
         self,
         title: str,
+        order: int,
         content: str = None,
     ) -> Todo:
-        # def sql() -> Todo:
-        #     query = text(
-        #         """
-        #             INSERT INTO todo (
-        #                 title, content, user_id,
-        #                 completed, created_at, updated_at
-        #                 )
-        #             VALUES (
-        #                 :title, :content, :user_id, 0,
-        #                 datetime('now'), datetime('now')
-        #                 )
-        #         """
-        #     )
-
-        #     values = {
-        #         "title": title,
-        #         "content": content,
-        #         "user_id": self.user_id,
-        #     }
-        #     try:
-        #         self.db.execute(query, values)
-        #         self.db.flush()
-
-        #     except Exception:
-        #         self.db.rollback()
-        #         raise Exception("Failed to create todo")
-        #     else:
-        #         self.db.commit()
-
-        #         todo_id = self.db.execute(
-        #             text("SELECT last_insert_rowid()")
-        #         ).scalar()
-
-        #         return self.get_todo_by_id(todo_id=todo_id)
-
         todo = Todo(
             title=title,
             content=content,
+            order=order,
             user_id=self.user_id,
         )
 
@@ -112,11 +81,7 @@ class TodoDAO(ProtectedBaseDAO):
 
         #     return self.get_todo_by_id(todo_id=todo_id)
 
-        todo = (
-            self.db.query(Todo)
-            .filter(Todo.id == todo_id, Todo.user_id == self.user_id)
-            .first()
-        )
+        todo = self.get_todo_by_id(todo_id=todo_id)
 
         if not todo:
             raise HTTPException(
@@ -145,11 +110,7 @@ class TodoDAO(ProtectedBaseDAO):
 
         #     return None
 
-        todo = (
-            self.db.query(Todo)
-            .filter(Todo.id == todo_id, Todo.user_id == self.user_id)
-            .first()
-        )
+        todo = self.get_todo_by_id(todo_id=todo_id)
 
         if not todo:
             raise HTTPException(
@@ -158,5 +119,14 @@ class TodoDAO(ProtectedBaseDAO):
             )
 
         self.db.delete(todo)
+
+        return None
+
+    def update_todo_list_order(self, todo_list: List[TodoOrderUpdate]) -> None:
+        for todo in todo_list:
+            # UPDATE todo SET order = :order WHERE id = :todo_id
+            target_todo = self.get_todo_by_id(todo_id=todo.id)
+
+            target_todo.order = todo.order
 
         return None
