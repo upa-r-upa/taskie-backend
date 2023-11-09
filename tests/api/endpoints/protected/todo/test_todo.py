@@ -1,8 +1,9 @@
+from typing import List
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app.models.models import Todo
-from app.schemas.todo import TodoDetail, TodoBase
+from app.schemas.todo import TodoDetail, TodoBase, TodoOrderUpdateInput
 
 
 def test_get_todo(client: TestClient, add_todo: Todo, access_token: str):
@@ -78,3 +79,41 @@ def test_delete_todo(
     assert response.status_code == 204
 
     assert session.query(Todo).filter(Todo.id == add_todo.id).first() is None
+
+
+def test_update_todo_list_order(
+    client: TestClient,
+    session: Session,
+    access_token: str,
+    add_todo_list: List[Todo],
+    todo_order_update_data: TodoOrderUpdateInput,
+):
+    response = client.put(
+        "/todo/order",
+        json=todo_order_update_data.dict(),
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 204
+
+    assert (
+        session.query(Todo)
+        .filter(Todo.id == add_todo_list[0].id)
+        .first()
+        .order
+        == 3
+    )
+    assert (
+        session.query(Todo)
+        .filter(Todo.id == add_todo_list[1].id)
+        .first()
+        .order
+        == 1
+    )
+    assert (
+        session.query(Todo)
+        .filter(Todo.id == add_todo_list[2].id)
+        .first()
+        .order
+        == 2
+    )
