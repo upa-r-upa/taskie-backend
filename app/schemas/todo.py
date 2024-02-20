@@ -33,3 +33,13 @@ class TodoOrderUpdate(BaseModel):
 
 class TodoOrderUpdateInput(BaseModel):
     todo_list: list[TodoOrderUpdate]
+
+
+class TodoListGetInput(BaseModel):
+    limit: int
+    offset: int
+
+    start_date: str = None
+    end_date: str = None
+
+    completed: int = 0
