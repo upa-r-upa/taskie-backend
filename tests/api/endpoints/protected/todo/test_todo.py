@@ -3,7 +3,12 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app.models.models import Todo
-from app.schemas.todo import TodoDetail, TodoBase, TodoOrderUpdateInput
+from app.schemas.todo import (
+    TodoDetail,
+    TodoBase,
+    TodoListGetInput,
+    TodoOrderUpdateInput,
+)
 
 
 def test_get_todo(client: TestClient, add_todo: Todo, access_token: str):
@@ -117,3 +122,127 @@ def test_update_todo_list_order(
         .order
         == 2
     )
+
+
+def test_get_todo_list__valid_page_and_offset__1_page(
+    client: TestClient,
+    session: Session,
+    access_token: str,
+    add_todo_list_with_date: List[Todo],
+):
+    params = TodoListGetInput(limit=3, offset=0, completed=0)
+
+    response = client.get(
+        "/todo",
+        params=params.dict(),
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json().get("data")
+
+    assert len(response_data) == 3
+    assert response_data[0].get("id") == add_todo_list_with_date[0].id
+    assert response_data[1].get("id") == add_todo_list_with_date[1].id
+    assert response_data[2].get("id") == add_todo_list_with_date[2].id
+
+
+def test_get_todo_list__valid_page_and_offset__2_page(
+    client: TestClient,
+    session: Session,
+    access_token: str,
+    add_todo_list_with_date: List[Todo],
+):
+    params = TodoListGetInput(limit=3, offset=3, completed=0)
+
+    response = client.get(
+        "/todo",
+        params=params.dict(),
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json().get("data")
+
+    assert len(response_data) == 3
+    assert response_data[0].get("id") == add_todo_list_with_date[3].id
+    assert response_data[1].get("id") == add_todo_list_with_date[4].id
+    assert response_data[2].get("id") == add_todo_list_with_date[5].id
+
+
+def test_get_todo_list__valid_date_range(
+    client: TestClient,
+    session: Session,
+    access_token: str,
+    add_todo_list_with_date: List[Todo],
+):
+
+    params = TodoListGetInput(
+        limit=3,
+        offset=0,
+        completed=0,
+        start_date="2023-11-04",
+        end_date="2023-11-06",
+    )
+
+    response = client.get(
+        "/todo",
+        params=params.dict(),
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json().get("data")
+
+    assert len(response_data) == 2
+    assert response_data[0].get("id") == add_todo_list_with_date[4].id
+    assert response_data[1].get("id") == add_todo_list_with_date[5].id
+
+
+def test_get_todo_list_invalid_date_range(
+    client: TestClient,
+    session: Session,
+    access_token: str,
+    add_todo_list_with_date: List[Todo],
+):
+    params = TodoListGetInput(
+        limit=3,
+        offset=0,
+        completed=0,
+        start_date="2023",
+        end_date="2023-11-06",
+    )
+
+    response = client.get(
+        "/todo",
+        params=params.dict(),
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 400
+
+
+def test_get_todo_list__complete(
+    client: TestClient,
+    session: Session,
+    access_token: str,
+    add_todo_list_with_date: List[Todo],
+):
+    params = TodoListGetInput(limit=3, offset=0, completed=1)
+
+    response = client.get(
+        "/todo",
+        params=params.dict(),
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json().get("data")
+
+    assert len(response_data) == 2
+    assert response_data[0].get("id") == add_todo_list_with_date[8].id
+    assert response_data[1].get("id") == add_todo_list_with_date[7].id

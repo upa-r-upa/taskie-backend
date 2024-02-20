@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 import pytest
 from sqlalchemy.orm import Session
@@ -66,3 +67,84 @@ def todo_order_update_data() -> TodoOrderUpdateInput:
             TodoOrderUpdate(id=3, order=2),
         ]
     )
+
+
+@pytest.fixture
+def todo_list_with_date() -> List[Todo]:
+    return [
+        Todo(
+            title="Test title 1",
+            content="Test content 1",
+            order=1,
+            updated_at=datetime(2023, 11, 9, 0, 0, 0),
+            user_id=1,
+        ),
+        Todo(
+            title="Test title 2",
+            content="Test content 2",
+            order=2,
+            updated_at=datetime(2023, 11, 8, 0, 0, 0),
+            user_id=1,
+        ),
+        Todo(
+            title="Test title 3",
+            content="Test content 3",
+            order=3,
+            updated_at=datetime(2023, 11, 7, 0, 0, 0),
+            user_id=1,
+        ),
+        Todo(
+            title="Test title 4",
+            content="Test content 4",
+            order=4,
+            updated_at=datetime(2023, 11, 6, 0, 0, 0),
+            user_id=1,
+        ),
+        Todo(
+            title="Test title 5",
+            content="Test content 5",
+            order=5,
+            updated_at=datetime(2023, 11, 5, 0, 0, 0),
+            user_id=1,
+        ),
+        Todo(
+            title="Test title 6",
+            content="Test content 6",
+            order=6,
+            updated_at=datetime(2023, 11, 4, 0, 0, 0),
+            user_id=1,
+        ),
+        Todo(
+            title="Test title 7",
+            content="Test content 7",
+            order=7,
+            updated_at=datetime(2023, 11, 3, 0, 0, 0),
+            user_id=1,
+        ),
+        Todo(
+            title="Test title 8",
+            content="Test content 8",
+            order=8,
+            completed=1,
+            updated_at=datetime(2023, 11, 9, 0, 0, 0),
+            user_id=1,
+        ),
+        Todo(
+            title="Test title 9",
+            content="Test content 9",
+            order=9,
+            completed=1,
+            updated_at=datetime(2023, 11, 10, 0, 0, 0),
+            user_id=1,
+        ),
+    ]
+
+
+@pytest.fixture
+def add_todo_list_with_date(
+    todo_list_with_date: List[Todo], session: Session, add_user: User
+) -> List[Todo]:
+    session.add_all(todo_list_with_date)
+    session.commit()
+
+    return todo_list_with_date
