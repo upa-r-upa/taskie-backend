@@ -1,7 +1,11 @@
 from contextlib import contextmanager
+import datetime
+
+from typing import List, Optional
 from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
+from app.core.utils import validate_date
 from app.dao import get_todo_dao
 from app.dao.todo_dao import TodoDAO
 from app.database.db import tx_manager
@@ -9,6 +13,7 @@ from app.schemas.response import Response
 from app.schemas.todo import (
     TodoBase,
     TodoDetail,
+    TodoListGetInput,
     TodoOrderUpdateInput,
     TodoUpdateInput,
 )
@@ -115,3 +120,39 @@ def delete_todo(
         )
 
     return None
+
+
+@router.get(
+    "/",
+    response_model=Response[List[TodoDetail]],
+    status_code=status.HTTP_200_OK,
+)
+def get_todo_list(
+    limit: int,
+    offset: int,
+    completed: bool = False,
+    start_date: str = None,
+    end_date: str = None,
+    todo_dao: TodoDAO = Depends(get_todo_dao),
+):
+    start_date = validate_date(start_date)
+    end_date = validate_date(end_date)
+
+    if start_date and not end_date:
+        end_date = datetime.now()
+
+    if end_date and not start_date:
+        start_date = datetime.datetime.now() - datetime.timedelta(days=30)
+
+    todo_list = todo_dao.get_todo_list(
+        completed=completed,
+        limit=limit,
+        offset=offset,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+    return Response(
+        status_code=status.HTTP_200_OK,
+        data=[TodoDetail.from_orm(todo) for todo in todo_list],
+    )

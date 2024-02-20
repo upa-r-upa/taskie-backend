@@ -1,5 +1,8 @@
+import datetime
+from operator import and_
 from typing import List
 from fastapi import HTTPException, status
+from sqlalchemy import text
 from app.api.strings import TODO_DOES_NOT_EXIST_ERROR
 from app.models.models import Todo
 from app.schemas.todo import TodoOrderUpdate
@@ -130,3 +133,54 @@ class TodoDAO(ProtectedBaseDAO):
             target_todo.order = todo.order
 
         return None
+
+    def get_todo_list(
+        self,
+        limit: int,
+        offset: int,
+        completed: int = 0,
+        start_date: datetime = None,
+        end_date: datetime = None,
+    ) -> List[Todo]:
+        # if start_date and end_date:
+        #     query = text(
+        #         """
+        #                 SELECT * FROM todo
+        #                 WHERE user_id = :user_id AND completed = :completed
+        #                 AND updated_at BETWEEN :start_date AND :end_date
+        #                 ORDER BY updated_at DESC
+        #                 LIMIT :limit OFFSET :offset
+        #             """
+        #     )
+
+        # result = self.db.execute(
+        #     query,
+        #     {
+        #         "user_id": self.user_id,
+        #         "completed": completed,
+        #         "limit": limit,
+        #         "offset": offset,
+        #         "start_date": start_date,
+        #         "end_date": end_date,
+        #     },
+        # )
+
+        # list = result.fetchall()
+
+        query = self.db.query(Todo).filter(
+            Todo.user_id == self.user_id, Todo.completed == completed
+        )
+
+        if start_date and end_date:
+            query = query.filter(
+                and_(Todo.updated_at >= start_date, Todo.updated_at < end_date)
+            )
+
+        todo = (
+            query.order_by(Todo.updated_at.desc())
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
+
+        return todo
