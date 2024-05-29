@@ -14,7 +14,7 @@ def test_get_me(
     excepted_output = UserData.from_orm(user_data)
 
     response = client.get(
-        "/user/me", headers={"Authorization": f"Bearer {access_token}"}
+        "/users/me", headers={"Authorization": f"Bearer {access_token}"}
     )
 
     assert response.status_code == 200
@@ -22,7 +22,10 @@ def test_get_me(
 
 
 def test_update_me(
-    client: TestClient, session: Session, access_token: str, user_data: UserBase
+    client: TestClient,
+    session: Session,
+    access_token: str,
+    user_data: UserBase,
 ):
     excepted_output = UserData.from_orm(user_data)
 
@@ -39,7 +42,7 @@ def test_update_me(
     )
 
     response = client.put(
-        "/user/me",
+        "/users/me",
         headers={"Authorization": f"Bearer {access_token}"},
         json=data.dict(),
     )
