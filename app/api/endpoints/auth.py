@@ -21,7 +21,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     response_model=Response[SignupOutput],
     status_code=status.HTTP_201_CREATED,
 )
-async def signup(
+def signup(
     data: SignupInput,
     auth_dao: AuthDAO = Depends(get_auth_dao),
     tx_manager: None = Depends(tx_manager),
@@ -40,7 +40,7 @@ async def signup(
     response_model=Response[LoginOutput],
     status_code=status.HTTP_200_OK,
 )
-async def login(
+def login(
     data: LoginInput,
     auth_dao: AuthDAO = Depends(get_auth_dao),
     tx_manager: None = Depends(tx_manager),
