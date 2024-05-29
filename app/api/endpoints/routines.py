@@ -16,14 +16,14 @@ from app.schemas.routine import (
 )
 
 router = APIRouter(
-    prefix="/routine",
-    tags=["routine"],
+    prefix="/routines",
+    tags=["routines"],
     dependencies=[Depends(get_current_user)],
 )
 
 
 @router.post(
-    "/create",
+    "/",
     response_model=Response[RoutineDetail],
     status_code=status.HTTP_201_CREATED,
 )

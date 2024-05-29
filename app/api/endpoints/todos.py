@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 import datetime
 
-from typing import List, Optional
+from typing import List
 from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
@@ -13,14 +13,13 @@ from app.schemas.response import Response
 from app.schemas.todo import (
     TodoBase,
     TodoDetail,
-    TodoListGetInput,
     TodoOrderUpdateInput,
     TodoUpdateInput,
 )
 
 router = APIRouter(
-    prefix="/todo",
-    tags=["todo"],
+    prefix="/todos",
+    tags=["todos"],
     dependencies=[Depends(get_current_user)],
 )
 
@@ -42,7 +41,7 @@ def get_todo(
 
 
 @router.post(
-    "/create",
+    "/",
     response_model=Response[TodoDetail],
     status_code=status.HTTP_201_CREATED,
 )

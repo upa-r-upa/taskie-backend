@@ -10,8 +10,8 @@ from app.schemas.response import Response
 from app.schemas.user import UserData, UserUpdateInput
 
 router = APIRouter(
-    prefix="/user",
-    tags=["user"],
+    prefix="/users",
+    tags=["users"],
     dependencies=[Depends(get_current_user)],
 )
 

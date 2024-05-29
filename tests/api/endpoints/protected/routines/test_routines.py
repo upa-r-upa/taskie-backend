@@ -19,7 +19,7 @@ def test_create_routine(
     access_token: str,
 ):
     response = client.post(
-        "/routine/create",
+        "/routines",
         json=routine_data.dict(),
         headers={"Authorization": f"Bearer {access_token}"},
     )
@@ -52,7 +52,7 @@ def test_get_routine_valid_id(
     client: TestClient, access_token: str, add_routine: RoutineDetail
 ):
     response = client.get(
-        "/routine/1",
+        "/routines/1",
         headers={"Authorization": f"Bearer {access_token}"},
     )
 
@@ -68,7 +68,7 @@ def test_get_routine_invalid_id(
     access_token: str,
 ):
     response = client.get(
-        "/routine/1",
+        "/routines/1",
         headers={"Authorization": f"Bearer {access_token}"},
     )
 
@@ -82,7 +82,7 @@ def test_delete_routine_valid_id(
     add_routine: RoutineDetail,
 ):
     response = client.delete(
-        "/routine/1",
+        "/routines/1",
         headers={"Authorization": f"Bearer {access_token}"},
     )
 
@@ -96,7 +96,7 @@ def test_delete_routine_invalid_id(
     access_token: str,
 ):
     response = client.delete(
-        "/routine/1",
+        "/routines/1",
         headers={"Authorization": f"Bearer {access_token}"},
     )
 
@@ -110,7 +110,7 @@ def test_update_routine_full_update(
     update_routine_all_data: RoutineUpdateInput,
 ):
     response = client.put(
-        "/routine/1",
+        "/routines/1",
         headers={"Authorization": f"Bearer {access_token}"},
         json=update_routine_all_data.dict(),
     )
@@ -145,7 +145,7 @@ def test_update_routine_only_elements_data(
     update_routine_only_elements_data: RoutineUpdateInput,
 ):
     response = client.put(
-        "/routine/1",
+        "/routines/1",
         headers={"Authorization": f"Bearer {access_token}"},
         json=update_routine_only_elements_data.dict(),
     )
@@ -186,7 +186,7 @@ def test_update_routine_only_routine_data(
     update_routine_only_routine_data: RoutineUpdateInput,
 ):
     response = client.put(
-        "/routine/1",
+        "/routines/1",
         headers={"Authorization": f"Bearer {access_token}"},
         json=update_routine_only_routine_data.dict(),
     )
@@ -219,7 +219,7 @@ def test_update_routine_empty_routine_elements(
     update_routine_empty_routine_elements: RoutineUpdateInput,
 ):
     response = client.put(
-        "/routine/1",
+        "/routines/1",
         headers={"Authorization": f"Bearer {access_token}"},
         json=update_routine_empty_routine_elements.dict(),
     )
@@ -251,7 +251,7 @@ def test_update_routine_element_complete__complete(
     update_log_data__complete: RoutineItemCompleteUpdate,
 ):
     response = client.put(
-        "/routine/log/complete",
+        "/routines/log/complete",
         headers={"Authorization": f"Bearer {access_token}"},
         json=update_log_data__complete.dict(),
     )
@@ -303,7 +303,7 @@ def test_update_routine_element_complete__incomplete(
     update_log_data__incomplete: RoutineItemCompleteUpdate,
 ):
     response = client.put(
-        "/routine/log/complete",
+        "/routines/log/complete",
         headers={"Authorization": f"Bearer {access_token}"},
         json=update_log_data__incomplete.dict(),
     )
