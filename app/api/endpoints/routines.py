@@ -35,10 +35,7 @@ def create_routine(
     with tx_manager:
         routine = repository.create_routine(data)
 
-    return Response(
-        data=routine,
-        status_code=status.HTTP_201_CREATED,
-    )
+    return Response(data=routine)
 
 
 @router.get(
@@ -50,8 +47,7 @@ def get_routine(routine_id: int, dao: RoutineDAO = Depends(get_routine_dao)):
     routine = dao.get_routine_with_elements_by_id(routine_id)
 
     response = Response(
-        data=RoutineDetail.from_routine(routine, routine.routine_elements),
-        status_code=status.HTTP_200_OK,
+        data=RoutineDetail.from_routine(routine, routine.routine_elements)
     )
 
     return response
@@ -90,8 +86,7 @@ def update_routine(
         )
 
     return Response(
-        data=RoutineDetail.from_routine(routine, routine.routine_elements),
-        status_code=status.HTTP_200_OK,
+        data=RoutineDetail.from_routine(routine, routine.routine_elements)
     )
 
 

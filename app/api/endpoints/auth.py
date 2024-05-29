@@ -16,7 +16,11 @@ from app.schemas.auth import (
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/signup", response_model=Response[SignupOutput], status_code=201)
+@router.post(
+    "/signup",
+    response_model=Response[SignupOutput],
+    status_code=status.HTTP_201_CREATED,
+)
 async def signup(
     data: SignupInput,
     auth_dao: AuthDAO = Depends(get_auth_dao),
@@ -27,12 +31,15 @@ async def signup(
 
     return Response(
         message="Signup success",
-        status_code=status.HTTP_201_CREATED,
         data=SignupOutput.from_orm(user),
     )
 
 
-@router.post("/login", response_model=Response[LoginOutput], status_code=200)
+@router.post(
+    "/login",
+    response_model=Response[LoginOutput],
+    status_code=status.HTTP_200_OK,
+)
 async def login(
     data: LoginInput,
     auth_dao: AuthDAO = Depends(get_auth_dao),
@@ -42,13 +49,14 @@ async def login(
         login_output = auth_dao.login(data.username, data.password)
 
     return Response(
-        status_code=status.HTTP_200_OK,
         data=login_output,
     )
 
 
 @router.post(
-    "/refresh", response_model=Response[RefreshOutput], status_code=200
+    "/refresh",
+    response_model=Response[RefreshOutput],
+    status_code=status.HTTP_200_OK,
 )
 async def refresh(
     data: RefreshInput, auth_dao: AuthDAO = Depends(get_auth_dao)
@@ -56,6 +64,5 @@ async def refresh(
     access_token = auth_dao.refresh(data.refresh_token)
 
     return Response(
-        status_code=status.HTTP_200_OK,
         data=RefreshOutput(access_token=access_token),
     )
