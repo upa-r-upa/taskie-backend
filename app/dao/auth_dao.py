@@ -59,7 +59,6 @@ class AuthDAO(BaseDAO):
 
     def login(self, username: str, password: str) -> LoginOutput:
         user = self.db.query(User).filter_by(username=username).first()
-        # SELECT * FROM user WHERE username = :username
 
         if not user or not check_password_hash(user.password, password):
             raise HTTPException(

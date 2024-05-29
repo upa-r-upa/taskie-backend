@@ -14,7 +14,6 @@ from .base import ProtectedBaseDAO
 class UserDAO(ProtectedBaseDAO):
     def update_me(self, data: UserUpdateInput) -> User:
         user = self.db.query(User).filter_by(id=self.user_id).first()
-        # SELECT * FROM user WHERE id = :user_id
 
         if data.username != self.username:
             raise HTTPException(
@@ -38,8 +37,5 @@ class UserDAO(ProtectedBaseDAO):
 
         if data.nickname:
             user.nickname = data.nickname
-
-        # UPDATE user SET email = :email, profile_image = :profile_image,
-        # nickname = :nickname WHERE id = :user_id
 
         return user
