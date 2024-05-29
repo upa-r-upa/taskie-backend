@@ -21,7 +21,6 @@ router = APIRouter(
 )
 def get_me(user: User = Depends(get_current_user)):
     return Response(
-        status_code=status.HTTP_200_OK,
         data=UserData.from_orm(user),
         message="User data retrieved successfully",
     )
@@ -39,6 +38,4 @@ def update_me(
     with tx_manager:
         user = user_dao.update_me(data)
 
-    return Response(
-        status_code=status.HTTP_200_OK, data=UserData.from_orm(user)
-    )
+    return Response(data=UserData.from_orm(user))

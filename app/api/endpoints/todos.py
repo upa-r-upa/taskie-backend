@@ -35,9 +35,7 @@ def get_todo(
 ):
     todo = dao.get_todo_by_id(todo_id=todo_id)
 
-    return Response(
-        status_code=status.HTTP_200_OK, data=TodoDetail.from_orm(todo)
-    )
+    return Response(data=TodoDetail.from_orm(todo))
 
 
 @router.post(
@@ -57,9 +55,7 @@ def create_todo(
             order=data.order,
         )
 
-    return Response(
-        status_code=status.HTTP_201_CREATED, data=TodoDetail.from_orm(todo)
-    )
+    return Response(data=TodoDetail.from_orm(todo))
 
 
 @router.put(
@@ -98,9 +94,7 @@ def update_todo(
             content=data.content,
         )
 
-    return Response(
-        status_code=status.HTTP_200_OK, data=TodoDetail.from_orm(todo)
-    )
+    return Response(data=TodoDetail.from_orm(todo))
 
 
 @router.delete(
@@ -152,6 +146,5 @@ def get_todo_list(
     )
 
     return Response(
-        status_code=status.HTTP_200_OK,
         data=[TodoDetail.from_orm(todo) for todo in todo_list],
     )

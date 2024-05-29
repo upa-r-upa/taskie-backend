@@ -8,7 +8,6 @@ T = TypeVar("T")
 class Response(GenericModel, Generic[T]):
     data: Optional[T] = None
     message: str = ""
-    status_code: int
 
 
 class InnerErrorResponse(BaseModel):
@@ -18,5 +17,4 @@ class InnerErrorResponse(BaseModel):
 
 class ErrorResponse(BaseModel):
     message: str
-    status_code: int
     errors: List[InnerErrorResponse] | None = None

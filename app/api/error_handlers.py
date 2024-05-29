@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
@@ -8,23 +8,19 @@ from app.schemas.response import ErrorResponse, InnerErrorResponse
 
 def validation_exception_handler(app: FastAPI):
     @app.exception_handler(HTTPException)
-    async def custom_http_exception_handler(request: Request, exc: HTTPException):
+    async def custom_http_exception_handler(
+        request: Request, exc: HTTPException
+    ):
         return JSONResponse(
             status_code=exc.status_code,
-            content=ErrorResponse(
-                message=exc.detail,
-                status_code=exc.status_code,
-            ).dict(),
+            content=ErrorResponse(message=exc.detail).dict(),
         )
 
     @app.exception_handler(Exception)
     async def custom_exception_handler(request: Request, exc: Exception):
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content=ErrorResponse(
-                message="Internal Server Error",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            ).dict(),
+            content=ErrorResponse(message="Internal Server Error").dict(),
         )
 
     def filtered_location_list(location: List[str]) -> List[str]:
@@ -46,10 +42,7 @@ def validation_exception_handler(app: FastAPI):
         ):
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content=ErrorResponse(
-                    message="Invalid JSON payload",
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                ).dict(),
+                content=ErrorResponse(message="Invalid JSON payload").dict(),
             )
 
         for detail in details:
@@ -63,8 +56,6 @@ def validation_exception_handler(app: FastAPI):
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=ErrorResponse(
-                message="Validation Error",
-                errors=errors,
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                message="Validation Error", errors=errors
             ).dict(),
         )
