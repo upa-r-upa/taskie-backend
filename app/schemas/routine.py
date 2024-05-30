@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import List
 
 from app.models.models import Routine, RoutineElement
@@ -15,6 +15,41 @@ class RoutineCreateInput(BaseModel):
     start_time_minutes: int
     repeat_days: List[int]
     routine_elements: List[RoutineItemBase]
+
+    @validator("repeat_days")
+    def validate_repeat_days(cls, v):
+        if len(v) == 0:
+            raise ValueError("repeat_days must contain at least one value")
+        elif len(v) != len(set(v)):
+            raise ValueError("repeat_days must not contain duplicate values")
+
+        for i in range(len(v)):
+            if v[i] < 1 or v[i] > 7:
+                raise ValueError("repeat_days must be between 1 and 7")
+        return v
+
+    @validator("start_time_minutes")
+    def validate_start_time_minutes(cls, v):
+        if v < 0 or v >= 1440:
+            raise ValueError("start_time_minutes must be between 0 and 1439")
+        return v
+
+    @validator("routine_elements")
+    def validate_routine_elements(cls, v):
+        for item in v:
+            if item.duration_minutes < 0:
+                raise ValueError("duration_minutes must be positive")
+            elif item.duration_minutes > 1440:
+                raise ValueError("duration_minutes must be less than 1440")
+        return v
+
+    @validator("title")
+    def validate_title(cls, v):
+        if len(v) == 0:
+            raise ValueError("title must not be empty")
+        elif len(v) > 255:
+            raise ValueError("title must be less than 255 characters")
+        return v
 
     class Config:
         orm_mode = True

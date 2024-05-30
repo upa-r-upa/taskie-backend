@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from datetime import datetime
 
 
@@ -6,6 +6,12 @@ class TodoBase(BaseModel):
     title: str
     order: int
     content: str = None
+
+    @validator("title")
+    def title_must_not_be_empty(cls, v):
+        if not v:
+            raise ValueError("Title must not be empty")
+        return v
 
     class Config:
         orm_mode = True
