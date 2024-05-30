@@ -1,4 +1,3 @@
-from functools import wraps
 from fastapi import Depends, HTTPException, status
 import jwt
 from datetime import datetime, timedelta
@@ -74,19 +73,3 @@ def get_current_user(
     user = get_user_by_username(db, username)
 
     return user
-
-
-def jwt_required(func: Callable) -> Callable:
-    @wraps(func)
-    async def wrapper(
-        current_user: User = Depends(get_current_user), *args, **kwargs
-    ):
-        if not current_user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=USER_NOT_AUTHENTICATED_ERROR,
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        return await func(*args, **kwargs)
-
-    return wrapper
