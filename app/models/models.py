@@ -1,4 +1,3 @@
-from datetime import datetime
 from pydantic import validator
 from sqlalchemy import (
     Column,
@@ -59,9 +58,12 @@ class Habit(Base):
     __tablename__ = "habit"
 
     id = Column(Integer, primary_key=True)
+
     title = Column(String(100), nullable=False)
     start_time_minutes = Column(Integer, nullable=False)
     repeat_days = Column(Text, nullable=False)
+    repeat_time_minutes = Column(Integer, nullable=False)
+
     active = Column(Integer, default=0)
     deleted_at = Column(TIMESTAMP)
 
@@ -73,6 +75,29 @@ class Habit(Base):
     )
     user = relationship("User", back_populates="habits")
     habit_logs = relationship("HabitLog", back_populates="habit")
+
+    @validator("title")
+    def title_must_not_be_empty(cls, v):
+        if not v:
+            raise ValueError("Title must not be empty")
+        return v
+
+    @validator("repeat_days")
+    def validate_repeat_days(cls, v):
+        if len(v) == 0:
+            raise ValueError("repeat_days must not be empty")
+        for day in v:
+            if day not in range(1, 8):
+                raise ValueError(
+                    "repeat_days must be a list of integers between 1 and 7"
+                )
+        return v
+
+    @validator("start_time_minutes")
+    def validate_start_time_minutes(cls, v):
+        if v < 0 or v >= 1440:
+            raise ValueError("start_time_minutes must be between 0 and 1439")
+        return v
 
 
 class HabitLog(Base):

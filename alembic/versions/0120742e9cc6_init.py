@@ -45,6 +45,7 @@ def upgrade() -> None:
         sa.Column("deleted_at", sa.TIMESTAMP(), nullable=True),
         sa.Column("created_at", sa.TIMESTAMP(), nullable=True),
         sa.Column("updated_at", sa.TIMESTAMP(), nullable=True),
+        sa.Column("repeat_time_minutes", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
