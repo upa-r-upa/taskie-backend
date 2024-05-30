@@ -81,9 +81,15 @@ def add_user(session: Session, user_data: UserBase) -> User:
     session.add(user)
     session.commit()
 
-    yield user
+    return user
 
 
 @pytest.fixture
 def access_token(user_data: UserBase) -> str:
     return generate_access_token(user_data.username)
+
+
+@pytest.fixture
+def access_token_headers(access_token: str) -> dict[str, str]:
+    headers = {"Authorization": f"Bearer {access_token}"}
+    return headers
