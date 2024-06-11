@@ -23,6 +23,7 @@ def test_create_habit(
 
     assert response_data.title == habit_data.title
     assert response_data.start_time_minutes == habit_data.start_time_minutes
+    assert response_data.end_time_minutes == habit_data.end_time_minutes
     assert response_data.repeat_time_minutes == habit_data.repeat_time_minutes
     assert response_data.repeat_days == habit_data.repeat_days
 

@@ -40,6 +40,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("title", sa.String(length=100), nullable=False),
         sa.Column("start_time_minutes", sa.Integer(), nullable=False),
+        sa.Column("end_time_minutes", sa.Integer(), nullable=False),
         sa.Column("repeat_days", sa.Text(), nullable=False),
         sa.Column("active", sa.Integer(), nullable=True),
         sa.Column("deleted_at", sa.TIMESTAMP(), nullable=True),

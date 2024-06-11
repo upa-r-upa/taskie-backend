@@ -14,6 +14,7 @@ class HabitRepository(ProtectedBaseRepository):
         new_habit = Habit(
             title=habit.title,
             start_time_minutes=habit.start_time_minutes,
+            end_time_minutes=habit.end_time_minutes,
             repeat_time_minutes=habit.repeat_time_minutes,
             repeat_days=Habit.repeat_days_to_string(habit.repeat_days),
             user_id=self.user_id,

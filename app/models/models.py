@@ -53,6 +53,7 @@ class Habit(Base):
     id = Column(Integer, primary_key=True)
 
     title = Column(String(100), nullable=False)
+    end_time_minutes = Column(Integer, nullable=False)
     start_time_minutes = Column(Integer, nullable=False)
     repeat_days = Column(Text, nullable=False)
     repeat_time_minutes = Column(Integer, nullable=False)

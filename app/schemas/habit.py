@@ -7,6 +7,7 @@ from app.models.models import Habit
 class HabitBase(BaseModel):
     title: str
     start_time_minutes: int
+    end_time_minutes: int
     repeat_time_minutes: int
     repeat_days: list[int]
 
@@ -24,6 +25,12 @@ class HabitCreateInput(HabitBase):
     def validate_start_time_minutes(cls, v):
         if v < 0 or v >= 1440:
             raise ValueError("start_time_minutes must be between 0 and 1439")
+        return v
+
+    @validator("end_time_minutes")
+    def validate_end_time_minutes(cls, v):
+        if v < 0 or v >= 1440:
+            raise ValueError("end_time_minutes must be between 0 and 1439")
         return v
 
     @validator("repeat_days")
