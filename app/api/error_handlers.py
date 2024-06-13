@@ -14,16 +14,10 @@ def validation_exception_handler(app: FastAPI):
         return JSONResponse(
             status_code=exc.status_code,
             content=ErrorResponse(message=exc.detail).dict(),
+            headers=exc.headers,
         )
 
-    @app.exception_handler(Exception)
-    async def custom_exception_handler(request: Request, exc: Exception):
-        return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content=ErrorResponse(message="Internal Server Error").dict(),
-        )
-
-    def filtered_location_list(location: List[str]) -> List[str]:
+    def _filtered_location_list(location: List[str]) -> List[str]:
         if location and location[0] in ("body", "path", "query"):
             return location[1:]
         return location
@@ -49,7 +43,7 @@ def validation_exception_handler(app: FastAPI):
             errors.append(
                 InnerErrorResponse(
                     message=detail["msg"],
-                    location=filtered_location_list(detail["loc"]),
+                    location=_filtered_location_list(detail["loc"]),
                 )
             )
 
@@ -58,4 +52,11 @@ def validation_exception_handler(app: FastAPI):
             content=ErrorResponse(
                 message="Validation Error", errors=errors
             ).dict(),
+        )
+
+    @app.exception_handler(Exception)
+    async def custom_exception_handler(request: Request, exc: Exception):
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=ErrorResponse(message="Internal Server Error").dict(),
         )
