@@ -50,12 +50,8 @@ class HabitCreateInput(HabitBase):
         return v
 
 
-class HabitDetail(BaseModel):
+class HabitDetail(HabitBase):
     id: int
-    title: str
-    start_time_minutes: int
-    repeat_time_minutes: int
-    repeat_days: list[int]
     active: bool
     created_at: datetime
     updated_at: datetime
@@ -65,6 +61,7 @@ class HabitDetail(BaseModel):
             id=habit.id,
             title=habit.title,
             start_time_minutes=habit.start_time_minutes,
+            end_time_minutes=habit.end_time_minutes,
             repeat_time_minutes=habit.repeat_time_minutes,
             repeat_days=habit.repeat_days_to_list(),
             active=habit.active,
