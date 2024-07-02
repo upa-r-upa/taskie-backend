@@ -24,10 +24,15 @@ class User(Base):
     nickname = Column(String(50))
     created_at = Column(TIMESTAMP, default=func.now())
 
-    todos = relationship("Todo", back_populates="user")
-    habits = relationship("Habit", back_populates="user")
-    routines = relationship("Routine", back_populates="user")
-    routine_elements = relationship("RoutineElement", back_populates="user")
+    todos = relationship(
+        "Todo", back_populates="user", lazy="dynamic", cascade="all, delete"
+    )
+    habits = relationship(
+        "Habit", back_populates="user", lazy="dynamic", cascade="all, delete"
+    )
+    routines = relationship(
+        "Routine", back_populates="user", lazy="dynamic", cascade="all, delete"
+    )
 
 
 class Todo(Base):
@@ -68,7 +73,12 @@ class Habit(Base):
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
     user = relationship("User", back_populates="habits")
-    habit_logs = relationship("HabitLog", back_populates="habit")
+    habit_logs = relationship(
+        "HabitLog",
+        back_populates="habit",
+        cascade="all, delete",
+        lazy="dynamic",
+    )
 
     @staticmethod
     def repeat_days_to_string(repeat_days):
@@ -112,6 +122,7 @@ class Routine(Base):
         "RoutineElement",
         back_populates="routine",
         order_by="RoutineElement.order.asc()",
+        cascade="all, delete",
     )
 
     def repeat_days_to_list(self):
@@ -145,7 +156,9 @@ class RoutineElement(Base):
 
     user = relationship("User", back_populates="routine_elements")
     routine = relationship("Routine", back_populates="routine_elements")
-    routine_logs = relationship("RoutineLog", back_populates="routine_element")
+    routine_logs = relationship(
+        "RoutineLog", back_populates="routine_element", cascade="all, delete"
+    )
 
 
 class RoutineLog(Base):
@@ -156,7 +169,9 @@ class RoutineLog(Base):
     completed_at = Column(TIMESTAMP, default=func.now())
 
     routine_element_id = Column(
-        Integer, ForeignKey("routine_element.id"), nullable=False
+        Integer,
+        ForeignKey("routine_element.id", ondelete="CASCADE"),
+        nullable=False,
     )
 
     routine_element = relationship(
