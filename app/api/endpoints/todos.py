@@ -5,7 +5,7 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
-from app.core.utils import validate_date
+from app.core.utils import validate_date_format
 from app.dao import get_todo_dao
 from app.dao.todo_dao import TodoDAO
 from app.database.db import tx_manager
@@ -128,8 +128,8 @@ def get_todo_list(
     end_date: str = None,
     todo_dao: TodoDAO = Depends(get_todo_dao),
 ):
-    start_date = validate_date(start_date)
-    end_date = validate_date(end_date)
+    start_date = validate_date_format(start_date)
+    end_date = validate_date_format(end_date)
 
     if start_date and not end_date:
         end_date = datetime.now()
