@@ -3,8 +3,8 @@ from .validator import limit_must_be_valid
 
 
 class ListLoadParams(BaseModel):
-    last_id: int
     limit: int = 20
+    last_id: int | None = None
 
     @validator("limit")
     def validate_limit(cls, v):

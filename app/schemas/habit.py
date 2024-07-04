@@ -1,7 +1,9 @@
 from datetime import datetime
+from typing import List
 from pydantic import BaseModel, validator
 
-from app.models.models import Habit
+from app.schemas.common import ListLoadParams
+from app.schemas.validator import validate_date
 
 
 class HabitBase(BaseModel):
@@ -10,6 +12,9 @@ class HabitBase(BaseModel):
     end_time_minutes: int
     repeat_time_minutes: int
     repeat_days: list[int]
+
+    class Config:
+        orm_mode = True
 
 
 class HabitCreateInput(HabitBase):
@@ -52,19 +57,40 @@ class HabitCreateInput(HabitBase):
 
 class HabitDetail(HabitBase):
     id: int
-    active: bool
+    activated: bool
     created_at: datetime
     updated_at: datetime
 
-    def from_habit(habit: Habit):
-        return HabitDetail(
-            id=habit.id,
-            title=habit.title,
-            start_time_minutes=habit.start_time_minutes,
-            end_time_minutes=habit.end_time_minutes,
-            repeat_time_minutes=habit.repeat_time_minutes,
-            repeat_days=habit.repeat_days_to_list(),
-            active=habit.active,
-            created_at=habit.created_at,
-            updated_at=habit.updated_at,
-        )
+    @validator("repeat_days", pre=True)
+    def parsed_repeat_days(cls, v):
+        if isinstance(v, str):
+            return [int(day) for day in v]
+        return v
+
+    class Config:
+        orm_mode = True
+
+
+class HabitListGetInput(ListLoadParams):
+    log_target_date: str
+    deleted: bool = False
+    activated: bool = True
+
+    @validator("log_target_date")
+    def validate_log_target_date(cls, v):
+        return validate_date(v)
+
+
+class HabitLog(BaseModel):
+    id: int
+    completed_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class HabitWithLog(HabitDetail):
+    log_list: List[HabitLog]
+
+    class Config:
+        orm_mode = True

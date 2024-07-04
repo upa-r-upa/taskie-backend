@@ -1,11 +1,17 @@
 from contextlib import contextmanager
+from typing import List
 from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
 from app.database.db import tx_manager
 from app.repositories import get_habit_repository
 from app.repositories.habit_repository import HabitRepository
-from app.schemas.habit import HabitCreateInput, HabitDetail
+from app.schemas.habit import (
+    HabitCreateInput,
+    HabitDetail,
+    HabitListGetInput,
+    HabitWithLog,
+)
 from app.schemas.response import Response
 
 router = APIRouter(
@@ -26,4 +32,18 @@ def create_habit(
     with tx_manager:
         habit = repository.create_habit(data)
 
-    return Response(data=HabitDetail.from_habit(habit))
+    return Response(data=HabitDetail.from_orm(habit))
+
+
+@router.get(
+    "/",
+    response_model=Response[List[HabitWithLog]],
+    status_code=status.HTTP_200_OK,
+)
+def get_habits(
+    params: HabitListGetInput = Depends(),
+    repository: HabitRepository = Depends(get_habit_repository),
+):
+    habits = repository.get_habits(**params.dict())
+
+    return Response(data=habits)
