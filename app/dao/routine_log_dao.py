@@ -17,10 +17,10 @@ class RoutineLogDAO(ProtectedBaseDAO):
         log = (
             self.db.query(RoutineLog)
             .filter(
-                RoutineLog.routine_element_id == element_id
-                and self._is_timestamp_on_day(
+                RoutineLog.routine_element_id == element_id,
+                self._is_timestamp_on_day(
                     target_date, RoutineLog.completed_at
-                )
+                ),
             )
             .first()
         )
