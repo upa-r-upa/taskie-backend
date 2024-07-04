@@ -63,7 +63,7 @@ class Habit(Base):
     repeat_days = Column(Text, nullable=False)
     repeat_time_minutes = Column(Integer, nullable=False)
 
-    active = Column(Integer, default=0)
+    active = Column(Integer, default=1)
     deleted_at = Column(TIMESTAMP)
 
     created_at = Column(TIMESTAMP, default=func.now())
@@ -79,13 +79,6 @@ class Habit(Base):
         cascade="all, delete",
         lazy="dynamic",
     )
-
-    @staticmethod
-    def repeat_days_to_string(repeat_days):
-        return "".join([str(day) for day in repeat_days])
-
-    def repeat_days_to_list(self):
-        return [int(day) for day in self.repeat_days]
 
 
 class HabitLog(Base):
@@ -154,7 +147,6 @@ class RoutineElement(Base):
         Integer, ForeignKey("routine.id", ondelete="CASCADE"), nullable=False
     )
 
-    user = relationship("User", back_populates="routine_elements")
     routine = relationship("Routine", back_populates="routine_elements")
     routine_logs = relationship(
         "RoutineLog", back_populates="routine_element", cascade="all, delete"
