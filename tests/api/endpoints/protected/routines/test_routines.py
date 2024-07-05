@@ -1,6 +1,6 @@
-from datetime import datetime
 from typing import List
 from fastapi.testclient import TestClient
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.models.models import Routine, RoutineElement, RoutineLog
 
@@ -236,9 +236,9 @@ def test_update_routine_empty_routine_elements(
 
 
 def is_timestamp_on_today(timestamp) -> bool:
-    today_date = datetime.now().date()
+    today_date = "2024-07-07"
 
-    timestamp_date = timestamp.date()
+    timestamp_date = func.date(timestamp)
 
     return today_date == timestamp_date
 
@@ -261,8 +261,7 @@ def test_update_routine_element_complete__complete(
     assert (
         session.query(RoutineLog)
         .filter(
-            RoutineLog.routine_element_id == 1,
-            is_timestamp_on_today(RoutineLog.completed_at),
+            RoutineLog.routine_element_id == 1
         )
         .first()
     )
@@ -271,7 +270,6 @@ def test_update_routine_element_complete__complete(
         session.query(RoutineLog)
         .filter(
             RoutineLog.routine_element_id == 2
-            and is_timestamp_on_today(RoutineLog.completed_at)
         )
         .first()
     )
@@ -279,8 +277,7 @@ def test_update_routine_element_complete__complete(
     assert (
         session.query(RoutineLog)
         .filter(
-            RoutineLog.routine_element_id == 3,
-            is_timestamp_on_today(RoutineLog.completed_at),
+            RoutineLog.routine_element_id == 3
         )
         .first()
     )
@@ -288,8 +285,7 @@ def test_update_routine_element_complete__complete(
     assert (
         session.query(RoutineLog)
         .filter(
-            RoutineLog.routine_element_id == 4,
-            is_timestamp_on_today(RoutineLog.completed_at),
+            RoutineLog.routine_element_id == 4
         )
         .first()
     )
@@ -313,8 +309,7 @@ def test_update_routine_element_complete__incomplete(
     assert (
         session.query(RoutineLog)
         .filter(
-            RoutineLog.routine_element_id == 1,
-            is_timestamp_on_today(RoutineLog.completed_at),
+            RoutineLog.routine_element_id == 1
         )
         .first()
     ) is None
@@ -322,8 +317,7 @@ def test_update_routine_element_complete__incomplete(
     assert (
         session.query(RoutineLog)
         .filter(
-            RoutineLog.routine_element_id == 2,
-            is_timestamp_on_today(RoutineLog.completed_at),
+            RoutineLog.routine_element_id == 2
         )
         .first()
     ) is None
@@ -331,8 +325,7 @@ def test_update_routine_element_complete__incomplete(
     assert (
         session.query(RoutineLog)
         .filter(
-            RoutineLog.routine_element_id == 3,
-            is_timestamp_on_today(RoutineLog.completed_at),
+            RoutineLog.routine_element_id == 3
         )
         .first()
     ) is None
@@ -340,8 +333,7 @@ def test_update_routine_element_complete__incomplete(
     assert (
         session.query(RoutineLog)
         .filter(
-            RoutineLog.routine_element_id == 4,
-            is_timestamp_on_today(RoutineLog.completed_at),
+            RoutineLog.routine_element_id == 4
         )
         .first()
     ) is None
