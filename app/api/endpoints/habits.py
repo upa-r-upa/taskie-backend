@@ -9,7 +9,7 @@ from app.repositories.habit_repository import HabitRepository
 from app.schemas.habit import (
     HabitCreateInput,
     HabitDetail,
-    HabitListGetInput,
+    HabitListGetParams,
     HabitWithLog,
 )
 from app.schemas.response import Response
@@ -41,7 +41,7 @@ def create_habit(
     status_code=status.HTTP_200_OK,
 )
 def get_habits(
-    params: HabitListGetInput = Depends(),
+    params: HabitListGetParams = Depends(),
     repository: HabitRepository = Depends(get_habit_repository),
 ):
     habits = repository.get_habits(**params.dict())

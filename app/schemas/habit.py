@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List
+from fastapi.params import Query
 from pydantic import BaseModel, validator
 
 from app.schemas.common import ListLoadParams
@@ -71,10 +72,12 @@ class HabitDetail(HabitBase):
         orm_mode = True
 
 
-class HabitListGetInput(ListLoadParams):
-    log_target_date: str
-    deleted: bool = False
-    activated: bool = True
+class HabitListGetParams(ListLoadParams):
+    log_target_date: str = Query(
+        description="YYYY-MM-DD",
+    )
+    deleted: bool | None = Query(False)
+    activated: bool | None = Query(True)
 
     @validator("log_target_date")
     def validate_log_target_date(cls, v):
