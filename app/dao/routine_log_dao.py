@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import List
 
 from sqlalchemy import func
@@ -23,7 +23,7 @@ class RoutineLogDAO(ProtectedBaseDAO):
         return log
 
     def update_logs_complete(self, completed: bool, item_ids: List[int]):
-        current_date = datetime.now().strftime("%Y-%m-%d")
+        current_date = datetime.now(UTC).strftime("%Y-%m-%d")
 
         for item_id in item_ids:
             log = self.get_routine_log_by_date(item_id, current_date)
