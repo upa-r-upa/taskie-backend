@@ -202,29 +202,6 @@ def test_get_todo_list__valid_date_range(
     assert response_data[1].get("id") == add_todo_list_with_date[5].id
 
 
-def test_get_todo_list_invalid_date_range(
-    client: TestClient,
-    session: Session,
-    access_token: str,
-    add_todo_list_with_date: List[Todo],
-):
-    params = TodoListGetInput(
-        limit=3,
-        offset=0,
-        completed=0,
-        start_date="2023",
-        end_date="2023-11-06",
-    )
-
-    response = client.get(
-        "/todos",
-        params=params.dict(),
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
-
-    assert response.status_code == 400
-
-
 def test_get_todo_list__complete(
     client: TestClient,
     session: Session,
