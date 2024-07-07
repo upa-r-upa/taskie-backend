@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import List
 from fastapi import HTTPException, status
 from app.api.strings import ROUTINE_DOES_NOT_EXIST_ERROR
@@ -87,4 +87,4 @@ class RoutineDAO(ProtectedBaseDAO):
     ) -> None:
         routine = self.get_routine_by_id(routine_id)
 
-        routine.deleted_at = datetime.now()
+        routine.deleted_at = datetime.now(UTC)
