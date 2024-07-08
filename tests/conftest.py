@@ -14,7 +14,7 @@ from app.models.models import User
 from app.core.auth import generate_access_token
 from app.main import app as client_app
 
-engine = create_engine(os.environ.get("TSK_SQLALCHEMY_URL"), echo=True)
+engine = create_engine(os.environ.get("TSK_DB_URL"), echo=True)
 TestingSessionLocal = sessionmaker(
     bind=engine, autocommit=False, autoflush=False
 )

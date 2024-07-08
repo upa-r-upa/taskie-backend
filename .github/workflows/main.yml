@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      TSK_SQLALCHEMY_URL: "sqlite:///./db/taskie_test.db"
+      TSK_DB_URL: "sqlite:///./db/taskie_test.db"
 
     steps:
     - name: Checkout repository

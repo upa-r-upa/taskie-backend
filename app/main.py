@@ -1,8 +1,8 @@
-import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.endpoints import router as api_router
+from app.database.db import initialize_database
 from app.schemas.response import ErrorResponse
 from app.api.error_handlers import validation_exception_handler
 
@@ -12,6 +12,11 @@ app = FastAPI(
         422: {"model": ErrorResponse, "description": "Validation Error"},
     },
 )
+
+
+@app.on_event("startup")
+async def startup_event():
+    initialize_database()
 
 
 # CORS 설정

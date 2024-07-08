@@ -30,10 +30,10 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-sqlalchemy_url = os.environ.get("TSK_SQLALCHEMY_URL")
+sqlalchemy_url = os.environ.get("TSK_DB_URL")
 
 if not sqlalchemy_url:
-    raise ValueError("TSK_SQLALCHEMY_URL environment variable is not set")
+    raise ValueError("TSK_DB_URL environment variable is not set")
 
 
 def run_migrations_offline() -> None:
