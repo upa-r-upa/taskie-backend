@@ -2,11 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: main.py",
+            "name": "Uvicorn Server: main.py",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/app/main.py",
-            "console": "integratedTerminal"
+            "program": "${workspaceFolder}/.venv/bin/uvicorn",
+            "args": [
+                "app.main:app",
+                "--reload",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "8000"
+            ],
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONUNBUFFERED": "1"
+            }
         }
     ]
 }

@@ -32,7 +32,3 @@ app.add_middleware(
 app.include_router(api_router)
 
 validation_exception_handler(app)
-
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
