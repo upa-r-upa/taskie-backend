@@ -26,5 +26,5 @@ jobs:
         with:
           push: true
           file: ./Dockerfile
-          tags: ${{ env.DOCKER_IMAGE_TAG }}
+          tags: ${{ secrets.DOCKER_IMAGE_TAG }}
           platforms: linux/amd64,linux/arm64
