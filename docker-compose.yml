@@ -1,0 +1,10 @@
+services:
+  taskie-backend:
+    container_name: taskie-backend-container
+    image: taskie-backend
+    ports:
+      - "8000:8000"
+    environment:
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      TSK_DB_URL: ${TSK_DB_URL}
+    restart: unless-stopped
