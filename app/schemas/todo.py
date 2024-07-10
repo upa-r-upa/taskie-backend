@@ -48,4 +48,4 @@ class TodoListGetInput(BaseModel):
     start_date: str = None
     end_date: str = None
 
-    completed: int = 0
+    completed: bool = False

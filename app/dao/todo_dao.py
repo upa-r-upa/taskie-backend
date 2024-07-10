@@ -83,12 +83,12 @@ class TodoDAO(ProtectedBaseDAO):
         self,
         limit: int,
         offset: int,
-        completed: int = 0,
+        completed: bool = False,
         start_date: datetime = None,
         end_date: datetime = None,
     ) -> List[Todo]:
         query = self.db.query(Todo).filter(
-            Todo.user_id == self.user_id, Todo.completed == completed
+            Todo.user_id == self.user_id, Todo.completed == int(completed)
         )
 
         if start_date and end_date:

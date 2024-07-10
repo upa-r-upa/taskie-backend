@@ -9,9 +9,18 @@ on:
 jobs:
   Run-and-Test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: taskie_test_db
+        ports:
+          - 5432:5432
 
     env:
-      TSK_DB_URL: "sqlite:///./db/taskie_test.db"
+      TSK_DB_URL: "postgresql://testuser:testpass@localhost:5432/taskie_test_db"
       JWT_SECRET_KEY: ""
 
     steps:
@@ -29,12 +38,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
-
-      - name: Set up the database folder
-        run: |
-          mkdir db
-          echo "Initializing the database..."
+          poetry Install
 
       - name: Test with pytest
         run: |

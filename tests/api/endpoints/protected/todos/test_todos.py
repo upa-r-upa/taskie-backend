@@ -130,7 +130,7 @@ def test_get_todo_list__valid_page_and_offset__1_page(
     access_token: str,
     add_todo_list_with_date: List[Todo],
 ):
-    params = TodoListGetInput(limit=3, offset=0, completed=0)
+    params = TodoListGetInput(limit=3, offset=0, completed=False)
 
     response = client.get(
         "/todos",
@@ -154,7 +154,7 @@ def test_get_todo_list__valid_page_and_offset__2_page(
     access_token: str,
     add_todo_list_with_date: List[Todo],
 ):
-    params = TodoListGetInput(limit=3, offset=3, completed=0)
+    params = TodoListGetInput(limit=3, offset=3, completed=False)
 
     response = client.get(
         "/todos",
@@ -182,7 +182,7 @@ def test_get_todo_list__valid_date_range(
     params = TodoListGetInput(
         limit=3,
         offset=0,
-        completed=0,
+        completed=False,
         start_date="2023-11-04",
         end_date="2023-11-06",
     )
@@ -208,7 +208,7 @@ def test_get_todo_list__complete(
     access_token: str,
     add_todo_list_with_date: List[Todo],
 ):
-    params = TodoListGetInput(limit=3, offset=0, completed=1)
+    params = TodoListGetInput(limit=3, offset=0, completed=True)
 
     response = client.get(
         "/todos",
