@@ -135,7 +135,9 @@ def get_todo_list(
         end_date = datetime.datetime.now(datetime.UTC)
 
     if end_date and not start_date:
-        start_date = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=30)
+        start_date = datetime.datetime.now(datetime.UTC) - datetime.timedelta(
+            days=30
+        )
 
     todo_list = todo_dao.get_todo_list(
         completed=completed,

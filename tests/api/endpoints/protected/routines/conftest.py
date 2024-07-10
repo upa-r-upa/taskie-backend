@@ -23,6 +23,7 @@ def routine_data() -> RoutineCreateInput:
             RoutineItemUpdate(title="아침 물 마시기", duration_minutes=5),
             RoutineItemUpdate(title="아침 운동하기", duration_minutes=30),
             RoutineItemUpdate(title="아침 식사하기", duration_minutes=15),
+            RoutineItemUpdate(title="세수하기", duration_minutes=15),
         ],
     )
 
