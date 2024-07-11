@@ -1,7 +1,6 @@
 FROM python:3.11.7-slim
 
 WORKDIR /source
-RUN mkdir -p /source/db
 
 COPY poetry.lock pyproject.toml /source/
 
