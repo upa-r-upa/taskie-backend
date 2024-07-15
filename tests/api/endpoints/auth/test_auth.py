@@ -53,8 +53,16 @@ def test_login(client: TestClient, user_data: UserBase, add_user: User):
     response = client.post("/auth/login", json=data.dict())
 
     assert response.status_code == 200
+
+    assert response.cookies.get("refresh_token") is not None
     assert response.json().get("data").get("access_token")
-    assert response.json().get("data").get("refresh_token")
+
+
+def test_logout(client: TestClient, add_user: User):
+    response = client.post("/auth/logout")
+
+    assert response.status_code == 204
+    assert response.cookies.get("refresh_token") is None
 
 
 def test_refresh(client: TestClient, refresh_token: str):

@@ -55,7 +55,6 @@ class LoginInput(BaseModel):
 
 class LoginOutput(BaseModel):
     access_token: str
-    refresh_token: str
 
 
 class RefreshInput(BaseModel):
