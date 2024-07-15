@@ -20,6 +20,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     "/signup",
     response_model=Response[SignupOutput],
     status_code=status.HTTP_201_CREATED,
+    operation_id="signup",
 )
 def signup(
     data: SignupInput,
@@ -39,6 +40,7 @@ def signup(
     "/login",
     response_model=Response[LoginOutput],
     status_code=status.HTTP_200_OK,
+    operation_id="login",
 )
 def login(
     data: LoginInput,
@@ -57,6 +59,7 @@ def login(
     "/refresh",
     response_model=Response[RefreshOutput],
     status_code=status.HTTP_200_OK,
+    operation_id="refreshToken",
 )
 async def refresh(
     data: RefreshInput, auth_dao: AuthDAO = Depends(get_auth_dao)

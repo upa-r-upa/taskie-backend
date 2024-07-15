@@ -17,7 +17,10 @@ router = APIRouter(
 
 
 @router.get(
-    "/me", response_model=Response[UserData], status_code=status.HTTP_200_OK
+    "/me",
+    response_model=Response[UserData],
+    status_code=status.HTTP_200_OK,
+    operation_id="getMe",
 )
 def get_me(user: User = Depends(get_current_user)):
     return Response(
@@ -27,7 +30,10 @@ def get_me(user: User = Depends(get_current_user)):
 
 
 @router.put(
-    "/me", response_model=Response[UserData], status_code=status.HTTP_200_OK
+    "/me",
+    response_model=Response[UserData],
+    status_code=status.HTTP_200_OK,
+    operation_id="updateMe",
 )
 def update_me(
     data: UserUpdateInput,

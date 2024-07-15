@@ -28,6 +28,7 @@ router = APIRouter(
     "/{todo_id}",
     response_model=Response[TodoDetail],
     status_code=status.HTTP_200_OK,
+    operation_id="getTodo",
 )
 def get_todo(
     todo_id: int,
@@ -42,6 +43,7 @@ def get_todo(
     "/",
     response_model=Response[TodoDetail],
     status_code=status.HTTP_201_CREATED,
+    operation_id="createTodo",
 )
 def create_todo(
     data: TodoBase,
@@ -62,6 +64,7 @@ def create_todo(
     "/order",
     response_model=None,
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="updateTodoListOrder",
 )
 def update_todo_list_order(
     data: TodoOrderUpdateInput,
@@ -80,6 +83,7 @@ def update_todo_list_order(
     "/{todo_id}",
     response_model=Response[TodoDetail],
     status_code=status.HTTP_200_OK,
+    operation_id="updateTodo",
 )
 def update_todo(
     todo_id: int,
@@ -101,6 +105,7 @@ def update_todo(
     "/{todo_id}",
     response_model=None,
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="deleteTodo",
 )
 def delete_todo(
     todo_id: int,
@@ -119,6 +124,7 @@ def delete_todo(
     "/",
     response_model=Response[List[TodoDetail]],
     status_code=status.HTTP_200_OK,
+    operation_id="getTodoList",
 )
 def get_todo_list(
     limit: int,

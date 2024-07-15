@@ -26,6 +26,7 @@ router = APIRouter(
     "/",
     response_model=Response[RoutineDetail],
     status_code=status.HTTP_201_CREATED,
+    operation_id="createRoutine",
 )
 def create_routine(
     data: RoutineCreateInput,
@@ -42,6 +43,7 @@ def create_routine(
     "/{routine_id}",
     response_model=Response[RoutineDetail],
     status_code=status.HTTP_200_OK,
+    operation_id="getRoutine",
 )
 def get_routine(routine_id: int, dao: RoutineDAO = Depends(get_routine_dao)):
     routine = dao.get_routine_with_elements_by_id(routine_id)
@@ -57,6 +59,7 @@ def get_routine(routine_id: int, dao: RoutineDAO = Depends(get_routine_dao)):
     "/{routine_id}",
     response_model=None,
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="deleteRoutine",
 )
 def delete_routine(
     routine_id: int,
@@ -73,6 +76,7 @@ def delete_routine(
     "/{routine_id}",
     response_model=Response[RoutineDetail],
     status_code=status.HTTP_200_OK,
+    operation_id="updateRoutine",
 )
 def update_routine(
     routine_id: int,
@@ -94,6 +98,7 @@ def update_routine(
     "/log/complete",
     response_model=None,
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="updateRoutineElementComplete",
 )
 def update_routine_element_complete(
     data: RoutineItemCompleteUpdate,
