@@ -4,7 +4,6 @@ from app.models.models import User
 
 from app.schemas.auth import (
     LoginInput,
-    RefreshInput,
     SignupInput,
     SignupOutput,
     UserBase,
@@ -66,9 +65,23 @@ def test_logout(client: TestClient, add_user: User):
 
 
 def test_refresh(client: TestClient, refresh_token: str):
-    data = RefreshInput(refresh_token=refresh_token)
-
-    response = client.post("/auth/refresh", json=data.dict())
+    response = client.post(
+        "/auth/refresh", cookies={"refresh_token": refresh_token}
+    )
 
     assert response.status_code == 200
     assert response.json().get("data").get("access_token")
+
+
+def test_invalid_refresh(client: TestClient, refresh_token: str):
+    response = client.post("/auth/refresh", cookies={"refresh_token": "test"})
+
+    assert response.status_code == 401
+    assert response.cookies.get("refresh_token") is None
+
+
+def test_null_refresh(client: TestClient):
+    response = client.post("/auth/refresh")
+
+    assert response.status_code == 401
+    assert response.cookies.get("refresh_token") is None
