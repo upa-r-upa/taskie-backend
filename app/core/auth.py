@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 import jwt
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from typing import Callable, Optional
+from typing import Optional
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.api.strings import (
     USER_EXPIRED_AUTHENTICATED_ERROR,

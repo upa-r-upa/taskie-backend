@@ -1,4 +1,12 @@
-from fastapi import APIRouter, Depends, status, Response as FastAPIResponse
+from typing import Annotated
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    Response as FastAPIResponse,
+    Cookie,
+)
 
 from app.dao import get_auth_dao
 from app.dao.auth_dao import AuthDAO
@@ -7,7 +15,6 @@ from app.schemas.response import Response
 from app.schemas.auth import (
     LoginInput,
     LoginOutput,
-    RefreshInput,
     RefreshOutput,
     SignupInput,
     SignupOutput,
@@ -88,9 +95,27 @@ def logout(
     operation_id="refreshToken",
 )
 async def refresh(
-    data: RefreshInput, auth_dao: AuthDAO = Depends(get_auth_dao)
+    response: FastAPIResponse,
+    refresh_token: Annotated[str | None, Cookie()] = None,
+    auth_dao: AuthDAO = Depends(get_auth_dao),
 ):
-    access_token = auth_dao.refresh(data.refresh_token)
+    if not refresh_token:
+        headers = {
+            "WWW-Authenticate": 'Bearer realm="Access to the refresh API", \
+            error="invalid_token",\
+            error_description="The refresh token is missing"'
+        }
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token is required",
+            headers=headers,
+        )
+
+    try:
+        access_token = auth_dao.refresh(refresh_token=refresh_token)
+    except HTTPException as e:
+        response.delete_cookie(key="refresh_token")
+        raise e
 
     return Response(
         data=RefreshOutput(access_token=access_token),

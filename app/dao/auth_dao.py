@@ -4,8 +4,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.api.strings import (
     EMAIL_ALREADY_EXISTS_ERROR,
     INVALID_LOGIN_ERROR,
-    REQUIRE_REFRESH_TOKEN_ERROR,
-    USER_NOT_AUTHENTICATED_ERROR,
     USERNAME_ALREADY_EXISTS_ERROR,
 )
 from app.core.auth import (
@@ -73,21 +71,7 @@ class AuthDAO(BaseDAO):
         return refresh_token, access_token
 
     def refresh(self, refresh_token: str) -> str:
-        if not refresh_token:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=REQUIRE_REFRESH_TOKEN_ERROR,
-            )
-
         username = decode_token(refresh_token)
-
-        if not username:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=USER_NOT_AUTHENTICATED_ERROR,
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-
         access_token = generate_access_token(username)
 
         return access_token
