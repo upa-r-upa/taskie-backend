@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Response as FastAPIResponse
 
 from app.dao import get_auth_dao
 from app.dao.auth_dao import AuthDAO
@@ -44,15 +44,41 @@ def signup(
 )
 def login(
     data: LoginInput,
+    response: FastAPIResponse,
     auth_dao: AuthDAO = Depends(get_auth_dao),
     tx_manager: None = Depends(tx_manager),
 ):
     with tx_manager:
-        login_output = auth_dao.login(data.username, data.password)
+        refresh_token, access_token = auth_dao.login(
+            data.username, data.password
+        )
+
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            max_age=60 * 60 * 24 * 7,
+            secure=True,
+            samesite="strict",
+        )
 
     return Response(
-        data=login_output,
+        data=LoginOutput(access_token=access_token),
     )
+
+
+@router.post(
+    "/logout",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="logout",
+)
+def logout(
+    response: FastAPIResponse,
+):
+    response.delete_cookie(key="refresh_token")
+
+    return None
 
 
 @router.post(

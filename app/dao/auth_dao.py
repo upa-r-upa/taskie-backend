@@ -1,3 +1,4 @@
+from typing import Tuple
 from fastapi import HTTPException, status
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.api.strings import (
@@ -14,7 +15,7 @@ from app.core.auth import (
 )
 
 from app.models.models import User
-from app.schemas.auth import LoginOutput, SignupInput
+from app.schemas.auth import SignupInput
 
 from .base import BaseDAO
 
@@ -57,7 +58,7 @@ class AuthDAO(BaseDAO):
 
         return user
 
-    def login(self, username: str, password: str) -> LoginOutput:
+    def login(self, username: str, password: str) -> Tuple[str, str]:
         user = self.db.query(User).filter_by(username=username).first()
 
         if not user or not check_password_hash(user.password, password):
@@ -69,9 +70,7 @@ class AuthDAO(BaseDAO):
         access_token = generate_access_token(user.username)
         refresh_token = generate_refresh_token(user.username)
 
-        return LoginOutput(
-            access_token=access_token, refresh_token=refresh_token
-        )
+        return refresh_token, access_token
 
     def refresh(self, refresh_token: str) -> str:
         if not refresh_token:
