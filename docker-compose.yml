@@ -2,7 +2,7 @@ services:
   taskie-backend:
     image: taskie-backend
     ports:
-      - "88:8000"
+      - "8000:8000"
     environment:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       TSK_DB_URL: ${TSK_DB_URL}
