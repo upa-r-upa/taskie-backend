@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from app.models.models import User
 
 from app.schemas.auth import (
-    LoginInput,
     SignupInput,
     SignupOutput,
     UserBase,
@@ -44,17 +43,27 @@ def test_signup(client: TestClient, session: Session, user_data: UserBase):
 
 
 def test_login(client: TestClient, user_data: UserBase, add_user: User):
-    data = LoginInput(
+    data = dict(
         username=add_user.username,
         password=user_data.password,
     )
 
-    response = client.post("/auth/login", json=data.dict())
+    response = client.post("/auth/login", json=data)
 
     assert response.status_code == 200
 
     assert response.cookies.get("refresh_token") is not None
     assert response.json().get("data").get("access_token")
+
+
+def test_login_invalid_data(
+    client: TestClient, user_data: UserBase, add_user: User
+):
+    data = dict(username="invalid_username", password="invalid_password")
+
+    response = client.post("/auth/login", json=data)
+
+    assert response.status_code == 401
 
 
 def test_logout(client: TestClient, add_user: User):
@@ -64,7 +73,7 @@ def test_logout(client: TestClient, add_user: User):
     assert response.cookies.get("refresh_token") is None
 
 
-def test_refresh(client: TestClient, refresh_token: str):
+def test_refresh(client: TestClient, refresh_token: str, add_user: User):
     response = client.post(
         "/auth/refresh", cookies={"refresh_token": refresh_token}
     )
@@ -73,7 +82,9 @@ def test_refresh(client: TestClient, refresh_token: str):
     assert response.json().get("data").get("access_token")
 
 
-def test_invalid_refresh(client: TestClient, refresh_token: str):
+def test_invalid_refresh(
+    client: TestClient, refresh_token: str, add_user: User
+):
     response = client.post("/auth/refresh", cookies={"refresh_token": "test"})
 
     assert response.status_code == 401

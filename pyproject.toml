@@ -12,13 +12,13 @@ fastapi = "^0.98.0"
 sqlalchemy = "^2.0.17"
 datetime = "^5.1"
 pyjwt = "^2.7.0"
-werkzeug = "^2.3.6"
 uvicorn = {extras = ["standard"], version = "^0.22.0"}
 alembic = "^1.11.1"
 pytest = "^7.4.0"
 httpx = "^0.24.1"
 python-dotenv = "^1.0.0"
 psycopg2-binary = "^2.9.9"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"

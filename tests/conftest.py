@@ -1,7 +1,6 @@
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from werkzeug.security import generate_password_hash
 
 
 from sqlalchemy import create_engine
@@ -11,7 +10,7 @@ from app.core.config import DATABASE_URI
 from app.schemas.auth import UserBase
 from app.database.db import Base, get_db
 from app.models.models import User
-from app.core.auth import generate_access_token
+from app.core.auth import create_access_token, get_password_hash
 from app.main import app as client_app
 
 engine = create_engine(DATABASE_URI, echo=True)
@@ -71,7 +70,7 @@ def user_data() -> UserBase:
 def add_user(session: Session, user_data: UserBase) -> User:
     user = User(
         username=user_data.username,
-        password=generate_password_hash(user_data.password),
+        password=get_password_hash(user_data.password),
         email=user_data.email,
         grade=user_data.grade,
         profile_image=user_data.profile_image,
@@ -86,7 +85,7 @@ def add_user(session: Session, user_data: UserBase) -> User:
 
 @pytest.fixture
 def access_token(user_data: UserBase) -> str:
-    return generate_access_token(user_data.username)
+    return create_access_token(user_data.username)
 
 
 @pytest.fixture

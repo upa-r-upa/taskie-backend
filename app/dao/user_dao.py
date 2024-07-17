@@ -1,10 +1,10 @@
 from fastapi import HTTPException, status
-from werkzeug.security import check_password_hash
 
 from app.api.strings import (
     INVALID_LOGIN_ERROR,
     USERNAME_CANNOT_BE_CHANGED_ERROR,
 )
+from app.core.auth import verify_password
 from app.models.models import User
 from app.schemas.user import UserUpdateInput
 
@@ -21,7 +21,7 @@ class UserDAO(ProtectedBaseDAO):
                 detail=USERNAME_CANNOT_BE_CHANGED_ERROR,
             )
 
-        if not check_password_hash(user.password, data.password):
+        if not verify_password(data.password, user.password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=INVALID_LOGIN_ERROR,
