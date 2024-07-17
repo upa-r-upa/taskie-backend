@@ -127,8 +127,8 @@ def delete_todo(
     operation_id="getTodoList",
 )
 def get_todo_list(
-    limit: int,
-    offset: int,
+    limit: int = 30,
+    offset: int = 0,
     completed: bool = False,
     start_date: str = None,
     end_date: str = None,
