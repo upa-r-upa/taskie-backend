@@ -20,11 +20,7 @@ async def startup_event():
 
 
 # CORS 설정
-origins = [
-    "http://localhost",
-    "http://localhost:8080",
-    # 필요한 경우 추가적인 origin을 여기에 나열합니다.
-]
+origins = ["http://localhost:5173", "https://taskie.upa-r-upa.com"]
 
 app.add_middleware(
     CORSMiddleware,
