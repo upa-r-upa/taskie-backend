@@ -194,6 +194,7 @@ migrations/
 
 # env
 .env
+.env.dev
 
 # virtual env
 .venv
