@@ -107,7 +107,6 @@ async def refresh(
         }
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token is required",
             headers=headers,
         )
 

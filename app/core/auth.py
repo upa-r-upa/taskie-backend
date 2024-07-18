@@ -1,5 +1,4 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
 import jwt
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
@@ -7,6 +6,7 @@ from sqlalchemy.orm import Session
 from typing import Annotated, Literal
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.database.db import get_db
 from app.models.models import User
@@ -20,7 +20,7 @@ from .config import (
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+security_scheme = HTTPBearer()
 
 
 class TokenData(BaseModel):
@@ -108,10 +108,11 @@ def refresh_token_decode(refresh_token: str, db: Session) -> User:
 
 
 def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    credentials: HTTPAuthorizationCredentials = Depends(security_scheme),
     db: Session = Depends(get_db),
 ) -> User:
     try:
+        token = credentials.credentials
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         username: str | None = payload.get("username")
         type: str | None = payload.get("type")
@@ -119,6 +120,12 @@ def get_current_user(
         if username is None or type != "access":
             raise credentials_exception
 
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     except InvalidTokenError:
         raise credentials_exception
 
