@@ -8,14 +8,12 @@ from app.schemas.user import UserData, UserUpdateInput
 
 def test_get_me(
     client: TestClient,
-    access_token: str,
+    access_token_headers: dict[str, str],
     user_data: UserBase,
 ):
     excepted_output = UserData.from_orm(user_data)
 
-    response = client.get(
-        "/users/me", headers={"Authorization": f"Bearer {access_token}"}
-    )
+    response = client.get("/users/me", headers=access_token_headers)
 
     assert response.status_code == 200
     assert response.json().get("data") == excepted_output.dict()
@@ -24,7 +22,7 @@ def test_get_me(
 def test_update_me(
     client: TestClient,
     session: Session,
-    access_token: str,
+    access_token_headers: dict[str, str],
     user_data: UserBase,
 ):
     excepted_output = UserData.from_orm(user_data)
@@ -43,7 +41,7 @@ def test_update_me(
 
     response = client.put(
         "/users/me",
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=access_token_headers,
         json=data.dict(),
     )
 

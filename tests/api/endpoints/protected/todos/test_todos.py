@@ -11,10 +11,12 @@ from app.schemas.todo import (
 )
 
 
-def test_get_todo(client: TestClient, add_todo: Todo, access_token: str):
+def test_get_todo(
+    client: TestClient, add_todo: Todo, access_token_headers: dict[str, str]
+):
     response = client.get(
         f"/todos/{add_todo.id}",
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=access_token_headers,
     )
 
     response_data = TodoDetail(**response.json().get("data"))
@@ -27,12 +29,12 @@ def test_get_todo(client: TestClient, add_todo: Todo, access_token: str):
 
 
 def test_create_todo(
-    client: TestClient, session: Session, todo: TodoBase, access_token: str
+    client: TestClient, session: Session, todo: TodoBase, access_token_headers: dict[str, str]
 ):
     response = client.post(
         "/todos",
         json=todo.dict(),
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=access_token_headers,
     )
 
     response_data = TodoDetail(**response.json().get("data"))
@@ -46,7 +48,7 @@ def test_create_todo(
 
 
 def test_update_todo(
-    client: TestClient, session: Session, add_todo: Todo, access_token: str
+    client: TestClient, session: Session, add_todo: Todo, access_token_headers: dict[str, str]
 ):
     request_data = TodoBase.from_orm(add_todo)
 
@@ -56,7 +58,7 @@ def test_update_todo(
     response = client.put(
         f"/todos/{add_todo.id}",
         json=request_data.dict(),
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=access_token_headers,
     )
 
     response_data = TodoDetail(**response.json().get("data"))
@@ -74,11 +76,11 @@ def test_update_todo(
 
 
 def test_delete_todo(
-    client: TestClient, session: Session, add_todo: Todo, access_token: str
+    client: TestClient, session: Session, add_todo: Todo, access_token_headers: dict[str, str]
 ):
     response = client.delete(
         f"/todos/{add_todo.id}",
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=access_token_headers,
     )
 
     assert response.status_code == 204
@@ -89,14 +91,14 @@ def test_delete_todo(
 def test_update_todo_list_order(
     client: TestClient,
     session: Session,
-    access_token: str,
+    access_token_headers: dict[str, str],
     add_todo_list: List[Todo],
     todo_order_update_data: TodoOrderUpdateInput,
 ):
     response = client.put(
         "/todos/order",
         json=todo_order_update_data.dict(),
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=access_token_headers,
     )
 
     assert response.status_code == 204
@@ -127,7 +129,7 @@ def test_update_todo_list_order(
 def test_get_todo_list__valid_page_and_offset__1_page(
     client: TestClient,
     session: Session,
-    access_token: str,
+    access_token_headers: dict[str, str],
     add_todo_list_with_date: List[Todo],
 ):
     params = TodoListGetInput(limit=3, offset=0, completed=False)
@@ -135,7 +137,7 @@ def test_get_todo_list__valid_page_and_offset__1_page(
     response = client.get(
         "/todos",
         params=params.dict(),
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=access_token_headers,
     )
 
     assert response.status_code == 200
@@ -151,7 +153,7 @@ def test_get_todo_list__valid_page_and_offset__1_page(
 def test_get_todo_list__valid_page_and_offset__2_page(
     client: TestClient,
     session: Session,
-    access_token: str,
+    access_token_headers: dict[str, str],
     add_todo_list_with_date: List[Todo],
 ):
     params = TodoListGetInput(limit=3, offset=3, completed=False)
@@ -159,7 +161,7 @@ def test_get_todo_list__valid_page_and_offset__2_page(
     response = client.get(
         "/todos",
         params=params.dict(),
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=access_token_headers,
     )
 
     assert response.status_code == 200
@@ -175,7 +177,7 @@ def test_get_todo_list__valid_page_and_offset__2_page(
 def test_get_todo_list__valid_date_range(
     client: TestClient,
     session: Session,
-    access_token: str,
+    access_token_headers: dict[str, str],
     add_todo_list_with_date: List[Todo],
 ):
 
@@ -190,7 +192,7 @@ def test_get_todo_list__valid_date_range(
     response = client.get(
         "/todos",
         params=params.dict(),
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=access_token_headers,
     )
 
     assert response.status_code == 200
@@ -205,7 +207,7 @@ def test_get_todo_list__valid_date_range(
 def test_get_todo_list__complete(
     client: TestClient,
     session: Session,
-    access_token: str,
+    access_token_headers: dict[str, str],
     add_todo_list_with_date: List[Todo],
 ):
     params = TodoListGetInput(limit=3, offset=0, completed=True)
@@ -213,7 +215,7 @@ def test_get_todo_list__complete(
     response = client.get(
         "/todos",
         params=params.dict(),
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=access_token_headers,
     )
 
     assert response.status_code == 200
