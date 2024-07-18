@@ -123,7 +123,7 @@ def get_current_user(
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="",
+            detail="EXPIRED_TOKEN",
             headers={"WWW-Authenticate": "Bearer"},
         )
     except InvalidTokenError:

@@ -19,6 +19,7 @@ from app.schemas.auth import (
     SignupInput,
     SignupOutput,
 )
+from app.schemas.user import UserData
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -56,7 +57,7 @@ def login(
     tx_manager: None = Depends(tx_manager),
 ):
     with tx_manager:
-        refresh_token, access_token = auth_dao.login(
+        refresh_token, access_token, user = auth_dao.login(
             data.username, data.password
         )
 
@@ -70,7 +71,9 @@ def login(
         )
 
     return Response(
-        data=LoginOutput(access_token=access_token),
+        data=LoginOutput(
+            access_token=access_token, user=UserData.from_orm(user)
+        ),
     )
 
 
@@ -111,11 +114,13 @@ async def refresh(
         )
 
     try:
-        access_token = auth_dao.refresh(refresh_token=refresh_token)
+        access_token, user = auth_dao.refresh(refresh_token=refresh_token)
     except HTTPException as e:
         response.delete_cookie(key="refresh_token")
         raise e
 
     return Response(
-        data=RefreshOutput(access_token=access_token),
+        data=RefreshOutput(
+            access_token=access_token, user=UserData.from_orm(user)
+        ),
     )

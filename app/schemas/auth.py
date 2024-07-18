@@ -1,6 +1,8 @@
 import re
 from pydantic import BaseModel, validator
 
+from app.schemas.user import UserData
+
 
 class SignupInput(BaseModel):
     username: str
@@ -55,10 +57,12 @@ class LoginInput(BaseModel):
 
 class LoginOutput(BaseModel):
     access_token: str
+    user: UserData
 
 
 class RefreshOutput(BaseModel):
     access_token: str
+    user: UserData
 
 
 class UserBase(BaseModel):

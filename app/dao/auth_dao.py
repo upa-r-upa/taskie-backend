@@ -56,7 +56,7 @@ class AuthDAO(BaseDAO):
 
         return user
 
-    def login(self, username: str, password: str) -> Tuple[str, str]:
+    def login(self, username: str, password: str) -> Tuple[str, str, User]:
         user = authenticate_user(self.db, username, password)
 
         if not user:
@@ -69,10 +69,10 @@ class AuthDAO(BaseDAO):
         access_token = create_access_token(user.username)
         refresh_token = create_refresh_token(user.username)
 
-        return refresh_token, access_token
+        return refresh_token, access_token, user
 
-    def refresh(self, refresh_token: str) -> str:
+    def refresh(self, refresh_token: str) -> Tuple[str, User]:
         user: User = refresh_token_decode(refresh_token, self.db)
         access_token = create_access_token(user.username)
 
-        return access_token
+        return access_token, user
