@@ -49,11 +49,18 @@ def test_login(client: TestClient, user_data: UserBase, add_user: User):
     )
 
     response = client.post("/auth/login", json=data)
+    response_json_user = response.json().get("data").get("user")
 
     assert response.status_code == 200
 
     assert response.cookies.get("refresh_token") is not None
     assert response.json().get("data").get("access_token")
+
+    assert response_json_user.get("username") == user_data.username
+    assert response_json_user.get("email") == user_data.email
+    assert response_json_user.get("grade") == user_data.grade
+    assert response_json_user.get("profile_image") == user_data.profile_image
+    assert response_json_user.get("nickname") == user_data.nickname
 
 
 def test_login_invalid_data(
@@ -73,13 +80,23 @@ def test_logout(client: TestClient, add_user: User):
     assert response.cookies.get("refresh_token") is None
 
 
-def test_refresh(client: TestClient, refresh_token: str, add_user: User):
+def test_refresh(
+    client: TestClient, refresh_token: str, user_data: UserBase, add_user: User
+):
     response = client.post(
         "/auth/refresh", cookies={"refresh_token": refresh_token}
     )
 
+    response_json_user = response.json().get("data").get("user")
+
     assert response.status_code == 200
     assert response.json().get("data").get("access_token")
+
+    assert response_json_user.get("username") == user_data.username
+    assert response_json_user.get("email") == user_data.email
+    assert response_json_user.get("grade") == user_data.grade
+    assert response_json_user.get("profile_image") == user_data.profile_image
+    assert response_json_user.get("nickname") == user_data.nickname
 
 
 def test_invalid_refresh(
