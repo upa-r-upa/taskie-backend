@@ -66,8 +66,8 @@ def login(
             value=refresh_token,
             httponly=True,
             max_age=60 * 60 * 24 * 7,
-            secure=True,
-            samesite="strict",
+            # secure=True,
+            samesite="lax",
         )
 
     return Response(
@@ -86,7 +86,14 @@ def login(
 def logout(
     response: FastAPIResponse,
 ):
-    response.delete_cookie(key="refresh_token")
+    response.set_cookie(
+        key="refresh_token",
+        value="",
+        httponly=True,
+        max_age=0,
+        # secure=True,
+        samesite="lax",
+    )
 
     return None
 
@@ -116,7 +123,14 @@ async def refresh(
     try:
         access_token, user = auth_dao.refresh(refresh_token=refresh_token)
     except HTTPException as e:
-        response.delete_cookie(key="refresh_token")
+        response.set_cookie(
+            key="refresh_token",
+            value="",
+            httponly=True,
+            max_age=0,
+            # secure=True,
+            samesite="lax",
+        )
         raise e
 
     return Response(
