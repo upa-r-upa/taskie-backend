@@ -1,8 +1,8 @@
 from fastapi import HTTPException, status
 
-from app.api.strings import (
-    INVALID_LOGIN_ERROR,
-    USERNAME_CANNOT_BE_CHANGED_ERROR,
+from app.api.errors import (
+    INCORRECT_USERNAME_OR_PASSWORD,
+    USERNAME_CANNOT_BE_CHANGED,
 )
 from app.core.auth import verify_password
 from app.models.models import User
@@ -18,13 +18,13 @@ class UserDAO(ProtectedBaseDAO):
         if data.username != self.username:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=USERNAME_CANNOT_BE_CHANGED_ERROR,
+                detail=USERNAME_CANNOT_BE_CHANGED,
             )
 
         if not verify_password(data.password, user.password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=INVALID_LOGIN_ERROR,
+                detail=INCORRECT_USERNAME_OR_PASSWORD,
             )
 
         if data.email:

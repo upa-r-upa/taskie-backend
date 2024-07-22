@@ -2,6 +2,12 @@ from datetime import datetime
 from pydantic import BaseModel, validator
 from typing import List
 
+from app.api.errors import (
+    DUPLICATED_VALUE,
+    INVALID_VALUE_RANGE,
+    VALUE_MUST_NOT_BE_EMPTY,
+    VALUE_TOO_LONG,
+)
 from app.models.models import Routine, RoutineElement
 
 
@@ -19,36 +25,36 @@ class RoutineCreateInput(BaseModel):
     @validator("repeat_days")
     def validate_repeat_days(cls, v):
         if len(v) == 0:
-            raise ValueError("repeat_days must contain at least one value")
+            raise ValueError(VALUE_MUST_NOT_BE_EMPTY)
         elif len(v) != len(set(v)):
-            raise ValueError("repeat_days must not contain duplicate values")
+            raise ValueError(DUPLICATED_VALUE)
 
         for i in range(len(v)):
             if v[i] < 1 or v[i] > 7:
-                raise ValueError("repeat_days must be between 1 and 7")
+                raise ValueError(INVALID_VALUE_RANGE)
         return v
 
     @validator("start_time_minutes")
     def validate_start_time_minutes(cls, v):
         if v < 0 or v >= 1440:
-            raise ValueError("start_time_minutes must be between 0 and 1439")
+            raise ValueError(INVALID_VALUE_RANGE)
         return v
 
     @validator("routine_elements")
     def validate_routine_elements(cls, v):
         for item in v:
             if item.duration_minutes < 0:
-                raise ValueError("duration_minutes must be positive")
+                raise ValueError(INVALID_VALUE_RANGE)
             elif item.duration_minutes > 1440:
-                raise ValueError("duration_minutes must be less than 1440")
+                raise ValueError(INVALID_VALUE_RANGE)
         return v
 
     @validator("title")
     def validate_title(cls, v):
         if len(v) == 0:
-            raise ValueError("title must not be empty")
+            raise ValueError(VALUE_MUST_NOT_BE_EMPTY)
         elif len(v) > 255:
-            raise ValueError("title must be less than 255 characters")
+            raise ValueError(VALUE_TOO_LONG)
         return v
 
     class Config:

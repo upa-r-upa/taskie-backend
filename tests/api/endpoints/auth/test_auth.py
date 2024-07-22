@@ -4,7 +4,6 @@ from app.models.models import User
 
 from app.schemas.auth import (
     SignupInput,
-    SignupOutput,
     UserBase,
 )
 
@@ -20,18 +19,9 @@ def test_signup(client: TestClient, session: Session, user_data: UserBase):
         nickname=user_data.nickname,
     )
 
-    expected_output = SignupOutput(
-        username=data.username,
-        email=data.email,
-        grade=data.grade,
-        profile_image=data.profile_image,
-        nickname=data.nickname,
-    )
-
     response = client.post("/auth/signup", json=data.dict())
 
     assert response.status_code == 201
-    assert response.json().get("data") == expected_output.dict()
 
     user = session.query(User).filter_by(username=data.username).first()
 

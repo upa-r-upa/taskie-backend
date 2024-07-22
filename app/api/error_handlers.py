@@ -13,7 +13,7 @@ def validation_exception_handler(app: FastAPI):
     ):
         return JSONResponse(
             status_code=exc.status_code,
-            content=ErrorResponse(message=exc.detail).dict(),
+            content=ErrorResponse(error_type=exc.detail).dict(),
             headers=exc.headers,
         )
 
@@ -36,21 +36,39 @@ def validation_exception_handler(app: FastAPI):
         ):
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content=ErrorResponse(message="Invalid JSON payload").dict(),
+                content=ErrorResponse(
+                    message="Invalid JSON payload",
+                    error_type="INVALID_JSON_PAYLOAD",
+                ).dict(),
             )
 
         for detail in details:
-            errors.append(
-                InnerErrorResponse(
-                    message=detail["msg"],
-                    location=_filtered_location_list(detail["loc"]),
+            if detail["type"] == "value_error":
+                errors.append(
+                    InnerErrorResponse(
+                        location=_filtered_location_list(detail["loc"]),
+                        error_type=detail["msg"],
+                    )
                 )
-            )
+            else:
+                if detail["type"] == "value_error.missing":
+                    detail["type"] = "REQUIRED_VALUE"
+                else:
+                    detail["type"] = detail["type"].upper().replace(".", "_")
+
+                errors.append(
+                    InnerErrorResponse(
+                        location=_filtered_location_list(detail["loc"]),
+                        error_type=detail["type"],
+                    )
+                )
 
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=ErrorResponse(
-                message="Validation Error", errors=errors
+                message="Validation Error",
+                error_type="VALIDATION_ERROR",
+                errors=errors,
             ).dict(),
         )
 
@@ -58,5 +76,8 @@ def validation_exception_handler(app: FastAPI):
     async def custom_exception_handler(request: Request, exc: Exception):
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content=ErrorResponse(message="Internal Server Error").dict(),
+            content=ErrorResponse(
+                message="Internal Server Error",
+                error_type="INTERNAL_SERVER_ERROR",
+            ).dict(),
         )

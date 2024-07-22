@@ -17,7 +17,6 @@ from app.schemas.auth import (
     LoginOutput,
     RefreshOutput,
     SignupInput,
-    SignupOutput,
 )
 from app.schemas.user import UserData
 
@@ -26,7 +25,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post(
     "/signup",
-    response_model=Response[SignupOutput],
+    response_model=None,
     status_code=status.HTTP_201_CREATED,
     operation_id="signup",
 )
@@ -36,12 +35,9 @@ def signup(
     tx_manager: None = Depends(tx_manager),
 ):
     with tx_manager:
-        user = auth_dao.sign_up(data)
+        auth_dao.sign_up(data)
 
-    return Response(
-        message="Signup success",
-        data=SignupOutput.from_orm(user),
-    )
+    return None
 
 
 @router.post(

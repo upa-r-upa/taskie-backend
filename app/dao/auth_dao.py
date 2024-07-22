@@ -1,8 +1,9 @@
 from typing import Tuple
 from fastapi import HTTPException, status
-from app.api.strings import (
-    EMAIL_ALREADY_EXISTS_ERROR,
-    USERNAME_ALREADY_EXISTS_ERROR,
+from app.api.errors import (
+    EMAIL_ALREADY_EXISTS,
+    INCORRECT_USERNAME_OR_PASSWORD,
+    USERNAME_ALREADY_EXISTS,
 )
 from app.core.auth import (
     authenticate_user,
@@ -43,13 +44,13 @@ class AuthDAO(BaseDAO):
         if self.check_existing_username(user.username):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=USERNAME_ALREADY_EXISTS_ERROR,
+                detail=USERNAME_ALREADY_EXISTS,
             )
 
         if self.check_existing_email(user.email):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=EMAIL_ALREADY_EXISTS_ERROR,
+                detail=EMAIL_ALREADY_EXISTS,
             )
 
         self.db.add(user)
@@ -62,7 +63,7 @@ class AuthDAO(BaseDAO):
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
+                detail=INCORRECT_USERNAME_OR_PASSWORD,
                 headers={"WWW-Authenticate": "Bearer"},
             )
 

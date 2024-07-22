@@ -2,7 +2,7 @@ import datetime
 from operator import and_
 from typing import List
 from fastapi import HTTPException, status
-from app.api.strings import TODO_DOES_NOT_EXIST_ERROR
+from app.api.errors import DATA_DOES_NOT_EXIST
 from app.models.models import Todo
 from app.schemas.todo import TodoOrderUpdate
 
@@ -20,7 +20,7 @@ class TodoDAO(ProtectedBaseDAO):
         if not todo:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=TODO_DOES_NOT_EXIST_ERROR,
+                detail=DATA_DOES_NOT_EXIST,
             )
 
         return todo
@@ -50,7 +50,7 @@ class TodoDAO(ProtectedBaseDAO):
         if not todo:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=TODO_DOES_NOT_EXIST_ERROR,
+                detail=DATA_DOES_NOT_EXIST,
             )
 
         todo.title = title
@@ -64,7 +64,7 @@ class TodoDAO(ProtectedBaseDAO):
         if not todo:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=TODO_DOES_NOT_EXIST_ERROR,
+                detail=DATA_DOES_NOT_EXIST,
             )
 
         self.db.delete(todo)

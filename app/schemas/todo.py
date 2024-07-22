@@ -1,6 +1,8 @@
 from pydantic import BaseModel, validator
 from datetime import datetime
 
+from app.api.errors import VALUE_MUST_NOT_BE_EMPTY
+
 
 class TodoBase(BaseModel):
     title: str
@@ -10,7 +12,7 @@ class TodoBase(BaseModel):
     @validator("title")
     def title_must_not_be_empty(cls, v):
         if not v:
-            raise ValueError("Title must not be empty")
+            raise ValueError(VALUE_MUST_NOT_BE_EMPTY)
         return v
 
     class Config:

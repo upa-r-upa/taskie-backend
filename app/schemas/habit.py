@@ -3,6 +3,12 @@ from typing import List
 from fastapi.params import Query
 from pydantic import BaseModel, validator
 
+from app.api.errors import (
+    DUPLICATED_VALUE,
+    INVALID_VALUE_RANGE,
+    VALUE_MUST_NOT_BE_EMPTY,
+    VALUE_TOO_LONG,
+)
 from app.schemas.common import ListLoadParams
 from app.schemas.validator import validate_date
 
@@ -22,33 +28,33 @@ class HabitCreateInput(HabitBase):
     @validator("title")
     def validate_title(cls, v):
         if len(v) == 0:
-            raise ValueError("title must not be empty")
+            raise ValueError(VALUE_MUST_NOT_BE_EMPTY)
         elif len(v) > 255:
-            raise ValueError("title must be less than 255 characters")
+            raise ValueError(VALUE_TOO_LONG)
         return v
 
     @validator("start_time_minutes")
     def validate_start_time_minutes(cls, v):
         if v < 0 or v >= 1440:
-            raise ValueError("start_time_minutes must be between 0 and 1439")
+            raise ValueError(INVALID_VALUE_RANGE)
         return v
 
     @validator("end_time_minutes")
     def validate_end_time_minutes(cls, v):
         if v < 0 or v >= 1440:
-            raise ValueError("end_time_minutes must be between 0 and 1439")
+            raise ValueError(INVALID_VALUE_RANGE)
         return v
 
     @validator("repeat_days")
     def validate_repeat_days(cls, v):
         if len(v) == 0:
-            raise ValueError("repeat_days must contain at least one value")
+            raise ValueError(VALUE_MUST_NOT_BE_EMPTY)
         elif len(v) != len(set(v)):
-            raise ValueError("repeat_days must not contain duplicate values")
+            raise ValueError(DUPLICATED_VALUE)
 
         for i in range(len(v)):
             if v[i] < 1 or v[i] > 7:
-                raise ValueError("repeat_days must be between 1 and 7")
+                raise ValueError(INVALID_VALUE_RANGE)
 
         if v != sorted(v):
             v = sorted(v)
