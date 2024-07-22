@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from typing import List
 from fastapi import HTTPException, status
-from app.api.strings import ROUTINE_DOES_NOT_EXIST_ERROR
+from app.api.errors import DATA_DOES_NOT_EXIST
 from app.dao.base import ProtectedBaseDAO
 from app.models.models import Routine
 
@@ -21,7 +21,7 @@ class RoutineDAO(ProtectedBaseDAO):
         if not routine:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=ROUTINE_DOES_NOT_EXIST_ERROR,
+                detail=DATA_DOES_NOT_EXIST,
             )
 
         return routine
@@ -40,7 +40,7 @@ class RoutineDAO(ProtectedBaseDAO):
         if not routine:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=ROUTINE_DOES_NOT_EXIST_ERROR,
+                detail=DATA_DOES_NOT_EXIST,
             )
 
         return routine

@@ -11,10 +11,12 @@ class Response(GenericModel, Generic[T]):
 
 
 class InnerErrorResponse(BaseModel):
-    message: str
     location: list[str]
+    error_type: str | None = None
 
 
 class ErrorResponse(BaseModel):
-    message: str
+    error_type: str = None
+
     errors: List[InnerErrorResponse] | None = None
+    message: str = ""

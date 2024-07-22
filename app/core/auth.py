@@ -8,6 +8,7 @@ from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
+from app.api.errors import EXPIRED_TOKEN, INVALID_CREDENTIAL
 from app.database.db import get_db
 from app.models.models import User
 
@@ -80,7 +81,7 @@ def get_user(db: Session, username: str) -> User | None:
 
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Could not validate credentials",
+    detail=INVALID_CREDENTIAL,
     headers={"WWW-Authenticate": "Bearer"},
 )
 
@@ -123,7 +124,7 @@ def get_current_user(
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="EXPIRED_TOKEN",
+            detail=EXPIRED_TOKEN,
             headers={"WWW-Authenticate": "Bearer"},
         )
     except InvalidTokenError:

@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 
 from app.dao.base import ProtectedBaseDAO
-from app.api.strings import ROUTINE_ITEM_NOT_EXIST_ERROR
+from app.api.errors import DATA_DOES_NOT_EXIST
 from app.models.models import RoutineElement
 from app.schemas.routine import RoutineItemBase, RoutineItemUpdate
 
@@ -20,7 +20,7 @@ class RoutineElementDAO(ProtectedBaseDAO):
         if not routine_element:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=ROUTINE_ITEM_NOT_EXIST_ERROR,
+                detail=DATA_DOES_NOT_EXIST,
             )
 
         return routine_element
@@ -135,7 +135,7 @@ class RoutineElementDAO(ProtectedBaseDAO):
             else:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=ROUTINE_ITEM_NOT_EXIST_ERROR,
+                    detail=DATA_DOES_NOT_EXIST,
                 )
 
         for routine_element in routine_elements_dict.values():

@@ -23,10 +23,7 @@ router = APIRouter(
     operation_id="getMe",
 )
 def get_me(user: User = Depends(get_current_user)):
-    return Response(
-        data=UserData.from_orm(user),
-        message="User data retrieved successfully",
-    )
+    return Response(data=UserData.from_orm(user))
 
 
 @router.put(
