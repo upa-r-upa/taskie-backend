@@ -1,4 +1,4 @@
-from typing import Generic, List, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 from pydantic.generics import GenericModel
 from pydantic import BaseModel
 
@@ -10,13 +10,8 @@ class Response(GenericModel, Generic[T]):
     message: str = ""
 
 
-class InnerErrorResponse(BaseModel):
-    location: list[str]
-    error_type: str | None = None
-
-
 class ErrorResponse(BaseModel):
-    error_type: str = None
+    error_type: str
 
-    errors: List[InnerErrorResponse] | None = None
     message: str = ""
+    location: str = None

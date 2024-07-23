@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
-from app.schemas.response import ErrorResponse, InnerErrorResponse
+from app.schemas.response import ErrorResponse
 
 
 def validation_exception_handler(app: FastAPI):
@@ -27,7 +27,6 @@ def validation_exception_handler(app: FastAPI):
         request: Request, exc: RequestValidationError
     ):
         details = exc.errors()
-        errors = []
 
         if (
             len(details) == 1
@@ -37,39 +36,31 @@ def validation_exception_handler(app: FastAPI):
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content=ErrorResponse(
-                    message="Invalid JSON payload",
+                    location=details[0]["loc"][1],
                     error_type="INVALID_JSON_PAYLOAD",
                 ).dict(),
             )
+        error = details[0]
 
-        for detail in details:
-            if detail["type"] == "value_error":
-                errors.append(
-                    InnerErrorResponse(
-                        location=_filtered_location_list(detail["loc"]),
-                        error_type=detail["msg"],
-                    )
-                )
+        if error["type"] == "value_error":
+            error_response = ErrorResponse(
+                location=_filtered_location_list(error["loc"])[0],
+                error_type=error["msg"],
+            )
+        else:
+            if error["type"] == "value_error.missing":
+                error["type"] = "REQUIRED_VALUE"
             else:
-                if detail["type"] == "value_error.missing":
-                    detail["type"] = "REQUIRED_VALUE"
-                else:
-                    detail["type"] = detail["type"].upper().replace(".", "_")
+                error["type"] = error["type"].upper().replace(".", "_")
 
-                errors.append(
-                    InnerErrorResponse(
-                        location=_filtered_location_list(detail["loc"]),
-                        error_type=detail["type"],
-                    )
-                )
+            error_response = ErrorResponse(
+                location=_filtered_location_list(error["loc"])[0],
+                error_type=error["type"],
+            )
 
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content=ErrorResponse(
-                message="Validation Error",
-                error_type="VALIDATION_ERROR",
-                errors=errors,
-            ).dict(),
+            content=error_response.dict(),
         )
 
     @app.exception_handler(Exception)

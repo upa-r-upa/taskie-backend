@@ -4,6 +4,7 @@ from pydantic import BaseModel, validator
 from app.api.errors import (
     INVALID_EMAIL_FORMAT,
     PASSWORD_NOT_MATCH,
+    VALUE_MUST_BE_ALPHANUM,
     VALUE_TOO_LONG,
     VALUE_TOO_SHORT,
 )
@@ -15,8 +16,6 @@ class SignupInput(BaseModel):
     password: str
     password_confirm: str
     email: str
-    grade: int = 0
-    profile_image: str | None = None
     nickname: str | None = None
 
     @validator("password_confirm")
@@ -27,8 +26,12 @@ class SignupInput(BaseModel):
 
     @validator("username")
     def username_length(cls: "SignupInput", v: str):
-        if len(v) < 3:
+        if len(v) < 4:
             raise ValueError(VALUE_TOO_SHORT)
+        elif len(v) > 20:
+            raise ValueError(VALUE_TOO_LONG)
+        elif not re.match("^[A-Za-z][A-Za-z0-9]*$", v):
+            raise ValueError(VALUE_MUST_BE_ALPHANUM)
         return v
 
     @validator("password")
@@ -37,6 +40,8 @@ class SignupInput(BaseModel):
             raise ValueError(VALUE_TOO_SHORT)
         elif len(v) > 20:
             raise ValueError(VALUE_TOO_LONG)
+        elif not re.match("^[A-Za-z][A-Za-z0-9]*$", v):
+            raise ValueError(VALUE_MUST_BE_ALPHANUM)
         return v
 
     @validator("email")
@@ -44,6 +49,8 @@ class SignupInput(BaseModel):
         email_regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if not re.match(email_regex, v):
             raise ValueError(INVALID_EMAIL_FORMAT)
+        elif len(v) > 100:
+            raise ValueError(VALUE_TOO_LONG)
         return v
 
 

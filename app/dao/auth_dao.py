@@ -36,9 +36,9 @@ class AuthDAO(BaseDAO):
             username=data.username,
             password=password_hash,
             email=data.email,
-            grade=data.grade,
-            profile_image=data.profile_image,
             nickname=data.nickname or data.username,
+            grade=0,
+            profile_image="",
         )
 
         if self.check_existing_username(user.username):
