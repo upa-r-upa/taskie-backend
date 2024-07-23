@@ -44,6 +44,7 @@ class Todo(Base):
     completed = Column(Integer, default=0)
     created_at = Column(TIMESTAMP, default=func.now())
     updated_at = Column(TIMESTAMP, default=func.now())
+    target_date = Column(TIMESTAMP, default=func.now())
     order = Column(Integer, nullable=False)
 
     user_id = Column(

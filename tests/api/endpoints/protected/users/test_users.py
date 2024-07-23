@@ -29,13 +29,11 @@ def test_update_me(
 
     excepted_output.nickname = "test_nickname"
     excepted_output.email = "test@test.com2"
-    excepted_output.profile_image = "test2"
 
     data = UserUpdateInput(
         username=excepted_output.username,
         password=user_data.password,
         email=excepted_output.email,
-        profile_image=excepted_output.profile_image,
         nickname=excepted_output.nickname,
     )
 
@@ -52,5 +50,4 @@ def test_update_me(
 
     assert user.username == excepted_output.username
     assert user.email == excepted_output.email
-    assert user.profile_image == excepted_output.profile_image
     assert user.nickname == excepted_output.nickname

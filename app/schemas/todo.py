@@ -1,19 +1,14 @@
 from pydantic import BaseModel, validator
 from datetime import datetime
 
-from app.api.errors import VALUE_MUST_NOT_BE_EMPTY
+from app.schemas.validator import validate_date
 
 
 class TodoBase(BaseModel):
     title: str
     order: int
+    target_date: str
     content: str = None
-
-    @validator("title")
-    def title_must_not_be_empty(cls, v):
-        if not v:
-            raise ValueError(VALUE_MUST_NOT_BE_EMPTY)
-        return v
 
     class Config:
         orm_mode = True
@@ -21,7 +16,12 @@ class TodoBase(BaseModel):
 
 class TodoUpdateInput(BaseModel):
     title: str
+    target_date: str
     content: str = None
+
+    @validator("target_date")
+    def validate_target_date(cls, v):
+        return validate_date(v)
 
 
 class TodoDetail(TodoBase):
@@ -29,6 +29,7 @@ class TodoDetail(TodoBase):
     completed: bool
     created_at: datetime
     updated_at: datetime
+    target_date: datetime
 
     class Config:
         orm_mode = True

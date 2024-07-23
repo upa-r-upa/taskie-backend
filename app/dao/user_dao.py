@@ -30,11 +30,6 @@ class UserDAO(ProtectedBaseDAO):
         if data.email:
             user.email = data.email
 
-        if data.profile_image == "":
-            user.profile_image = None
-        elif data.profile_image:
-            user.profile_image = data.profile_image
-
         if data.nickname:
             user.nickname = data.nickname
 

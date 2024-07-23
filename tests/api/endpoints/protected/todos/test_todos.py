@@ -29,7 +29,10 @@ def test_get_todo(
 
 
 def test_create_todo(
-    client: TestClient, session: Session, todo: TodoBase, access_token_headers: dict[str, str]
+    client: TestClient,
+    session: Session,
+    todo: TodoBase,
+    access_token_headers: dict[str, str],
 ):
     response = client.post(
         "/todos",
@@ -43,40 +46,55 @@ def test_create_todo(
 
     assert response_data.title == todo.title
     assert response_data.content == todo.content
+    assert response_data.target_date.strftime("%Y-%m-%d") is not None
 
     assert session.query(Todo).filter(Todo.id == response_data.id).first()
 
 
 def test_update_todo(
-    client: TestClient, session: Session, add_todo: Todo, access_token_headers: dict[str, str]
+    client: TestClient,
+    session: Session,
+    add_todo: Todo,
+    access_token_headers: dict[str, str],
 ):
-    request_data = TodoBase.from_orm(add_todo)
-
-    request_data.title = "Updated title"
-    request_data.content = "Updated content"
+    request_data = dict(
+        title="Updated title",
+        content="Updated content",
+        target_date="2024-07-24",
+    )
 
     response = client.put(
         f"/todos/{add_todo.id}",
-        json=request_data.dict(),
+        json=request_data,
         headers=access_token_headers,
     )
 
     response_data = TodoDetail(**response.json().get("data"))
 
     assert response.status_code == 200
-    assert TodoBase.from_orm(response_data) == TodoBase(**request_data.dict())
+    assert response_data.title == request_data["title"]
+    assert response_data.content == request_data["content"]
+    assert (
+        response_data.target_date.strftime("%Y-%m-%d")
+        == request_data["target_date"]
+    )
 
     assert (
         session.query(Todo)
         .filter(Todo.id == add_todo.id)
-        .filter(Todo.title == request_data.title)
-        .filter(Todo.content == request_data.content)
+        .filter(Todo.title == request_data["title"])
+        .filter(Todo.content == request_data["content"])
         .first()
+        .target_date.strftime("%Y-%m-%d")
+        == request_data["target_date"]
     )
 
 
 def test_delete_todo(
-    client: TestClient, session: Session, add_todo: Todo, access_token_headers: dict[str, str]
+    client: TestClient,
+    session: Session,
+    add_todo: Todo,
+    access_token_headers: dict[str, str],
 ):
     response = client.delete(
         f"/todos/{add_todo.id}",
@@ -145,9 +163,9 @@ def test_get_todo_list__valid_page_and_offset__1_page(
     response_data = response.json().get("data")
 
     assert len(response_data) == 3
-    assert response_data[0].get("id") == add_todo_list_with_date[0].id
-    assert response_data[1].get("id") == add_todo_list_with_date[1].id
-    assert response_data[2].get("id") == add_todo_list_with_date[2].id
+    assert response_data[0].get("id") == 7
+    assert response_data[1].get("id") == 6
+    assert response_data[2].get("id") == 5
 
 
 def test_get_todo_list__valid_page_and_offset__2_page(
@@ -169,9 +187,9 @@ def test_get_todo_list__valid_page_and_offset__2_page(
     response_data = response.json().get("data")
 
     assert len(response_data) == 3
-    assert response_data[0].get("id") == add_todo_list_with_date[3].id
-    assert response_data[1].get("id") == add_todo_list_with_date[4].id
-    assert response_data[2].get("id") == add_todo_list_with_date[5].id
+    assert response_data[0].get("id") == 4
+    assert response_data[1].get("id") == 3
+    assert response_data[2].get("id") == 2
 
 
 def test_get_todo_list__valid_date_range(
@@ -199,9 +217,10 @@ def test_get_todo_list__valid_date_range(
 
     response_data = response.json().get("data")
 
-    assert len(response_data) == 2
-    assert response_data[0].get("id") == add_todo_list_with_date[4].id
-    assert response_data[1].get("id") == add_todo_list_with_date[5].id
+    assert len(response_data) == 3
+    assert response_data[0].get("id") == 3
+    assert response_data[1].get("id") == 2
+    assert response_data[2].get("id") == 1
 
 
 def test_get_todo_list__complete(
@@ -223,5 +242,5 @@ def test_get_todo_list__complete(
     response_data = response.json().get("data")
 
     assert len(response_data) == 2
-    assert response_data[0].get("id") == add_todo_list_with_date[8].id
-    assert response_data[1].get("id") == add_todo_list_with_date[7].id
+    assert response_data[0].get("id") == 9
+    assert response_data[1].get("id") == 8

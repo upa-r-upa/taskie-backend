@@ -36,6 +36,7 @@ class TodoDAO(ProtectedBaseDAO):
             content=content,
             order=order,
             user_id=self.user_id,
+            target_date=datetime.strptime(target_date, "%Y-%m-%d"),
         )
 
         self.db.add(todo)
@@ -43,7 +44,11 @@ class TodoDAO(ProtectedBaseDAO):
         return todo
 
     def update_todo(
-        self, todo_id: int, title: str, content: str = None
+        self,
+        todo_id: int,
+        title: str,
+        target_date: str,
+        content: str = None,
     ) -> Todo:
         todo = self.get_todo_by_id(todo_id=todo_id)
 
@@ -55,6 +60,7 @@ class TodoDAO(ProtectedBaseDAO):
 
         todo.title = title
         todo.content = content
+        todo.target_date = datetime.strptime(target_date, "%Y-%m-%d")
 
         return todo
 
@@ -84,20 +90,29 @@ class TodoDAO(ProtectedBaseDAO):
         limit: int,
         offset: int,
         completed: bool = False,
-        start_date: datetime = None,
-        end_date: datetime = None,
+        start_date: str = None,
+        end_date: str = None,
     ) -> List[Todo]:
         query = self.db.query(Todo).filter(
             Todo.user_id == self.user_id, Todo.completed == int(completed)
         )
+        start_date = (
+            datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
+        )
+        end_date = (
+            datetime.strptime(end_date, "%Y-%m-%d") if end_date else None
+        )
 
         if start_date and end_date:
             query = query.filter(
-                and_(Todo.updated_at >= start_date, Todo.updated_at < end_date)
+                and_(
+                    Todo.target_date >= start_date,
+                    Todo.target_date <= end_date,
+                )
             )
 
         todo = (
-            query.order_by(Todo.updated_at.desc())
+            query.order_by(Todo.target_date.desc())
             .limit(limit)
             .offset(offset)
             .all()

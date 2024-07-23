@@ -54,6 +54,7 @@ def create_todo(
         todo = dao.create_todo(
             title=data.title,
             content=data.content,
+            target_date=data.target_date,
             order=data.order,
         )
 
@@ -95,6 +96,7 @@ def update_todo(
         todo = todo_dao.update_todo(
             todo_id=todo_id,
             title=data.title,
+            target_date=data.target_date,
             content=data.content,
         )
 
@@ -138,12 +140,12 @@ def get_todo_list(
     end_date = validate_date_format(end_date)
 
     if start_date and not end_date:
-        end_date = datetime.datetime.now(datetime.UTC)
+        end_date = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
 
     if end_date and not start_date:
-        start_date = datetime.datetime.now(datetime.UTC) - datetime.timedelta(
-            days=30
-        )
+        start_date = (
+            datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=30)
+        ).strftime("%Y-%m-%d")
 
     todo_list = todo_dao.get_todo_list(
         completed=completed,
