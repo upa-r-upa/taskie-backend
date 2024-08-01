@@ -95,15 +95,18 @@ class TodoDAO(ProtectedBaseDAO):
         start_date: str = None,
         end_date: str = None,
     ) -> List[Todo]:
-        query = self.db.query(Todo).filter(
-            Todo.user_id == self.user_id, Todo.completed == int(completed)
-        )
+        query = self.db.query(Todo).filter(Todo.user_id == self.user_id)
         start_date = (
             datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
         )
         end_date = (
             datetime.strptime(end_date, "%Y-%m-%d") if end_date else None
         )
+
+        if completed:
+            query = query.filter(Todo.completed_at.is_not(None))
+        else:
+            query = query.filter(Todo.completed_at.is_(None))
 
         if start_date and end_date:
             query = query.filter(

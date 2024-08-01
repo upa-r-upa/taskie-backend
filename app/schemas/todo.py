@@ -26,10 +26,10 @@ class TodoUpdateInput(BaseModel):
 
 class TodoDetail(TodoBase):
     id: int
-    completed: bool
     created_at: datetime
     updated_at: datetime
     target_date: datetime
+    completed_at: datetime | None
 
     class Config:
         orm_mode = True

@@ -41,11 +41,12 @@ class Todo(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String(100), nullable=False)
     content = Column(Text)
-    completed = Column(Integer, default=0)
     created_at = Column(TIMESTAMP, default=func.now())
-    updated_at = Column(TIMESTAMP, default=func.now())
+    updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
     target_date = Column(TIMESTAMP, default=func.now())
     order = Column(Integer, nullable=False)
+
+    completed_at = Column(TIMESTAMP)
 
     user_id = Column(
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
