@@ -2,7 +2,7 @@ from datetime import datetime
 from operator import and_
 from typing import List
 from fastapi import HTTPException, status
-from sqlalchemy import func
+from sqlalchemy import asc, desc, func
 from app.api.errors import DATA_DOES_NOT_EXIST
 from app.models.models import Todo
 from app.schemas.todo import TodoOrderUpdate
@@ -117,7 +117,7 @@ class TodoDAO(ProtectedBaseDAO):
             )
 
         todo = (
-            query.order_by(Todo.target_date.desc(), Todo.order.asc())
+            query.order_by(desc(Todo.target_date), asc(Todo.order))
             .limit(limit)
             .offset(offset)
             .all()
@@ -135,7 +135,7 @@ class TodoDAO(ProtectedBaseDAO):
                 Todo.user_id == self.user_id,
                 func.date(Todo.target_date) == date,
             )
-            .order_by(Todo.target_date.desc(), Todo.order.asc())
+            .order_by(desc(Todo.target_date), asc(Todo.order))
             .limit(1000)
             .all()
         )

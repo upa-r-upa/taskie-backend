@@ -30,7 +30,7 @@ class RoutineCreateInput(BaseModel):
             raise ValueError(DUPLICATED_VALUE)
 
         for i in range(len(v)):
-            if v[i] < 1 or v[i] > 7:
+            if v[i] < 0 or v[i] > 6:
                 raise ValueError(INVALID_VALUE_RANGE)
         return v
 
@@ -65,10 +65,22 @@ class RoutineItem(RoutineItemBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    completed: bool
+
+    completed_at: datetime | None
+    completed_duration_minutes: int | None
 
     class Config:
         orm_mode = True
+
+    def from_routine_element(element: RoutineElement, completed_at: datetime):
+        return RoutineItem(
+            id=element.id,
+            title=element.title,
+            duration_minutes=element.duration_minutes,
+            created_at=element.created_at,
+            updated_at=element.updated_at,
+            completed_at=completed_at,
+        )
 
 
 class RoutineBase(BaseModel):
@@ -84,6 +96,20 @@ class RoutineDetail(RoutineBase):
     deleted_at: datetime | None
 
     routine_elements: List[RoutineItem]
+
+    def from_routine_with_log(
+        routine: Routine, routine_items: List[RoutineItem]
+    ):
+        return RoutineDetail(
+            id=routine.id,
+            title=routine.title,
+            start_time_minutes=routine.start_time_minutes,
+            repeat_days=routine.repeat_days_to_list(),
+            created_at=routine.created_at,
+            updated_at=routine.updated_at,
+            deleted_at=routine.deleted_at,
+            routine_elements=routine_items,
+        )
 
     def from_routine(routine: Routine, routine_elements: List[RoutineElement]):
         return RoutineDetail(
@@ -101,7 +127,6 @@ class RoutineDetail(RoutineBase):
                     duration_minutes=item.duration_minutes,
                     created_at=item.created_at,
                     updated_at=item.updated_at,
-                    completed=False,
                 )
                 for item in routine_elements
             ],
@@ -120,6 +145,11 @@ class RoutineUpdateInput(BaseModel):
     routine_elements: List[RoutineItemUpdate] | None
 
 
-class RoutineItemCompleteUpdate(BaseModel):
-    completed: bool
-    item_ids: List[int]
+class RoutineLogBase(BaseModel):
+    routine_item_id: int
+    duration_minutes: int
+    is_skipped: bool = False
+
+
+class RoutineLogPutInput(BaseModel):
+    logs: List[RoutineLogBase]

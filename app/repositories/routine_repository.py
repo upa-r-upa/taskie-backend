@@ -1,11 +1,15 @@
+from datetime import datetime
+from sqlalchemy import asc, desc, func
 from sqlalchemy.orm import Session
 
 from app.dao.routine_dao import RoutineDAO
 from app.dao.routine_element_dao import RoutineElementDAO
-from app.models.models import Routine, User
+from app.dao.routine_log_dao import RoutineLogDAO
+from app.models.models import Routine, RoutineLog, User
 from app.schemas.routine import (
     RoutineCreateInput,
     RoutineDetail,
+    RoutineItem,
     RoutineUpdateInput,
 )
 
@@ -18,6 +22,7 @@ class RoutineRepository(ProtectedBaseRepository):
 
         self.routine_dao = RoutineDAO(db=db, user=user)
         self.routine_element_dao = RoutineElementDAO(db=db, user=user)
+        self.routine_log_dao = RoutineLogDAO(db=db, user=user)
 
     def update_routine(
         self, routine_id: int, routine: RoutineUpdateInput
@@ -58,3 +63,56 @@ class RoutineRepository(ProtectedBaseRepository):
         return RoutineDetail.from_routine(
             routine=new_routine, routine_elements=routine_elements
         )
+
+    def get_routine_by_date(self, date: str) -> list[RoutineDetail]:
+        date = datetime.strptime(date, "%Y-%m-%d")
+        routines = self.routine_dao.get_routines_by_weekday(
+            weekday=date.weekday()
+        )
+        routine_ids = [routine.id for routine in routines]
+        routine_logs = (
+            self.db.query(RoutineLog)
+            .filter(
+                RoutineLog.routine_id.in_(routine_ids),
+                func.date(RoutineLog.completed_at) == date.date(),
+            )
+            .order_by(
+                desc(RoutineLog.routine_id),
+                asc(RoutineLog.routine_element_id),
+                asc(RoutineLog.completed_at),
+            )
+            .all()
+        )
+        routine_log_map = dict()
+        for log in routine_logs:
+            if routine_log_map.get(log.routine_id) is None:
+                routine_log_map[log.routine_id] = dict()
+
+            routine_log_map[log.routine_id][log.routine_element_id] = log
+
+        result_routine_list = []
+        for routine in routines:
+            routine_with_logs: RoutineDetail = (
+                RoutineDetail.from_routine_with_log(
+                    routine=routine, routine_items=[]
+                )
+            )
+            for element in routine.routine_elements:
+                routine_item = RoutineItem.from_routine_element(element, False)
+
+                if (
+                    routine_log_map.get(routine.id) is not None
+                    and routine_log_map[routine.id].get(routine_item.id)
+                    is not None
+                ):
+                    log = routine_log_map[routine.id][element.id]
+                    routine_item.completed_at = log.completed_at
+                    routine_item.completed_duration_minutes = (
+                        log.duration_minutes
+                    )
+
+                routine_with_logs.routine_elements.append(routine_item)
+
+            result_routine_list.append(routine_with_logs)
+
+        return result_routine_list

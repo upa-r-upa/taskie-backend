@@ -26,6 +26,23 @@ class RoutineDAO(ProtectedBaseDAO):
 
         return routine
 
+    def get_routines_by_weekday(self, weekday: int) -> List[Routine]:
+        routines = (
+            self.db.query(Routine)
+            .filter(
+                Routine.user_id == self.user_id,
+            )
+            .filter(
+                Routine.deleted_at.is_(None),
+                Routine.repeat_days.contains(str(weekday)),
+            )
+            .order_by(Routine.start_time_minutes)
+            .limit(1000)
+            .all()
+        )
+
+        return routines
+
     def get_routine_with_elements_by_id(self, routine_id: int) -> Routine:
         routine = (
             self.db.query(Routine)

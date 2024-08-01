@@ -9,6 +9,7 @@ from app.api.errors import (
     VALUE_MUST_NOT_BE_EMPTY,
     VALUE_TOO_LONG,
 )
+from app.models.models import Habit
 from app.schemas.common import ListLoadParams
 from app.schemas.validator import validate_date
 
@@ -53,7 +54,7 @@ class HabitCreateInput(HabitBase):
             raise ValueError(DUPLICATED_VALUE)
 
         for i in range(len(v)):
-            if v[i] < 1 or v[i] > 7:
+            if v[i] < 0 or v[i] > 6:
                 raise ValueError(INVALID_VALUE_RANGE)
 
         if v != sorted(v):
@@ -99,7 +100,29 @@ class HabitLog(BaseModel):
 
 
 class HabitWithLog(HabitDetail):
+    near_weekday: int
     log_list: List[HabitLog]
 
-    class Config:
-        orm_mode = True
+    @classmethod
+    def from_orm_with_weekday(
+        cls, db_obj: Habit, log_list: list[HabitLog], today_weekday: int
+    ):
+        habit = HabitDetail.from_orm(db_obj).dict()
+        habit_with_log = HabitWithLog(
+            **habit,
+            near_weekday=HabitWithLog.calculate_near_weekday(
+                habit["repeat_days"], today_weekday
+            ),
+            log_list=log_list
+        )
+
+        return habit_with_log
+
+    @classmethod
+    def calculate_near_weekday(
+        cls, repeat_days: list[int], curr_week: int
+    ) -> int:
+        for day in repeat_days:
+            if day >= curr_week:
+                return day
+        return repeat_days[0]

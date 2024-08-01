@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+from sqlalchemy import asc
 
 from app.dao.base import ProtectedBaseDAO
 from app.api.errors import DATA_DOES_NOT_EXIST
@@ -34,7 +35,7 @@ class RoutineElementDAO(ProtectedBaseDAO):
                 RoutineElement.routine_id == routine_id,
                 RoutineElement.user_id == self.user_id,
             )
-            .order_by(RoutineElement.order.asc())
+            .order_by(asc(RoutineElement.order))
             .all()
         )
 
