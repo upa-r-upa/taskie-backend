@@ -1,0 +1,13 @@
+services:
+  postgres-test:
+    image: postgres:16
+    restart: always
+    ports:
+      - 9000:5432
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: taskie_test_db
+      
+networks:
+  taskie-test:

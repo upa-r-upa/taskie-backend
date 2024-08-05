@@ -9,7 +9,7 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.envFile": "${workspaceFolder}/.env.dev",
+    "python.envFile": "${workspaceFolder}/.env",
     "editor.codeActionsOnSave": {
         "source.organizeImports": "explicit"
     },
