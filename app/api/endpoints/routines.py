@@ -11,7 +11,7 @@ from app.schemas.response import Response
 from app.schemas.routine import (
     RoutineCreateInput,
     RoutineDetail,
-    RoutineItemCompleteUpdate,
+    RoutineLogPutInput,
     RoutineUpdateInput,
 )
 
@@ -73,6 +73,24 @@ def delete_routine(
 
 
 @router.put(
+    "/log/{routine_id}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="putRoutineLog",
+)
+def put_routine_log(
+    routine_id: int,
+    data: RoutineLogPutInput,
+    routine_log_dao: RoutineLogDAO = Depends(get_routine_log_dao),
+    tx_manager: contextmanager = Depends(tx_manager),
+):
+    with tx_manager:
+        routine_log_dao.put_logs(routine_id=routine_id, logs=data.logs)
+
+    return None
+
+
+@router.put(
     "/{routine_id}",
     response_model=Response[RoutineDetail],
     status_code=status.HTTP_200_OK,
@@ -92,22 +110,3 @@ def update_routine(
     return Response(
         data=RoutineDetail.from_routine(routine, routine.routine_elements)
     )
-
-
-@router.put(
-    "/log/complete",
-    response_model=None,
-    status_code=status.HTTP_204_NO_CONTENT,
-    operation_id="updateRoutineElementComplete",
-)
-def update_routine_element_complete(
-    data: RoutineItemCompleteUpdate,
-    routine_log_dao: RoutineLogDAO = Depends(get_routine_log_dao),
-    tx_manager: contextmanager = Depends(tx_manager),
-):
-    with tx_manager:
-        routine_log_dao.update_logs_complete(
-            completed=data.completed, item_ids=data.item_ids
-        )
-
-    return None

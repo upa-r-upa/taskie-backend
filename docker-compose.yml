@@ -4,8 +4,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      TSK_DB_URL: ${TSK_DB_URL}
+      JWT_SECRET_KEY: "secret_key"
+      TSK_DB_URL: "postgresql://testuser:testpass@postgres:5432/taskie_dev_db"
     depends_on:
       - postgres
     restart: unless-stopped
@@ -20,7 +20,7 @@ services:
     environment:
       POSTGRES_USER: testuser
       POSTGRES_PASSWORD: testpass
-      POSTGRES_DB: taskie_test_db
+      POSTGRES_DB: taskie_dev_db
   
 volumes:
   postgres_data:

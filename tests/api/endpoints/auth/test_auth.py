@@ -14,8 +14,6 @@ def test_signup(client: TestClient, session: Session, user_data: UserBase):
         password=user_data.password,
         password_confirm=user_data.password,
         email=user_data.email,
-        grade=user_data.grade,
-        profile_image=user_data.profile_image,
         nickname=user_data.nickname,
     )
 
@@ -27,8 +25,6 @@ def test_signup(client: TestClient, session: Session, user_data: UserBase):
 
     assert user.username == data.username
     assert user.email == data.email
-    assert user.grade == data.grade
-    assert user.profile_image == data.profile_image
     assert user.nickname == data.nickname
 
 
@@ -48,8 +44,6 @@ def test_login(client: TestClient, user_data: UserBase, add_user: User):
 
     assert response_json_user.get("username") == user_data.username
     assert response_json_user.get("email") == user_data.email
-    assert response_json_user.get("grade") == user_data.grade
-    assert response_json_user.get("profile_image") == user_data.profile_image
     assert response_json_user.get("nickname") == user_data.nickname
 
 
@@ -84,8 +78,6 @@ def test_refresh(
 
     assert response_json_user.get("username") == user_data.username
     assert response_json_user.get("email") == user_data.email
-    assert response_json_user.get("grade") == user_data.grade
-    assert response_json_user.get("profile_image") == user_data.profile_image
     assert response_json_user.get("nickname") == user_data.nickname
 
 

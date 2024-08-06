@@ -8,7 +8,8 @@ from app.models.models import Routine, RoutineElement, RoutineLog
 from app.schemas.routine import (
     RoutineCreateInput,
     RoutineDetail,
-    RoutineItemCompleteUpdate,
+    RoutineLogBase,
+    RoutineLogPutInput,
     RoutineUpdateInput,
 )
 
@@ -246,17 +247,18 @@ def is_timestamp_on_today(timestamp) -> bool:
     return today_date == timestamp_date
 
 
-def test_update_routine_element_complete__complete(
+def test_put_routine_log(
     client: TestClient,
     session: Session,
     access_token_headers: dict[str, str],
     add_routine: RoutineDetail,
-    update_log_data__complete: RoutineItemCompleteUpdate,
+    routine_log_data: List[RoutineLogBase],
 ):
+    body = RoutineLogPutInput(logs=routine_log_data).dict()
     response = client.put(
-        "/routines/log/complete",
+        "routines/log/1",
         headers=access_token_headers,
-        json=update_log_data__complete.dict(),
+        json=body,
     )
 
     assert response.status_code == 204
@@ -293,58 +295,7 @@ def test_update_routine_element_complete__complete(
         .filter(
             RoutineLog.routine_element_id == 4,
             is_timestamp_on_today(RoutineLog.completed_at),
+            RoutineLog.is_skipped == 1,
         )
         .first()
     )
-
-
-def test_update_routine_element_complete__incomplete(
-    client: TestClient,
-    session: Session,
-    access_token_headers: dict[str, str],
-    add_routine_log__complete: List[RoutineLog],
-    update_log_data__incomplete: RoutineItemCompleteUpdate,
-):
-    response = client.put(
-        "/routines/log/complete",
-        headers=access_token_headers,
-        json=update_log_data__incomplete.dict(),
-    )
-
-    assert response.status_code == 204
-
-    assert (
-        session.query(RoutineLog)
-        .filter(
-            RoutineLog.routine_element_id == 1,
-            is_timestamp_on_today(RoutineLog.completed_at),
-        )
-        .first()
-    ) is None
-
-    assert (
-        session.query(RoutineLog)
-        .filter(
-            RoutineLog.routine_element_id == 2,
-            is_timestamp_on_today(RoutineLog.completed_at),
-        )
-        .first()
-    ) is None
-
-    assert (
-        session.query(RoutineLog)
-        .filter(
-            RoutineLog.routine_element_id == 3,
-            is_timestamp_on_today(RoutineLog.completed_at),
-        )
-        .first()
-    ) is None
-
-    assert (
-        session.query(RoutineLog)
-        .filter(
-            RoutineLog.routine_element_id == 4,
-            is_timestamp_on_today(RoutineLog.completed_at),
-        )
-        .first()
-    ) is None

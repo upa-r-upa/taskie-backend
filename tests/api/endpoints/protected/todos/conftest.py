@@ -9,15 +9,35 @@ from app.schemas.todo import TodoBase, TodoOrderUpdateInput, TodoOrderUpdate
 
 @pytest.fixture
 def todo() -> TodoBase:
-    return TodoBase(title="Test title", content="Test content", order=1)
+    return TodoBase(
+        title="Test title",
+        content="Test content",
+        order=1,
+        target_date="2023-11-11",
+    )
 
 
 @pytest.fixture
 def todo_list() -> List[TodoBase]:
     return [
-        TodoBase(title="Test title 1", content="Test content 1", order=1),
-        TodoBase(title="Test title 2", content="Test content 2", order=2),
-        TodoBase(title="Test title 3", content="Test content 3", order=3),
+        TodoBase(
+            title="Test title 1",
+            content="Test content 1",
+            order=1,
+            target_date="2023-11-11",
+        ),
+        TodoBase(
+            title="Test title 2",
+            content="Test content 2",
+            order=2,
+            target_date="2023-11-11",
+        ),
+        TodoBase(
+            title="Test title 3",
+            content="Test content 3",
+            order=3,
+            target_date="2023-11-11",
+        ),
     ]
 
 
@@ -76,65 +96,74 @@ def todo_list_with_date() -> List[Todo]:
             title="Test title 1",
             content="Test content 1",
             order=1,
-            updated_at=datetime(2023, 11, 9, 0, 0, 0),
+            updated_at=datetime(2023, 11, 4, 0, 0, 0),
+            target_date=datetime(2023, 11, 4, 0, 0, 0),
             user_id=1,
         ),
         Todo(
             title="Test title 2",
             content="Test content 2",
             order=2,
-            updated_at=datetime(2023, 11, 8, 0, 0, 0),
+            updated_at=datetime(2023, 11, 5, 0, 0, 0),
+            target_date=datetime(2023, 11, 5, 0, 0, 0),
             user_id=1,
         ),
         Todo(
             title="Test title 3",
             content="Test content 3",
             order=3,
-            updated_at=datetime(2023, 11, 7, 0, 0, 0),
+            updated_at=datetime(2023, 11, 6, 0, 0, 0),
+            target_date=datetime(2023, 11, 6, 0, 0, 0),
             user_id=1,
         ),
         Todo(
             title="Test title 4",
             content="Test content 4",
             order=4,
-            updated_at=datetime(2023, 11, 6, 0, 0, 0),
+            updated_at=datetime(2023, 11, 12, 0, 0, 0),
+            target_date=datetime(2023, 11, 12, 0, 0, 0),
             user_id=1,
         ),
         Todo(
             title="Test title 5",
             content="Test content 5",
             order=5,
-            updated_at=datetime(2023, 11, 5, 0, 0, 0),
+            updated_at=datetime(2023, 11, 13, 0, 0, 0),
+            target_date=datetime(2023, 11, 13, 0, 0, 0),
             user_id=1,
         ),
         Todo(
             title="Test title 6",
             content="Test content 6",
             order=6,
-            updated_at=datetime(2023, 11, 4, 0, 0, 0),
+            updated_at=datetime(2023, 11, 14, 0, 0, 0),
+            target_date=datetime(2023, 11, 14, 0, 0, 0),
             user_id=1,
         ),
         Todo(
             title="Test title 7",
             content="Test content 7",
             order=7,
-            updated_at=datetime(2023, 11, 3, 0, 0, 0),
+            updated_at=datetime(2023, 11, 15, 0, 0, 0),
+            target_date=datetime(2023, 11, 15, 0, 0, 0),
             user_id=1,
         ),
         Todo(
             title="Test title 8",
             content="Test content 8",
             order=8,
-            completed=1,
-            updated_at=datetime(2023, 11, 9, 0, 0, 0),
+            completed_at=datetime(2023, 11, 16, 0, 0, 0),
+            updated_at=datetime(2023, 11, 16, 0, 0, 0),
+            target_date=datetime(2023, 11, 16, 0, 0, 0),
             user_id=1,
         ),
         Todo(
             title="Test title 9",
             content="Test content 9",
             order=9,
-            completed=1,
-            updated_at=datetime(2023, 11, 10, 0, 0, 0),
+            completed_at=datetime(2023, 11, 16, 0, 0, 0),
+            updated_at=datetime(2023, 11, 17, 0, 0, 0),
+            target_date=datetime(2023, 11, 17, 0, 0, 0),
             user_id=1,
         ),
     ]

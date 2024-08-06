@@ -8,7 +8,6 @@ class UserData(BaseModel):
     username: str
     email: str
     grade: int
-    profile_image: str | None
     nickname: str | None
 
     class Config:
@@ -19,7 +18,6 @@ class UserUpdateInput(BaseModel):
     username: str
     password: str
     email: str | None
-    profile_image: str | None
     nickname: str | None
 
     class Config:

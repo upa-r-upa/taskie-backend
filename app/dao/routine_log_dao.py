@@ -1,46 +1,36 @@
-from datetime import UTC, datetime
 from typing import List
 
 from sqlalchemy import func
 
 from app.dao.base import ProtectedBaseDAO
 from app.models.models import RoutineLog
+from app.schemas.routine import RoutineLogBase
 
 
 class RoutineLogDAO(ProtectedBaseDAO):
-    def get_routine_log_by_date(
-        self, element_id: int, target_date: str
-    ) -> RoutineLog | None:
+    def get_routine_logs_by_date(
+        self, routine_id: int, target_date: str
+    ) -> List[RoutineLog]:
         log = (
             self.db.query(RoutineLog)
             .filter(
-                RoutineLog.routine_element_id == element_id,
+                RoutineLog.routine_id == routine_id,
                 target_date == func.date(RoutineLog.completed_at),
             )
-            .first()
+            .all()
         )
 
         return log
 
-    def update_logs_complete(self, completed: bool, item_ids: List[int]):
-        current_date = datetime.now(UTC).strftime("%Y-%m-%d")
-
-        for item_id in item_ids:
-            log = self.get_routine_log_by_date(item_id, current_date)
-
-            if completed:
-                self.add_log(item_id, log)
-            else:
-                self.remove_log(log)
-
-    def add_log(self, item_id: int, log: RoutineLog | None):
-        if log is None:
-            log = RoutineLog(
-                routine_element_id=item_id,
+    def put_logs(self, routine_id: int, logs: List[RoutineLogBase]):
+        for log in logs:
+            routine_log = RoutineLog(
+                routine_id=routine_id,
+                routine_element_id=log.routine_item_id,
+                duration_minutes=log.duration_minutes,
+                is_skipped=bool(log.is_skipped),
             )
 
-            self.db.add(log)
+            self.db.add(routine_log)
 
-    def remove_log(self, log: RoutineLog | None):
-        if log is not None:
-            self.db.delete(log)
+        return routine_log

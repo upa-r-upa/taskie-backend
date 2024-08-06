@@ -1,8 +1,8 @@
-"""init
+"""empty message
 
-Revision ID: 00c7705614c1
+Revision ID: 624523664e50
 Revises: 
-Create Date: 2024-07-10 22:11:13.173776
+Create Date: 2024-08-01 22:42:16.421532
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '00c7705614c1'
+revision: str = '624523664e50'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -64,10 +64,11 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=100), nullable=False),
     sa.Column('content', sa.Text(), nullable=True),
-    sa.Column('completed', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=True),
     sa.Column('updated_at', sa.TIMESTAMP(), nullable=True),
+    sa.Column('target_date', sa.TIMESTAMP(), nullable=True),
     sa.Column('order', sa.Integer(), nullable=False),
+    sa.Column('completed_at', sa.TIMESTAMP(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
@@ -95,9 +96,13 @@ def upgrade() -> None:
     )
     op.create_table('routine_log',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('duration_minutes', sa.Integer(), nullable=True),
     sa.Column('completed_at', sa.TIMESTAMP(), nullable=True),
+    sa.Column('is_skipped', sa.Integer(), nullable=True),
+    sa.Column('routine_id', sa.Integer(), nullable=False),
     sa.Column('routine_element_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['routine_element_id'], ['routine_element.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['routine_id'], ['routine.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

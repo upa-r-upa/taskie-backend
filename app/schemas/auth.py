@@ -74,7 +74,6 @@ class UserBase(BaseModel):
     password: str
     email: str
     grade: int = 0
-    profile_image: str | None = None
     nickname: str | None = None
 
     class Config:

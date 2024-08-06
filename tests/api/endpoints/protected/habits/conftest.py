@@ -13,7 +13,7 @@ def habit_data() -> HabitCreateInput:
         start_time_minutes=480,
         end_time_minutes=1380,
         repeat_time_minutes=30,
-        repeat_days=[1, 2, 3, 4, 5, 6, 7],
+        repeat_days=[0, 1, 2, 3, 4, 5, 6],
     )
 
 
@@ -25,7 +25,7 @@ def habit_list() -> List[Habit]:
             start_time_minutes=480,
             end_time_minutes=1380,
             repeat_time_minutes=30,
-            repeat_days="1234567",
+            repeat_days="0123456",
             created_at=datetime(2024, 6, 12, 7, 0, 0),
         ),
         Habit(
@@ -33,7 +33,7 @@ def habit_list() -> List[Habit]:
             start_time_minutes=600,
             end_time_minutes=1380,
             repeat_time_minutes=60,
-            repeat_days="12345",
+            repeat_days="01234",
             created_at=datetime(2024, 6, 12, 8, 0, 0),
         ),
         Habit(
@@ -41,7 +41,7 @@ def habit_list() -> List[Habit]:
             start_time_minutes=960,
             end_time_minutes=1380,
             repeat_time_minutes=30,
-            repeat_days="1234567",
+            repeat_days="0123456",
             created_at=datetime(2024, 6, 12, 9, 0, 0),
         ),
         Habit(
@@ -49,7 +49,7 @@ def habit_list() -> List[Habit]:
             start_time_minutes=960,
             end_time_minutes=1380,
             repeat_time_minutes=30,
-            repeat_days="1234567",
+            repeat_days="0123456",
             created_at=datetime(2024, 6, 13, 0, 0, 0),
         ),
         Habit(
@@ -57,7 +57,7 @@ def habit_list() -> List[Habit]:
             start_time_minutes=960,
             end_time_minutes=1380,
             repeat_time_minutes=30,
-            repeat_days="1234567",
+            repeat_days="0123456",
             created_at=datetime(2024, 6, 13, 5, 0, 0),
         ),
         Habit(
@@ -65,7 +65,7 @@ def habit_list() -> List[Habit]:
             start_time_minutes=480,
             end_time_minutes=1380,
             repeat_time_minutes=30,
-            repeat_days="1234567",
+            repeat_days="0123456",
             created_at=datetime(2024, 6, 13, 7, 0, 0),
             activated=0,
         ),
@@ -74,7 +74,7 @@ def habit_list() -> List[Habit]:
             start_time_minutes=480,
             end_time_minutes=1380,
             repeat_time_minutes=30,
-            repeat_days="1234567",
+            repeat_days="0123456",
             created_at=datetime(2024, 6, 13, 8, 0, 0),
             activated=0,
             deleted_at=datetime(2024, 6, 13, 8, 0, 0),

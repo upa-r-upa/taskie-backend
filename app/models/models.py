@@ -41,10 +41,12 @@ class Todo(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String(100), nullable=False)
     content = Column(Text)
-    completed = Column(Integer, default=0)
     created_at = Column(TIMESTAMP, default=func.now())
-    updated_at = Column(TIMESTAMP, default=func.now())
+    updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
+    target_date = Column(TIMESTAMP, default=func.now())
     order = Column(Integer, nullable=False)
+
+    completed_at = Column(TIMESTAMP)
 
     user_id = Column(
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
@@ -156,7 +158,10 @@ class RoutineElement(Base):
 
     routine = relationship("Routine", back_populates="routine_elements")
     routine_logs = relationship(
-        "RoutineLog", back_populates="routine_element", cascade="all, delete"
+        "RoutineLog",
+        back_populates="routine_element",
+        cascade="all, delete",
+        lazy="dynamic",
     )
 
 
@@ -165,7 +170,15 @@ class RoutineLog(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
+    duration_minutes = Column(Integer)
     completed_at = Column(TIMESTAMP, default=func.now())
+    is_skipped = Column(Integer, default=0)
+
+    routine_id = Column(
+        Integer,
+        ForeignKey("routine.id", ondelete="CASCADE"),
+        nullable=False,
+    )
 
     routine_element_id = Column(
         Integer,

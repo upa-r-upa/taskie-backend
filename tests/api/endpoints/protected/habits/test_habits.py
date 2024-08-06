@@ -63,6 +63,7 @@ def test_get_habits(
     assert response_data[0].id == 5
     assert response_data[1].id == 4
     assert response_data[2].id == 3
+    assert response_data[0].near_weekday is not None
 
     assert len(response_data[0].log_list) == 0
     assert len(response_data[1].log_list) == 0
