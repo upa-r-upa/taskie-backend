@@ -18,7 +18,7 @@ def test_create_habit(
     access_token_headers: dict[str, str],
 ):
     response = client.post(
-        "/habits/",
+        "/habits",
         json=habit_data.dict(),
         headers=access_token_headers,
     )
@@ -48,7 +48,7 @@ def test_get_habits(
         log_target_date=datetime(2024, 6, 12).strftime("%Y-%m-%d"),
     )
     response = client.get(
-        "/habits/",
+        "/habits",
         headers=access_token_headers,
         params=params,
     )
@@ -83,7 +83,7 @@ def test_get_habits_valid_last_id(
         log_target_date=datetime(2024, 6, 12).strftime("%Y-%m-%d"),
     )
     response = client.get(
-        "/habits/",
+        "/habits",
         headers=access_token_headers,
         params=params,
     )
@@ -125,7 +125,7 @@ def test_get_habits_empty_log_date(
         log_target_date=datetime(2024, 6, 15).strftime("%Y-%m-%d"),
     )
     response = client.get(
-        "/habits/",
+        "/habits",
         headers=access_token_headers,
         params=params,
     )
@@ -160,7 +160,7 @@ def test_get_habits_deactivated_habits(
         activated=False,
     )
     response = client.get(
-        "/habits/",
+        "/habits",
         headers=access_token_headers,
         params=params,
     )
@@ -194,7 +194,7 @@ def test_get_habits_deleted_habits(
         deleted=True,
     )
     response = client.get(
-        "/habits/",
+        "/habits",
         headers=access_token_headers,
         params=params,
     )

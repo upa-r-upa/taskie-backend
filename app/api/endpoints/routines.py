@@ -23,7 +23,7 @@ router = APIRouter(
 
 
 @router.post(
-    "/",
+    "",
     response_model=Response[RoutineDetail],
     status_code=status.HTTP_201_CREATED,
     operation_id="createRoutine",

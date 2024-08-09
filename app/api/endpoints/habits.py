@@ -20,7 +20,7 @@ router = APIRouter(
 
 
 @router.post(
-    "/",
+    "",
     response_model=Response[HabitDetail],
     status_code=status.HTTP_201_CREATED,
     operation_id="createHabit",
@@ -37,7 +37,7 @@ def create_habit(
 
 
 @router.get(
-    "/",
+    "",
     response_model=Response[List[HabitWithLog]],
     status_code=status.HTTP_200_OK,
     operation_id="getHabitList",

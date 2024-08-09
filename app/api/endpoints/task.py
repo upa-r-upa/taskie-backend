@@ -15,7 +15,7 @@ router = APIRouter(
 
 
 @router.get(
-    "/",
+    "",
     response_model=Response[TaskPublic],
     status_code=status.HTTP_200_OK,
     operation_id="getAllDailyTask",
