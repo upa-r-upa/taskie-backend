@@ -16,7 +16,7 @@ def test_get_all_daily_task_no_match_log(
     params = dict(date="2024-07-30")
 
     response = client.get(
-        "/task/",
+        "/task",
         params=params,
         headers=access_token_headers,
     )
@@ -46,7 +46,7 @@ def test_get_all_daily_task(
     params = dict(date=target_date.strftime("%Y-%m-%d"))
 
     response = client.get(
-        "/task/",
+        "/task",
         params=params,
         headers=access_token_headers,
     )

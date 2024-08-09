@@ -40,7 +40,7 @@ def get_todo(
 
 
 @router.post(
-    "/",
+    "",
     response_model=Response[TodoDetail],
     status_code=status.HTTP_201_CREATED,
     operation_id="createTodo",
@@ -123,7 +123,7 @@ def delete_todo(
 
 
 @router.get(
-    "/",
+    "",
     response_model=Response[List[TodoDetail]],
     status_code=status.HTTP_200_OK,
     operation_id="getTodoList",
