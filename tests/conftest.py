@@ -58,7 +58,6 @@ def user_data() -> UserBase:
         username="test",
         password="test123",
         email="test@test.com",
-        grade=1,
         nickname="test",
     )
 
@@ -71,7 +70,6 @@ def add_user(session: Session, user_data: UserBase) -> User:
         username=user_data.username,
         password=get_password_hash(user_data.password),
         email=user_data.email,
-        grade=user_data.grade,
         nickname=user_data.nickname,
     )
 

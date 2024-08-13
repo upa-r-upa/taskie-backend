@@ -73,7 +73,6 @@ class UserBase(BaseModel):
     username: str
     password: str
     email: str
-    grade: int = 0
     nickname: str | None = None
 
     class Config:
