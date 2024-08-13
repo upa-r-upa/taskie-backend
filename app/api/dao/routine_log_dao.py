@@ -2,7 +2,7 @@ from typing import List
 
 from sqlalchemy import func
 
-from app.dao.base import ProtectedBaseDAO
+from .base import ProtectedBaseDAO
 from app.models.models import RoutineLog
 from app.schemas.routine import RoutineLogBase
 

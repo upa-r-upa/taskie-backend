@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
 from app.core.utils import validate_date_format
-from app.dao import get_todo_dao
-from app.dao.todo_dao import TodoDAO
+from ..dao import get_todo_dao
+from ..dao.todo_dao import TodoDAO
 from app.database.db import tx_manager
 from app.schemas.response import Response
 from app.schemas.todo import (

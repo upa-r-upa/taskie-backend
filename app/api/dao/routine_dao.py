@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import HTTPException, status
 from app.api.errors import DATA_DOES_NOT_EXIST
-from app.dao.base import ProtectedBaseDAO
+from .base import ProtectedBaseDAO
 from app.models.models import Routine
 
 

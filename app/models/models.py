@@ -107,7 +107,6 @@ class Routine(Base):
 
     routine_elements = relationship(
         "RoutineElement",
-        back_populates="routine",
         order_by="RoutineElement.order.asc()",
         cascade="all, delete",
         lazy="joined",

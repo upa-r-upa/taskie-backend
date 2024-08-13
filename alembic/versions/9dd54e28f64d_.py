@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 624523664e50
+Revision ID: 9dd54e28f64d
 Revises: 
-Create Date: 2024-08-01 22:42:16.421532
+Create Date: 2024-08-13 20:55:10.269844
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '624523664e50'
+revision: str = '9dd54e28f64d'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,8 +24,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=50), nullable=False),
     sa.Column('password', sa.String(length=128), nullable=False),
-    sa.Column('email', sa.String(length=100), nullable=False),
-    sa.Column('grade', sa.Integer(), nullable=False),
+    sa.Column('email', sa.String(length=254), nullable=False),
     sa.Column('profile_image', sa.String(length=100), nullable=True),
     sa.Column('nickname', sa.String(length=50), nullable=True),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=True),
@@ -35,39 +34,37 @@ def upgrade() -> None:
     )
     op.create_table('habit',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('title', sa.String(length=100), nullable=False),
+    sa.Column('title', sa.String(length=200), nullable=False),
     sa.Column('end_time_minutes', sa.Integer(), nullable=False),
     sa.Column('start_time_minutes', sa.Integer(), nullable=False),
-    sa.Column('repeat_days', sa.Text(), nullable=False),
+    sa.Column('repeat_days', sa.String(length=7), nullable=False),
     sa.Column('repeat_time_minutes', sa.Integer(), nullable=False),
-    sa.Column('activated', sa.Integer(), nullable=True),
-    sa.Column('deleted_at', sa.TIMESTAMP(), nullable=True),
-    sa.Column('created_at', sa.TIMESTAMP(), nullable=True),
-    sa.Column('updated_at', sa.TIMESTAMP(), nullable=True),
+    sa.Column('activated', sa.Boolean(), nullable=False),
+    sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
+    sa.Column('updated_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('routine',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('title', sa.Text(), nullable=False),
+    sa.Column('title', sa.String(length=200), nullable=False),
     sa.Column('start_time_minutes', sa.Integer(), nullable=False),
-    sa.Column('repeat_days', sa.Text(), nullable=False),
-    sa.Column('deleted_at', sa.TIMESTAMP(), nullable=True),
-    sa.Column('created_at', sa.TIMESTAMP(), nullable=True),
-    sa.Column('updated_at', sa.TIMESTAMP(), nullable=True),
+    sa.Column('repeat_days', sa.String(length=7), nullable=False),
+    sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
+    sa.Column('updated_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('todo',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('title', sa.String(length=100), nullable=False),
-    sa.Column('content', sa.Text(), nullable=True),
-    sa.Column('created_at', sa.TIMESTAMP(), nullable=True),
-    sa.Column('updated_at', sa.TIMESTAMP(), nullable=True),
-    sa.Column('target_date', sa.TIMESTAMP(), nullable=True),
+    sa.Column('title', sa.String(length=200), nullable=False),
     sa.Column('order', sa.Integer(), nullable=False),
+    sa.Column('target_date', sa.TIMESTAMP(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=True),
+    sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
+    sa.Column('updated_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('completed_at', sa.TIMESTAMP(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
@@ -75,18 +72,18 @@ def upgrade() -> None:
     )
     op.create_table('habit_log',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('completed_at', sa.TIMESTAMP(), nullable=True),
+    sa.Column('completed_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('habit_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['habit_id'], ['habit.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('routine_element',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('title', sa.Text(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('title', sa.String(length=200), nullable=False),
     sa.Column('order', sa.Integer(), nullable=False),
-    sa.Column('duration_minutes', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=True),
     sa.Column('updated_at', sa.TIMESTAMP(), nullable=True),
+    sa.Column('duration_minutes', sa.Integer(), nullable=True),
     sa.Column('deleted_at', sa.TIMESTAMP(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('routine_id', sa.Integer(), nullable=False),
@@ -95,14 +92,12 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('routine_log',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('duration_minutes', sa.Integer(), nullable=True),
-    sa.Column('completed_at', sa.TIMESTAMP(), nullable=True),
-    sa.Column('is_skipped', sa.Integer(), nullable=True),
-    sa.Column('routine_id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('duration_minutes', sa.Integer(), nullable=False),
+    sa.Column('completed_at', sa.TIMESTAMP(), nullable=False),
+    sa.Column('is_skipped', sa.Boolean(), nullable=False),
     sa.Column('routine_element_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['routine_element_id'], ['routine_element.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['routine_id'], ['routine.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

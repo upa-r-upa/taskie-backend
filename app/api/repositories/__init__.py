@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from app.core.auth import get_current_user
 from app.database.db import get_db
 from app.models.models import User
-from app.repositories.habit_repository import HabitRepository
-from app.repositories.task_repository import TaskRepository
+from .habit_repository import HabitRepository
+from .task_repository import TaskRepository
 from .routine_repository import RoutineRepository
 
 

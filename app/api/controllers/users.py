@@ -2,8 +2,8 @@ from contextlib import contextmanager
 from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
-from app.dao import get_user_dao
-from app.dao.user_dao import UserDAO
+from ..dao import get_user_dao
+from ..dao.user_dao import UserDAO
 from app.database.db import tx_manager
 from app.models.models import User
 from app.schemas.response import Response

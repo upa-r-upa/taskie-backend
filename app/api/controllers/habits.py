@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
 from app.database.db import tx_manager
-from app.repositories import get_habit_repository
-from app.repositories.habit_repository import HabitRepository
+from ..repositories import get_habit_repository
+from ..repositories.habit_repository import HabitRepository
 from app.schemas.habit import (
     HabitCreateInput,
     HabitDetail,

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
-from app.repositories import get_task_repository
-from app.repositories.task_repository import TaskRepository
+from ..repositories import get_task_repository
+from ..repositories.task_repository import TaskRepository
 from app.schemas.response import Response
 from app.schemas.task import TaskGetInput, TaskPublic
 

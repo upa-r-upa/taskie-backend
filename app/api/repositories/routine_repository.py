@@ -2,9 +2,9 @@ from datetime import datetime
 from sqlalchemy import asc, desc, func
 from sqlalchemy.orm import Session
 
-from app.dao.routine_dao import RoutineDAO
-from app.dao.routine_element_dao import RoutineElementDAO
-from app.dao.routine_log_dao import RoutineLogDAO
+from app.api.dao.routine_dao import RoutineDAO
+from app.api.dao.routine_element_dao import RoutineElementDAO
+from app.api.dao.routine_log_dao import RoutineLogDAO
 from app.models.models import Routine, RoutineLog, User
 from app.schemas.routine import (
     RoutineCreateInput,

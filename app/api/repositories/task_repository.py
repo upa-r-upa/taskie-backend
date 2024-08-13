@@ -1,10 +1,10 @@
 from pytest import Session
-from app.repositories.base import ProtectedBaseRepository
+from .base import ProtectedBaseRepository
 from app.models.models import User
 
-from app.dao.todo_dao import TodoDAO
-from app.repositories.routine_repository import RoutineRepository
-from app.repositories.habit_repository import HabitRepository
+from app.api.dao.todo_dao import TodoDAO
+from .routine_repository import RoutineRepository
+from .habit_repository import HabitRepository
 from app.schemas.task import TaskPublic
 
 
