@@ -5,6 +5,7 @@ from sqlalchemy import (
     Text,
     ForeignKey,
     TIMESTAMP,
+    Boolean,
     func,
 )
 from sqlalchemy.orm import relationship
@@ -64,8 +65,7 @@ class Habit(Base):
     repeat_days = Column(Text, nullable=False)
     repeat_time_minutes = Column(Integer, nullable=False)
 
-    activated = Column(Integer, default=1)
-    deleted_at = Column(TIMESTAMP)
+    activated = Column(Boolean, default=True, nullable=False)
 
     created_at = Column(TIMESTAMP, default=func.now())
     updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
@@ -169,15 +169,9 @@ class RoutineLog(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
-    duration_minutes = Column(Integer)
-    completed_at = Column(TIMESTAMP, default=func.now())
-    is_skipped = Column(Integer, default=0)
-
-    routine_id = Column(
-        Integer,
-        ForeignKey("routine.id", ondelete="CASCADE"),
-        nullable=False,
-    )
+    duration_minutes = Column(Integer, nullable=False)
+    completed_at = Column(TIMESTAMP, default=func.now(), nullable=False)
+    is_skipped = Column(Boolean, default=False, nullable=False)
 
     routine_element_id = Column(
         Integer,

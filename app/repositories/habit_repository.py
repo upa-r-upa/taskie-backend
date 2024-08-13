@@ -31,17 +31,13 @@ class HabitRepository(ProtectedBaseRepository):
         limit: int,
         log_target_date: str,
         last_id: int = None,
-        deleted: bool = False,
         activated: bool = True,
     ) -> list[HabitWithLog]:
         weekday = datetime.strptime(log_target_date, "%Y-%m-%d").weekday()
         query = self.db.query(Habit).filter(
             Habit.user_id == self.user_id,
-            Habit.activated == int(activated),
+            Habit.activated == activated,
         )
-
-        if deleted:
-            query = query.filter(Habit.deleted_at.isnot(None))
 
         if last_id is not None:
             query = query.filter(Habit.id < last_id)
@@ -58,7 +54,6 @@ class HabitRepository(ProtectedBaseRepository):
                     func.date(HabitLog.completed_at) == log_target_date
                 )
                 .order_by(desc(HabitLog.id))
-                .limit(1000)
                 .all()
             )
             habit_with_logs.log_list = logs
@@ -94,7 +89,6 @@ class HabitRepository(ProtectedBaseRepository):
                     func.date(HabitLog.completed_at) == date
                 )
                 .order_by(desc(HabitLog.id))
-                .limit(1000)
                 .all()
             )
             log_map[habit.id] = logs

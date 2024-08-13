@@ -83,7 +83,6 @@ class HabitListGetParams(ListLoadParams):
     log_target_date: str = Query(
         description="YYYY-MM-DD",
     )
-    deleted: bool | None = Query(False)
     activated: bool | None = Query(True)
 
     @validator("log_target_date")
