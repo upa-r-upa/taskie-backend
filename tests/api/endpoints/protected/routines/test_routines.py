@@ -92,7 +92,7 @@ def test_delete_routine_valid_id(
 
     assert response.status_code == 204
 
-    assert session.query(Routine).first().deleted_at is not None
+    assert session.query(Routine).first() is None
 
 
 def test_delete_routine_invalid_id(
@@ -295,7 +295,7 @@ def test_put_routine_log(
         .filter(
             RoutineLog.routine_element_id == 4,
             is_timestamp_on_today(RoutineLog.completed_at),
-            RoutineLog.is_skipped == 1,
+            RoutineLog.is_skipped.is_(True),
         )
         .first()
     )

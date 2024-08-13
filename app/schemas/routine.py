@@ -93,8 +93,6 @@ class RoutineBase(BaseModel):
 
 
 class RoutineDetail(RoutineBase):
-    deleted_at: datetime | None
-
     routine_elements: List[RoutineItem]
 
     def from_routine_with_log(
@@ -107,7 +105,6 @@ class RoutineDetail(RoutineBase):
             repeat_days=routine.repeat_days_to_list(),
             created_at=routine.created_at,
             updated_at=routine.updated_at,
-            deleted_at=routine.deleted_at,
             routine_elements=routine_items,
         )
 
@@ -119,7 +116,6 @@ class RoutineDetail(RoutineBase):
             repeat_days=routine.repeat_days_to_list(),
             created_at=routine.created_at,
             updated_at=routine.updated_at,
-            deleted_at=routine.deleted_at,
             routine_elements=[
                 RoutineItem(
                     id=item.id,

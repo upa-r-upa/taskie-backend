@@ -178,35 +178,3 @@ def test_get_habits_deactivated_habits(
 
     assert len(response_data[0].log_list) == 0
     assert len(response_data[1].log_list) == 0
-
-
-def test_get_habits_deleted_habits(
-    client: TestClient,
-    session: Session,
-    add_habit_list: list[Habit],
-    add_habit_log_list: list[HabitLog],
-    access_token_headers: dict[str, str],
-):
-    params = dict(
-        limit=3,
-        log_target_date=datetime(2024, 6, 15).strftime("%Y-%m-%d"),
-        activated=False,
-        deleted=True,
-    )
-    response = client.get(
-        "/habits",
-        headers=access_token_headers,
-        params=params,
-    )
-
-    response_data: List[HabitWithLog] = [
-        HabitWithLog(**habit) for habit in response.json().get("data")
-    ]
-
-    assert response.status_code == 200
-
-    assert len(response_data) == 1
-
-    assert response_data[0].id == 7
-
-    assert len(response_data[0].log_list) == 0

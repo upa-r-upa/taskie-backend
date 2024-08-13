@@ -362,7 +362,7 @@ def add_routine_list_with_log(
             routine_element_id=3,
             completed_at=non_target_date,
             duration_minutes=15,
-            is_skipped=1,
+            is_skipped=True,
         ),
         RoutineLog(
             routine_id=2,

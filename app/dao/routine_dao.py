@@ -1,4 +1,3 @@
-from datetime import UTC, datetime
 from typing import List
 from fastapi import HTTPException, status
 from app.api.errors import DATA_DOES_NOT_EXIST
@@ -10,11 +9,7 @@ class RoutineDAO(ProtectedBaseDAO):
     def get_routine_by_id(self, routine_id: int) -> Routine:
         routine = (
             self.db.query(Routine)
-            .filter(
-                Routine.id == routine_id,
-                Routine.user_id == self.user_id,
-                Routine.deleted_at.is_(None),
-            )
+            .filter(Routine.id == routine_id, Routine.user_id == self.user_id)
             .first()
         )
 
@@ -31,13 +26,9 @@ class RoutineDAO(ProtectedBaseDAO):
             self.db.query(Routine)
             .filter(
                 Routine.user_id == self.user_id,
-            )
-            .filter(
-                Routine.deleted_at.is_(None),
                 Routine.repeat_days.contains(str(weekday)),
             )
             .order_by(Routine.start_time_minutes)
-            .limit(1000)
             .all()
         )
 
@@ -49,7 +40,6 @@ class RoutineDAO(ProtectedBaseDAO):
             .filter(
                 Routine.id == routine_id,
                 Routine.user_id == self.user_id,
-                Routine.deleted_at.is_(None),
             )
             .first()
         )
@@ -98,10 +88,10 @@ class RoutineDAO(ProtectedBaseDAO):
 
         return routine
 
-    def soft_delete_routine(
+    def delete_routine(
         self,
         routine_id: int,
     ) -> None:
         routine = self.get_routine_by_id(routine_id)
 
-        routine.deleted_at = datetime.now(UTC)
+        self.db.delete(routine)
