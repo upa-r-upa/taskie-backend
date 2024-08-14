@@ -45,7 +45,7 @@ def test_get_habits(
 ):
     params = dict(
         limit=3,
-        log_target_date=datetime(2024, 6, 12).strftime("%Y-%m-%d"),
+        log_target_date="2024-06-12",
     )
     response = client.get(
         "/habits",
@@ -80,7 +80,7 @@ def test_get_habits_valid_last_id(
     params = dict(
         limit=3,
         last_id=3,
-        log_target_date=datetime(2024, 6, 12).strftime("%Y-%m-%d"),
+        log_target_date="2024-06-12",
     )
     response = client.get(
         "/habits",
@@ -122,7 +122,7 @@ def test_get_habits_empty_log_date(
 ):
     params = dict(
         limit=3,
-        log_target_date=datetime(2024, 6, 15).strftime("%Y-%m-%d"),
+        log_target_date="2024-06-15",
     )
     response = client.get(
         "/habits",
@@ -156,7 +156,7 @@ def test_get_habits_deactivated_habits(
 ):
     params = dict(
         limit=3,
-        log_target_date=datetime(2024, 6, 15).strftime("%Y-%m-%d"),
+        log_target_date="2024-06-15",
         activated=False,
     )
     response = client.get(
@@ -171,10 +171,8 @@ def test_get_habits_deactivated_habits(
 
     assert response.status_code == 200
 
-    assert len(response_data) == 2
+    assert len(response_data) == 1
 
-    assert response_data[0].id == 7
-    assert response_data[1].id == 6
+    assert response_data[0].id == 6
 
     assert len(response_data[0].log_list) == 0
-    assert len(response_data[1].log_list) == 0

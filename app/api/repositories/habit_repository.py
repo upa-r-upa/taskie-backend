@@ -29,11 +29,10 @@ class HabitRepository(ProtectedBaseRepository):
     def get_habits(
         self,
         limit: int,
-        log_target_date: str,
+        weekday: int,
         last_id: int = None,
         activated: bool = True,
-    ) -> list[HabitWithLog]:
-        weekday = datetime.strptime(log_target_date, "%Y-%m-%d").weekday()
+    ):
         query = self.db.query(Habit).filter(
             Habit.user_id == self.user_id,
             Habit.activated == activated,
@@ -44,24 +43,68 @@ class HabitRepository(ProtectedBaseRepository):
 
         habits = query.order_by(desc(Habit.id)).limit(limit).all()
 
-        result_habit_list = []
+        return habits
+
+    def get_habit_logs_by_date(
+        self,
+        habit_ids: list[str],
+        date: datetime,
+    ):
+        logs = (
+            self.db.query(HabitLog)
+            .filter(
+                func.date(HabitLog.completed_at) == date,
+                HabitLog.habit_id.in_(habit_ids),
+            )
+            .order_by(desc(HabitLog.id))
+            .all()
+        )
+
+        return logs
+
+    def _combine_habits_and_logs(
+        self, habits: list[Habit], logs: list[HabitLog], weekday: int
+    ):
+        logs_by_habit_id = {}
+
+        for log in logs:
+            if log.habit_id not in logs_by_habit_id:
+                logs_by_habit_id[log.habit_id] = []
+            logs_by_habit_id[log.habit_id].append(log)
+
+        result_habits = []
+
         for habit in habits:
+            habit_logs = logs_by_habit_id.get(habit.id, [])
             habit_with_logs: HabitWithLog = HabitWithLog.from_orm_with_weekday(
-                habit, [], weekday
+                habit, habit_logs, weekday
             )
-            logs = (
-                habit.habit_logs.filter(
-                    func.date(HabitLog.completed_at) == log_target_date
-                )
-                .order_by(desc(HabitLog.id))
-                .all()
-            )
-            habit_with_logs.log_list = logs
-            result_habit_list.append(habit_with_logs)
+            result_habits.append(habit_with_logs)
 
-        return result_habit_list
+        return result_habits
 
-    def _get_weekday_sorted_habits(
+    def get_habits_with_date_logs(
+        self,
+        limit: int,
+        log_target_date: str,
+        last_id: int = None,
+        activated: bool = True,
+    ) -> list[HabitWithLog]:
+        target_date = datetime.strptime(log_target_date, "%Y-%m-%d")
+
+        habits = self.get_habits(
+            limit, target_date.weekday(), last_id, activated
+        )
+        habit_ids = [habit.id for habit in habits]
+        habit_logs = self.get_habit_logs_by_date(habit_ids, target_date)
+
+        result_habits = self._combine_habits_and_logs(
+            habits, habit_logs, target_date.weekday()
+        )
+
+        return result_habits
+
+    def _sorted_habits_by_weekday(
         self, habit_list: list[HabitWithLog], weekday: int
     ) -> list[Habit]:
         def sort_key(habit: HabitWithLog):
@@ -70,33 +113,28 @@ class HabitRepository(ProtectedBaseRepository):
 
         return sorted(habit_list, key=sort_key)
 
-    def get_habits_by_date(self, date: str) -> list[HabitWithLog]:
-        date_obj = datetime.strptime(date, "%Y-%m-%d")
+    def get_habits_by_weekday(self, weekday: int):
         habits = (
             self.db.query(Habit)
             .filter(
                 Habit.user_id == self.user_id,
-                Habit.repeat_days.contains(date_obj.weekday()),
+                Habit.activated,
+                Habit.repeat_days.contains(weekday),
             )
             .order_by(desc(Habit.id))
             .all()
         )
 
-        log_map = dict()
-        for habit in habits:
-            logs = (
-                habit.habit_logs.filter(
-                    func.date(HabitLog.completed_at) == date
-                )
-                .order_by(desc(HabitLog.id))
-                .all()
-            )
-            log_map[habit.id] = logs
+        return habits
 
-        habit_with_log = [
-            HabitWithLog.from_orm_with_weekday(
-                habit, log_map[habit.id], date_obj.weekday()
-            )
-            for habit in habits
-        ]
+    def get_habits_with_log_by_date(self, date: str) -> list[HabitWithLog]:
+        date_obj = datetime.strptime(date, "%Y-%m-%d")
+
+        habits = self.get_habits_by_weekday(date_obj.weekday())
+        habit_ids = [habit.id for habit in habits]
+
+        habits_logs = self.get_habit_logs_by_date(habit_ids, date_obj)
+        habit_with_log = self._combine_habits_and_logs(
+            habits, habits_logs, date_obj.weekday()
+        )
         return habit_with_log

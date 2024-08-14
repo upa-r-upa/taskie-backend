@@ -46,6 +46,6 @@ def get_habits(
     params: HabitListGetParams = Depends(),
     repository: HabitRepository = Depends(get_habit_repository),
 ):
-    habits = repository.get_habits(**params.dict())
+    habits_with_logs = repository.get_habits_with_date_logs(**params.dict())
 
-    return Response(data=habits)
+    return Response(data=habits_with_logs)
