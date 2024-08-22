@@ -7,7 +7,6 @@ from app.api.errors import INVALID_EMAIL_FORMAT, VALUE_TOO_SHORT
 class UserData(BaseModel):
     username: str
     email: str
-    grade: int
     nickname: str | None
 
     class Config:

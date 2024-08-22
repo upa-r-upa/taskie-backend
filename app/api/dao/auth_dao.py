@@ -37,7 +37,6 @@ class AuthDAO(BaseDAO):
             password=password_hash,
             email=data.email,
             nickname=data.nickname or data.username,
-            grade=0,
             profile_image="",
         )
 

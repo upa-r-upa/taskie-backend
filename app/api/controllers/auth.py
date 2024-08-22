@@ -8,8 +8,8 @@ from fastapi import (
     Cookie,
 )
 
-from app.dao import get_auth_dao
-from app.dao.auth_dao import AuthDAO
+from ..dao import get_auth_dao
+from ..dao.auth_dao import AuthDAO
 from app.database.db import tx_manager
 from app.schemas.response import Response
 from app.schemas.auth import (

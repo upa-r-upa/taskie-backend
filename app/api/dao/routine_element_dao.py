@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy import asc
 
-from app.dao.base import ProtectedBaseDAO
+from .base import ProtectedBaseDAO
 from app.api.errors import DATA_DOES_NOT_EXIST
 from app.models.models import RoutineElement
 from app.schemas.routine import RoutineItemBase, RoutineItemUpdate

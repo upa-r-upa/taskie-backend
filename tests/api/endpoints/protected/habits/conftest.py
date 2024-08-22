@@ -67,17 +67,7 @@ def habit_list() -> List[Habit]:
             repeat_time_minutes=30,
             repeat_days="0123456",
             created_at=datetime(2024, 6, 13, 7, 0, 0),
-            activated=0,
-        ),
-        Habit(
-            title="습관 7 (삭제)",
-            start_time_minutes=480,
-            end_time_minutes=1380,
-            repeat_time_minutes=30,
-            repeat_days="0123456",
-            created_at=datetime(2024, 6, 13, 8, 0, 0),
-            activated=0,
-            deleted_at=datetime(2024, 6, 13, 8, 0, 0),
+            activated=False,
         ),
     ]
 

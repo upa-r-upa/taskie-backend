@@ -1,10 +1,10 @@
 from pytest import Session
-from app.repositories.base import ProtectedBaseRepository
+from .base import ProtectedBaseRepository
 from app.models.models import User
 
-from app.dao.todo_dao import TodoDAO
-from app.repositories.routine_repository import RoutineRepository
-from app.repositories.habit_repository import HabitRepository
+from app.api.dao.todo_dao import TodoDAO
+from .routine_repository import RoutineRepository
+from .habit_repository import HabitRepository
 from app.schemas.task import TaskPublic
 
 
@@ -19,7 +19,7 @@ class TaskRepository(ProtectedBaseRepository):
     def get_all_task_by_date(self, date: str) -> TaskPublic:
         todo_list = self.todo_dao.get_todo_list_by_date(date)
         routine_list = self.routine_repository.get_routine_by_date(date)
-        habit_list = self.habit_repository.get_habits_by_date(date)
+        habit_list = self.habit_repository.get_habits_with_log_by_date(date)
 
         return TaskPublic(
             todo_list=todo_list,

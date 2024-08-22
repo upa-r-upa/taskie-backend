@@ -136,7 +136,6 @@ class TodoDAO(ProtectedBaseDAO):
                 func.date(Todo.target_date) == date,
             )
             .order_by(desc(Todo.target_date), asc(Todo.order))
-            .limit(1000)
             .all()
         )
 
