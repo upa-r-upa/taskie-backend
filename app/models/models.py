@@ -156,6 +156,11 @@ class RoutineLog(Base):
     completed_at = Column(TIMESTAMP, default=func.now(), nullable=False)
     is_skipped = Column(Boolean, default=False, nullable=False)
 
+    routine_id = Column(
+        Integer,
+        ForeignKey("routine.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     routine_element_id = Column(
         Integer,
         ForeignKey("routine_element.id", ondelete="CASCADE"),

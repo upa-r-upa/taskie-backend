@@ -19,7 +19,7 @@ class TaskRepository(ProtectedBaseRepository):
     def get_all_task_by_date(self, date: str) -> TaskPublic:
         todo_list = self.todo_dao.get_todo_list_by_date(date)
         routine_list = self.routine_repository.get_routine_by_date(date)
-        habit_list = self.habit_repository.get_habits_by_date(date)
+        habit_list = self.habit_repository.get_habits_with_log_by_date(date)
 
         return TaskPublic(
             todo_list=todo_list,

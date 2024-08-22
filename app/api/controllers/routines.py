@@ -71,7 +71,7 @@ def delete_routine(
     tx_manager: contextmanager = Depends(tx_manager),
 ):
     with tx_manager:
-        dao.soft_delete_routine(routine_id)
+        dao.delete_routine(routine_id)
 
     return None
 
