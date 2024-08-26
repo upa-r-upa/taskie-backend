@@ -1,7 +1,9 @@
 from datetime import datetime
+from typing import Optional
 from sqlalchemy import desc, func
 from pytest import Session
 
+from app.exceptions.exceptions import DataNotFoundError
 from app.models.models import Habit, HabitLog, User
 from app.schemas.habit import HabitCreateInput, HabitWithLog
 
@@ -138,3 +140,22 @@ class HabitRepository(ProtectedBaseRepository):
             habits, habits_logs, date_obj.weekday()
         )
         return habit_with_log
+
+    def get_habit_by_id(self, habit_id: int) -> Optional[Habit]:
+        habit = (
+            self.db.query(Habit)
+            .filter(Habit.id == habit_id, Habit.user_id == self.user_id)
+            .first()
+        )
+
+        return habit
+
+    def delete_habit(self, habit_id: int):
+        habit = self.get_habit_by_id(habit_id)
+
+        if not habit:
+            raise DataNotFoundError()
+
+        self.db.delete(habit)
+
+        return None
