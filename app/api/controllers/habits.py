@@ -1,9 +1,11 @@
 from contextlib import contextmanager
 from typing import List
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.api.errors import DATA_DOES_NOT_EXIST
 from app.core.auth import get_current_user
 from app.database.db import tx_manager
+from app.exceptions.exceptions import DataNotFoundError
 from ..repositories import get_habit_repository
 from ..repositories.habit_repository import HabitRepository
 from app.schemas.habit import (
@@ -49,3 +51,28 @@ def get_habits(
     habits_with_logs = repository.get_habits_with_date_logs(**params.dict())
 
     return Response(data=habits_with_logs)
+
+
+@router.delete(
+    "/{habit_id}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="deleteHabit",
+)
+def delete_habit(
+    habit_id: int,
+    repository: HabitRepository = Depends(get_habit_repository),
+    tx_manager: contextmanager = Depends(tx_manager),
+):
+    with tx_manager:
+        try:
+            repository.delete_habit(
+                habit_id=habit_id,
+            )
+        except DataNotFoundError:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=DATA_DOES_NOT_EXIST,
+            )
+
+    return None

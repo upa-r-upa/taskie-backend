@@ -176,3 +176,36 @@ def test_get_habits_deactivated_habits(
     assert response_data[0].id == 6
 
     assert len(response_data[0].log_list) == 0
+
+
+def test_delete_habit(
+    client: TestClient,
+    session: Session,
+    add_habit_list: list[Habit],
+    add_habit_log_list: list[HabitLog],
+    access_token_headers: dict[str, str],
+):
+    response = client.delete(
+        "/habits/1",
+        headers=access_token_headers,
+    )
+
+    assert response.status_code == 204
+
+    assert session.query(Habit).filter(Habit.id == 1).first() is None
+    assert (
+        session.query(HabitLog).filter(HabitLog.habit_id == 1).first() is None
+    )
+
+
+def test_delete_habit_not_found(
+    client: TestClient,
+    session: Session,
+    access_token_headers: dict[str, str],
+):
+    response = client.delete(
+        "/habits/1",
+        headers=access_token_headers,
+    )
+
+    assert response.status_code == 404
