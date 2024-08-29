@@ -209,3 +209,25 @@ def test_delete_habit_not_found(
     )
 
     assert response.status_code == 404
+
+
+def test_update_habit(
+    client: TestClient,
+    session: Session,
+    access_token_headers: dict[str, str],
+):
+    body = dict(title="changed", repeat_days=[0, 1, 2])
+
+    response = client.put(
+        "/habits/1",
+        headers=access_token_headers,
+        json=body,
+    )
+
+    assert response.status_code == 200
+    assert (
+        session.query(Habit).filter(Habit.id == 1).first().title == "changed"
+    )
+    assert (
+        session.query(Habit).filter(Habit.id == 1).first().repeat_days == "012"
+    )
