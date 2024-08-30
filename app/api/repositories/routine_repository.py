@@ -8,7 +8,7 @@ from app.api.dao.routine_log_dao import RoutineLogDAO
 from app.models.models import Routine, RoutineLog, User
 from app.schemas.routine import (
     RoutineCreateInput,
-    RoutineDetail,
+    RoutinePublic,
     RoutineItem,
     RoutineUpdateInput,
 )
@@ -44,7 +44,7 @@ class RoutineRepository(ProtectedBaseRepository):
 
         return updated_routine
 
-    def create_routine(self, routine: RoutineCreateInput) -> RoutineDetail:
+    def create_routine(self, routine: RoutineCreateInput) -> RoutinePublic:
         new_routine = self.routine_dao.create_routine(
             title=routine.title,
             start_time_minutes=routine.start_time_minutes,
@@ -60,11 +60,11 @@ class RoutineRepository(ProtectedBaseRepository):
 
         self.db.flush()
 
-        return RoutineDetail.from_routine(
+        return RoutinePublic.from_routine(
             routine=new_routine, routine_elements=routine_elements
         )
 
-    def get_routine_by_date(self, date: str) -> list[RoutineDetail]:
+    def get_routine_by_date(self, date: str) -> list[RoutinePublic]:
         date = datetime.strptime(date, "%Y-%m-%d")
         routines = self.routine_dao.get_routines_by_weekday(
             weekday=date.weekday()
@@ -92,8 +92,8 @@ class RoutineRepository(ProtectedBaseRepository):
 
         result_routine_list = []
         for routine in routines:
-            routine_with_logs: RoutineDetail = (
-                RoutineDetail.from_routine_with_log(
+            routine_with_logs: RoutinePublic = (
+                RoutinePublic.from_routine_with_log(
                     routine=routine, routine_items=[]
                 )
             )

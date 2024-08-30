@@ -7,7 +7,7 @@ from app.models.models import Routine, RoutineElement, RoutineLog
 
 from app.schemas.routine import (
     RoutineCreateInput,
-    RoutineDetail,
+    RoutinePublic,
     RoutineLogBase,
     RoutineLogPutInput,
     RoutineUpdateInput,
@@ -26,7 +26,7 @@ def test_create_routine(
         headers=access_token_headers,
     )
 
-    response_data = RoutineDetail(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json().get("data"))
 
     assert response.status_code == 201
 
@@ -52,7 +52,7 @@ def test_create_routine(
 
 def test_get_routine_valid_id(
     client: TestClient,
-    add_routine: RoutineDetail,
+    add_routine: RoutinePublic,
     access_token_headers: dict[str, str],
 ):
     response = client.get(
@@ -60,7 +60,7 @@ def test_get_routine_valid_id(
         headers=access_token_headers,
     )
 
-    response_data = RoutineDetail(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json().get("data"))
 
     assert response.status_code == 200
 
@@ -82,7 +82,7 @@ def test_get_routine_invalid_id(
 def test_delete_routine_valid_id(
     client: TestClient,
     session: Session,
-    add_routine: RoutineDetail,
+    add_routine: RoutinePublic,
     access_token_headers: dict[str, str],
 ):
     response = client.delete(
@@ -109,7 +109,7 @@ def test_delete_routine_invalid_id(
 
 def test_update_routine_full_update(
     client: TestClient,
-    add_routine: RoutineDetail,
+    add_routine: RoutinePublic,
     update_routine_all_data: RoutineUpdateInput,
     access_token_headers: dict[str, str],
 ):
@@ -119,7 +119,7 @@ def test_update_routine_full_update(
         json=update_routine_all_data.dict(),
     )
 
-    response_data = RoutineDetail(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json().get("data"))
 
     assert response.status_code == 200
 
@@ -144,7 +144,7 @@ def test_update_routine_full_update(
 
 def test_update_routine_only_elements_data(
     client: TestClient,
-    add_routine: RoutineDetail,
+    add_routine: RoutinePublic,
     update_routine_only_elements_data: RoutineUpdateInput,
     access_token_headers: dict[str, str],
 ):
@@ -154,7 +154,7 @@ def test_update_routine_only_elements_data(
         json=update_routine_only_elements_data.dict(),
     )
 
-    response_data = RoutineDetail(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json().get("data"))
 
     assert response.status_code == 200
 
@@ -185,7 +185,7 @@ def test_update_routine_only_elements_data(
 
 def test_update_routine_only_routine_data(
     client: TestClient,
-    add_routine: RoutineDetail,
+    add_routine: RoutinePublic,
     update_routine_only_routine_data: RoutineUpdateInput,
     access_token_headers: dict[str, str],
 ):
@@ -195,7 +195,7 @@ def test_update_routine_only_routine_data(
         json=update_routine_only_routine_data.dict(),
     )
 
-    response_data = RoutineDetail(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json().get("data"))
 
     assert response.status_code == 200
 
@@ -219,7 +219,7 @@ def test_update_routine_only_routine_data(
 def test_update_routine_empty_routine_elements(
     client: TestClient,
     access_token_headers: dict[str, str],
-    add_routine: RoutineDetail,
+    add_routine: RoutinePublic,
     update_routine_empty_routine_elements: RoutineUpdateInput,
 ):
     response = client.put(
@@ -228,7 +228,7 @@ def test_update_routine_empty_routine_elements(
         json=update_routine_empty_routine_elements.dict(),
     )
 
-    response_data = RoutineDetail(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json().get("data"))
 
     assert response.status_code == 200
 
@@ -251,7 +251,7 @@ def test_put_routine_log(
     client: TestClient,
     session: Session,
     access_token_headers: dict[str, str],
-    add_routine: RoutineDetail,
+    add_routine: RoutinePublic,
     routine_log_data: List[RoutineLogBase],
 ):
     body = RoutineLogPutInput(logs=routine_log_data).dict()

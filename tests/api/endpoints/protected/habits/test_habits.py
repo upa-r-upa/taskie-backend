@@ -6,7 +6,7 @@ from pytest import Session
 from app.models.models import Habit, HabitLog
 from app.schemas.habit import (
     HabitCreateInput,
-    HabitDetail,
+    HabitPublic,
     HabitWithLog,
 )
 
@@ -23,7 +23,7 @@ def test_create_habit(
         headers=access_token_headers,
     )
 
-    response_data = HabitDetail(**response.json().get("data"))
+    response_data = HabitPublic(**response.json().get("data"))
 
     assert response.status_code == 201
 

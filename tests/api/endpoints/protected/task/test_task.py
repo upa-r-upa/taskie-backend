@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 
 from app.models.models import Todo
 from app.schemas.habit import HabitWithLog
-from app.schemas.routine import RoutineDetail
+from app.schemas.routine import RoutinePublic
 
 
 def test_get_all_daily_task_no_match_log(
@@ -11,7 +11,7 @@ def test_get_all_daily_task_no_match_log(
     access_token_headers: dict[str, str],
     add_todo_list: list[Todo],
     add_habit_list_with_log: list[HabitWithLog],
-    add_routine_list_with_log: list[RoutineDetail],
+    add_routine_list_with_log: list[RoutinePublic],
 ):
     params = dict(date="2024-07-30")
 
@@ -40,7 +40,7 @@ def test_get_all_daily_task(
     access_token_headers: dict[str, str],
     add_todo_list: list[Todo],
     add_habit_list_with_log: list[HabitWithLog],
-    add_routine_list_with_log: list[RoutineDetail],
+    add_routine_list_with_log: list[RoutinePublic],
     target_date: datetime,
 ):
     params = dict(date=target_date.strftime("%Y-%m-%d"))
