@@ -231,3 +231,33 @@ def test_update_habit(
     assert (
         session.query(Habit).filter(Habit.id == 1).first().repeat_days == "012"
     )
+
+
+def test_update_habit_all(
+    client: TestClient,
+    session: Session,
+    access_token_headers: dict[str, str],
+):
+    body = dict(
+        title="changed",
+        end_time_minutes=1440,
+        start_time_minutes=0,
+        repeat_days=[0, 1, 2, 3, 4],
+        repeat_time_minutes=60,
+        activated=False,
+    )
+
+    response = client.put(
+        "/habits/1",
+        headers=access_token_headers,
+        json=body,
+    )
+
+    habit = session.query(Habit).filter(Habit.id == 1).first()
+
+    assert response.status_code == 200
+    assert habit.end_time_minutes == body["end_time_minutes"]
+    assert habit.start_time_minutes == body["start_time_minutes"]
+    assert habit.repeat_days == "01234"
+    assert habit.repeat_time_minutes == body["repeat_time_minutes"]
+    assert habit.activated == body["activated"]
