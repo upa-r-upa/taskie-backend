@@ -28,8 +28,8 @@
 
 ### 2. 레포지터리 설치
 ```bash
-git clone https://github.com/upa-r-upa/taskie_backend.git
-cd taskie_backend
+git clone https://github.com/upa-r-upa/taskie-backend.git
+cd taskie-backend
 ```
 
 ### 3. 최초 실행 혹은 코드 변경 시
@@ -52,8 +52,8 @@ http://localhost:8000 에서 로컬 서버를 확인할 수 있습니다. (docs:
 
 ### 1. 레포지터리 설치
 ```bash
-git clone https://github.com/upa-r-upa/taskie_backend.git
-cd taskie_backend
+git clone https://github.com/upa-r-upa/taskie-backend.git
+cd taskie-backend
 ```
 ### 2. 환경 변수 설정
 ```bash
