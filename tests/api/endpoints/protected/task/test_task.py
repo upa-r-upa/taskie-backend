@@ -3,7 +3,31 @@ from fastapi.testclient import TestClient
 
 from app.models.models import Todo
 from app.schemas.habit import HabitWithLog
-from app.schemas.routine import RoutineDetail
+from app.schemas.routine import RoutinePublic
+
+
+def test_get_all_daily_task_empty(
+    client: TestClient,
+    access_token_headers: dict[str, str],
+):
+    params = dict(date="2024-07-30")
+
+    response = client.get(
+        "/task",
+        params=params,
+        headers=access_token_headers,
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json().get("data")
+    routine_list = response_data.get("routine_list")
+    todo_list = response_data.get("todo_list")
+    habit_list = response_data.get("habit_list")
+
+    assert todo_list == []
+    assert routine_list == []
+    assert habit_list == []
 
 
 def test_get_all_daily_task_no_match_log(
@@ -11,7 +35,7 @@ def test_get_all_daily_task_no_match_log(
     access_token_headers: dict[str, str],
     add_todo_list: list[Todo],
     add_habit_list_with_log: list[HabitWithLog],
-    add_routine_list_with_log: list[RoutineDetail],
+    add_routine_list_with_log: list[RoutinePublic],
 ):
     params = dict(date="2024-07-30")
 
@@ -40,7 +64,7 @@ def test_get_all_daily_task(
     access_token_headers: dict[str, str],
     add_todo_list: list[Todo],
     add_habit_list_with_log: list[HabitWithLog],
-    add_routine_list_with_log: list[RoutineDetail],
+    add_routine_list_with_log: list[RoutinePublic],
     target_date: datetime,
 ):
     params = dict(date=target_date.strftime("%Y-%m-%d"))

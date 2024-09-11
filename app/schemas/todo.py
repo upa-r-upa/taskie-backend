@@ -24,7 +24,7 @@ class TodoUpdateInput(BaseModel):
         return validate_date(v)
 
 
-class TodoDetail(TodoBase):
+class TodoPublic(TodoBase):
     id: int
     created_at: datetime
     updated_at: datetime

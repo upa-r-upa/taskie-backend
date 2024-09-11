@@ -14,7 +14,7 @@ from app.database.db import tx_manager
 from app.schemas.response import Response
 from app.schemas.routine import (
     RoutineCreateInput,
-    RoutineDetail,
+    RoutinePublic,
     RoutineLogPutInput,
     RoutineUpdateInput,
 )
@@ -28,7 +28,7 @@ router = APIRouter(
 
 @router.post(
     "",
-    response_model=Response[RoutineDetail],
+    response_model=Response[RoutinePublic],
     status_code=status.HTTP_201_CREATED,
     operation_id="createRoutine",
 )
@@ -45,7 +45,7 @@ def create_routine(
 
 @router.get(
     "/{routine_id}",
-    response_model=Response[RoutineDetail],
+    response_model=Response[RoutinePublic],
     status_code=status.HTTP_200_OK,
     operation_id="getRoutine",
 )
@@ -53,7 +53,7 @@ def get_routine(routine_id: int, dao: RoutineDAO = Depends(get_routine_dao)):
     routine = dao.get_routine_with_elements_by_id(routine_id)
 
     response = Response(
-        data=RoutineDetail.from_routine(routine, routine.routine_elements)
+        data=RoutinePublic.from_routine(routine, routine.routine_elements)
     )
 
     return response
@@ -96,7 +96,7 @@ def put_routine_log(
 
 @router.put(
     "/{routine_id}",
-    response_model=Response[RoutineDetail],
+    response_model=Response[RoutinePublic],
     status_code=status.HTTP_200_OK,
     operation_id="updateRoutine",
 )
@@ -112,5 +112,5 @@ def update_routine(
         )
 
     return Response(
-        data=RoutineDetail.from_routine(routine, routine.routine_elements)
+        data=RoutinePublic.from_routine(routine, routine.routine_elements)
     )

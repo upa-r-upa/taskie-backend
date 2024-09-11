@@ -5,7 +5,7 @@ from app.models.models import Routine, RoutineElement, User
 
 from app.schemas.routine import (
     RoutineCreateInput,
-    RoutineDetail,
+    RoutinePublic,
     RoutineItem,
     RoutineItemUpdate,
     RoutineLogBase,
@@ -80,7 +80,7 @@ def update_routine_all_data() -> RoutineUpdateInput:
 @pytest.fixture
 def add_routine(
     session: Session, add_user: User, routine_data: RoutineCreateInput
-) -> RoutineDetail:
+) -> RoutinePublic:
     repeat_days = "".join([str(day) for day in routine_data.repeat_days])
 
     test_routine = Routine(
@@ -107,7 +107,7 @@ def add_routine(
     session.add_all(routine_elements)
     session.commit()
 
-    return RoutineDetail(
+    return RoutinePublic(
         id=test_routine.id,
         title=test_routine.title,
         start_time_minutes=test_routine.start_time_minutes,
@@ -129,7 +129,7 @@ def add_routine(
 
 @pytest.fixture
 def routine_log_data(
-    session: Session, add_routine: RoutineDetail
+    session: Session, add_routine: RoutinePublic
 ) -> List[RoutineLogBase]:
     return [
         RoutineLogBase(

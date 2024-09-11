@@ -92,13 +92,13 @@ class RoutineBase(BaseModel):
     repeat_days: List[int]
 
 
-class RoutineDetail(RoutineBase):
+class RoutinePublic(RoutineBase):
     routine_elements: List[RoutineItem]
 
     def from_routine_with_log(
         routine: Routine, routine_items: List[RoutineItem]
     ):
-        return RoutineDetail(
+        return RoutinePublic(
             id=routine.id,
             title=routine.title,
             start_time_minutes=routine.start_time_minutes,
@@ -109,7 +109,7 @@ class RoutineDetail(RoutineBase):
         )
 
     def from_routine(routine: Routine, routine_elements: List[RoutineElement]):
-        return RoutineDetail(
+        return RoutinePublic(
             id=routine.id,
             title=routine.title,
             start_time_minutes=routine.start_time_minutes,

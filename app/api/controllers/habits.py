@@ -10,8 +10,9 @@ from ..repositories import get_habit_repository
 from ..repositories.habit_repository import HabitRepository
 from app.schemas.habit import (
     HabitCreateInput,
-    HabitDetail,
+    HabitPublic,
     HabitListGetParams,
+    HabitUpdateInput,
     HabitWithLog,
 )
 from app.schemas.response import Response
@@ -23,7 +24,7 @@ router = APIRouter(
 
 @router.post(
     "",
-    response_model=Response[HabitDetail],
+    response_model=Response[HabitPublic],
     status_code=status.HTTP_201_CREATED,
     operation_id="createHabit",
 )
@@ -35,7 +36,7 @@ def create_habit(
     with tx_manager:
         habit = repository.create_habit(data)
 
-    return Response(data=HabitDetail.from_orm(habit))
+    return Response(data=HabitPublic.from_orm(habit))
 
 
 @router.get(
@@ -76,3 +77,29 @@ def delete_habit(
             )
 
     return None
+
+
+@router.put(
+    "/{habit_id}",
+    response_model=Response[HabitPublic],
+    status_code=status.HTTP_200_OK,
+    operation_id="updateHabit",
+)
+def update_habit(
+    habit_id: int,
+    data: HabitUpdateInput,
+    repository: HabitRepository = Depends(get_habit_repository),
+    tx_manager: contextmanager = Depends(tx_manager),
+):
+    with tx_manager:
+        try:
+            habit = repository.update_habit(
+                habit_id=habit_id, update_input=data
+            )
+        except DataNotFoundError:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=DATA_DOES_NOT_EXIST,
+            )
+
+    return Response(data=HabitPublic.from_orm(habit))

@@ -6,7 +6,7 @@ from pytest import Session
 from app.models.models import Habit, HabitLog
 from app.schemas.habit import (
     HabitCreateInput,
-    HabitDetail,
+    HabitPublic,
     HabitWithLog,
 )
 
@@ -23,7 +23,7 @@ def test_create_habit(
         headers=access_token_headers,
     )
 
-    response_data = HabitDetail(**response.json().get("data"))
+    response_data = HabitPublic(**response.json().get("data"))
 
     assert response.status_code == 201
 
@@ -209,3 +209,34 @@ def test_delete_habit_not_found(
     )
 
     assert response.status_code == 404
+
+
+def test_update_habit(
+    client: TestClient,
+    session: Session,
+    access_token_headers: dict[str, str],
+    add_habit_list: list[Habit],
+):
+    body = dict(
+        title="changed",
+        start_time_minutes=0,
+        end_time_minutes=1440,
+        repeat_time_minutes=60,
+        repeat_days=[0, 1, 2, 3, 4],
+        activated=False,
+    )
+
+    response = client.put(
+        "/habits/1",
+        headers=access_token_headers,
+        json=body,
+    )
+
+    habit = session.query(Habit).filter(Habit.id == 1).first()
+
+    assert response.status_code == 200
+    assert habit.end_time_minutes == body["end_time_minutes"]
+    assert habit.start_time_minutes == body["start_time_minutes"]
+    assert habit.repeat_days == "01234"
+    assert habit.repeat_time_minutes == body["repeat_time_minutes"]
+    assert habit.activated == body["activated"]

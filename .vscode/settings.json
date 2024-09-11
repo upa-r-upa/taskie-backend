@@ -14,4 +14,9 @@
         "source.organizeImports": "explicit"
     },
     "editor.formatOnSave": true,
+    "cSpell.words": [
+        "fastapi",
+        "pydantic",
+        "Taskie"
+    ],
 }

@@ -25,7 +25,7 @@ class HabitBase(BaseModel):
         orm_mode = True
 
 
-class HabitCreateInput(HabitBase):
+class HabitModifiableBase(HabitBase):
     @validator("title")
     def validate_title(cls, v):
         if len(v) == 0:
@@ -36,13 +36,13 @@ class HabitCreateInput(HabitBase):
 
     @validator("start_time_minutes")
     def validate_start_time_minutes(cls, v):
-        if v < 0 or v >= 1440:
+        if v < 0 or v > 1440:
             raise ValueError(INVALID_VALUE_RANGE)
         return v
 
     @validator("end_time_minutes")
     def validate_end_time_minutes(cls, v):
-        if v < 0 or v >= 1440:
+        if v < 0 or v > 1440:
             raise ValueError(INVALID_VALUE_RANGE)
         return v
 
@@ -63,7 +63,15 @@ class HabitCreateInput(HabitBase):
         return v
 
 
-class HabitDetail(HabitBase):
+class HabitUpdateInput(HabitModifiableBase):
+    activated: bool | None
+
+
+class HabitCreateInput(HabitModifiableBase):
+    pass
+
+
+class HabitPublic(HabitBase):
     id: int
     activated: bool
     created_at: datetime
@@ -98,7 +106,7 @@ class HabitLog(BaseModel):
         orm_mode = True
 
 
-class HabitWithLog(HabitDetail):
+class HabitWithLog(HabitPublic):
     near_weekday: int
     log_list: List[HabitLog]
 
@@ -106,7 +114,7 @@ class HabitWithLog(HabitDetail):
     def from_orm_with_weekday(
         cls, db_obj: Habit, log_list: list[HabitLog], today_weekday: int
     ):
-        habit = HabitDetail.from_orm(db_obj).dict()
+        habit = HabitPublic.from_orm(db_obj).dict()
         habit_with_log = HabitWithLog(
             **habit,
             near_weekday=HabitWithLog.calculate_near_weekday(

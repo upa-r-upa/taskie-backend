@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.models.models import Todo
 from app.schemas.todo import (
-    TodoDetail,
+    TodoPublic,
     TodoBase,
     TodoListGetInput,
     TodoOrderUpdateInput,
@@ -19,7 +19,7 @@ def test_get_todo(
         headers=access_token_headers,
     )
 
-    response_data = TodoDetail(**response.json().get("data"))
+    response_data = TodoPublic(**response.json().get("data"))
 
     assert response.status_code == 200
 
@@ -40,7 +40,7 @@ def test_create_todo(
         headers=access_token_headers,
     )
 
-    response_data = TodoDetail(**response.json().get("data"))
+    response_data = TodoPublic(**response.json().get("data"))
 
     assert response.status_code == 201
 
@@ -69,7 +69,7 @@ def test_update_todo(
         headers=access_token_headers,
     )
 
-    response_data = TodoDetail(**response.json().get("data"))
+    response_data = TodoPublic(**response.json().get("data"))
 
     assert response.status_code == 200
     assert response_data.title == request_data["title"]
