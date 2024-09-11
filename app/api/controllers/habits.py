@@ -12,6 +12,7 @@ from app.schemas.habit import (
     HabitCreateInput,
     HabitPublic,
     HabitListGetParams,
+    HabitUpdateInput,
     HabitWithLog,
 )
 from app.schemas.response import Response
@@ -76,3 +77,29 @@ def delete_habit(
             )
 
     return None
+
+
+@router.put(
+    "/{habit_id}",
+    response_model=Response[HabitPublic],
+    status_code=status.HTTP_200_OK,
+    operation_id="updateHabit",
+)
+def update_habit(
+    habit_id: int,
+    data: HabitUpdateInput,
+    repository: HabitRepository = Depends(get_habit_repository),
+    tx_manager: contextmanager = Depends(tx_manager),
+):
+    with tx_manager:
+        try:
+            habit = repository.update_habit(
+                habit_id=habit_id, update_input=data
+            )
+        except DataNotFoundError:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=DATA_DOES_NOT_EXIST,
+            )
+
+    return Response(data=HabitPublic.from_orm(habit))

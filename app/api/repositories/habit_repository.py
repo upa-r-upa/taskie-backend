@@ -5,7 +5,7 @@ from pytest import Session
 
 from app.exceptions.exceptions import DataNotFoundError
 from app.models.models import Habit, HabitLog, User
-from app.schemas.habit import HabitCreateInput, HabitWithLog
+from app.schemas.habit import HabitCreateInput, HabitUpdateInput, HabitWithLog
 
 from .base import ProtectedBaseRepository
 
@@ -159,3 +159,22 @@ class HabitRepository(ProtectedBaseRepository):
         self.db.delete(habit)
 
         return None
+
+    def update_habit(self, habit_id: int, update_input: HabitUpdateInput):
+        habit = self.get_habit_by_id(habit_id)
+
+        if not habit:
+            raise DataNotFoundError()
+
+        habit.title = update_input.title
+        habit.start_time_minutes = update_input.start_time_minutes
+        habit.end_time_minutes = update_input.end_time_minutes
+        habit.repeat_time_minutes = update_input.repeat_time_minutes
+        habit.repeat_days = Habit.repeat_days_to_string(
+            update_input.repeat_days
+        )
+        habit.activated = update_input.activated
+
+        self.db.flush()
+
+        return habit

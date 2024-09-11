@@ -1,4 +1,4 @@
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 from pydantic.generics import GenericModel
 from pydantic import BaseModel
 
@@ -6,7 +6,7 @@ T = TypeVar("T")
 
 
 class Response(GenericModel, Generic[T]):
-    data: Optional[T] = None
+    data: T
     message: str = ""
 
 

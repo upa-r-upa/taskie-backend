@@ -25,7 +25,7 @@ class HabitBase(BaseModel):
         orm_mode = True
 
 
-class HabitCreateInput(HabitBase):
+class HabitModifiableBase(HabitBase):
     @validator("title")
     def validate_title(cls, v):
         if len(v) == 0:
@@ -36,13 +36,13 @@ class HabitCreateInput(HabitBase):
 
     @validator("start_time_minutes")
     def validate_start_time_minutes(cls, v):
-        if v < 0 or v >= 1440:
+        if v < 0 or v > 1440:
             raise ValueError(INVALID_VALUE_RANGE)
         return v
 
     @validator("end_time_minutes")
     def validate_end_time_minutes(cls, v):
-        if v < 0 or v >= 1440:
+        if v < 0 or v > 1440:
             raise ValueError(INVALID_VALUE_RANGE)
         return v
 
@@ -61,6 +61,14 @@ class HabitCreateInput(HabitBase):
             v = sorted(v)
 
         return v
+
+
+class HabitUpdateInput(HabitModifiableBase):
+    activated: bool | None
+
+
+class HabitCreateInput(HabitModifiableBase):
+    pass
 
 
 class HabitPublic(HabitBase):

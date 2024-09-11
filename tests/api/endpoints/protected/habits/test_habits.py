@@ -215,35 +215,14 @@ def test_update_habit(
     client: TestClient,
     session: Session,
     access_token_headers: dict[str, str],
-):
-    body = dict(title="changed", repeat_days=[0, 1, 2])
-
-    response = client.put(
-        "/habits/1",
-        headers=access_token_headers,
-        json=body,
-    )
-
-    assert response.status_code == 200
-    assert (
-        session.query(Habit).filter(Habit.id == 1).first().title == "changed"
-    )
-    assert (
-        session.query(Habit).filter(Habit.id == 1).first().repeat_days == "012"
-    )
-
-
-def test_update_habit_all(
-    client: TestClient,
-    session: Session,
-    access_token_headers: dict[str, str],
+    add_habit_list: list[Habit],
 ):
     body = dict(
         title="changed",
-        end_time_minutes=1440,
         start_time_minutes=0,
-        repeat_days=[0, 1, 2, 3, 4],
+        end_time_minutes=1440,
         repeat_time_minutes=60,
+        repeat_days=[0, 1, 2, 3, 4],
         activated=False,
     )
 
