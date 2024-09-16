@@ -19,7 +19,7 @@ def test_get_todo(
         headers=access_token_headers,
     )
 
-    response_data = TodoPublic(**response.json().get("data"))
+    response_data = TodoPublic(**response.json())
 
     assert response.status_code == 200
 
@@ -40,7 +40,7 @@ def test_create_todo(
         headers=access_token_headers,
     )
 
-    response_data = TodoPublic(**response.json().get("data"))
+    response_data = TodoPublic(**response.json())
 
     assert response.status_code == 201
 
@@ -69,7 +69,7 @@ def test_update_todo(
         headers=access_token_headers,
     )
 
-    response_data = TodoPublic(**response.json().get("data"))
+    response_data = TodoPublic(**response.json())
 
     assert response.status_code == 200
     assert response_data.title == request_data["title"]
@@ -160,7 +160,7 @@ def test_get_todo_list__valid_page_and_offset__1_page(
 
     assert response.status_code == 200
 
-    response_data = response.json().get("data")
+    response_data = response.json()
 
     assert len(response_data) == 3
     assert response_data[0].get("id") == 7
@@ -184,7 +184,7 @@ def test_get_todo_list__valid_page_and_offset__2_page(
 
     assert response.status_code == 200
 
-    response_data = response.json().get("data")
+    response_data = response.json()
 
     assert len(response_data) == 3
     assert response_data[0].get("id") == 4
@@ -215,7 +215,7 @@ def test_get_todo_list__valid_date_range(
 
     assert response.status_code == 200
 
-    response_data = response.json().get("data")
+    response_data = response.json()
 
     assert len(response_data) == 3
     assert response_data[0].get("id") == 3
@@ -239,7 +239,7 @@ def test_get_todo_list__complete(
 
     assert response.status_code == 200
 
-    response_data = response.json().get("data")
+    response_data = response.json()
 
     assert len(response_data) == 2
     assert response_data[0].get("id") == 9

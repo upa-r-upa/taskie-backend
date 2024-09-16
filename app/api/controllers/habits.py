@@ -15,7 +15,7 @@ from app.schemas.habit import (
     HabitUpdateInput,
     HabitWithLog,
 )
-from app.schemas.response import Response
+
 
 router = APIRouter(
     prefix="/habits", tags=["habits"], dependencies=[Depends(get_current_user)]
@@ -24,7 +24,7 @@ router = APIRouter(
 
 @router.post(
     "",
-    response_model=Response[HabitPublic],
+    response_model=HabitPublic,
     status_code=status.HTTP_201_CREATED,
     operation_id="createHabit",
 )
@@ -36,12 +36,12 @@ def create_habit(
     with tx_manager:
         habit = repository.create_habit(data)
 
-    return Response(data=HabitPublic.from_orm(habit))
+    return HabitPublic.from_orm(habit)
 
 
 @router.get(
     "",
-    response_model=Response[List[HabitWithLog]],
+    response_model=List[HabitWithLog],
     status_code=status.HTTP_200_OK,
     operation_id="getHabitList",
 )
@@ -51,7 +51,7 @@ def get_habits(
 ):
     habits_with_logs = repository.get_habits_with_date_logs(**params.dict())
 
-    return Response(data=habits_with_logs)
+    return habits_with_logs
 
 
 @router.delete(
@@ -81,7 +81,7 @@ def delete_habit(
 
 @router.put(
     "/{habit_id}",
-    response_model=Response[HabitPublic],
+    response_model=HabitPublic,
     status_code=status.HTTP_200_OK,
     operation_id="updateHabit",
 )
@@ -102,4 +102,4 @@ def update_habit(
                 detail=DATA_DOES_NOT_EXIST,
             )
 
-    return Response(data=HabitPublic.from_orm(habit))
+    return HabitPublic.from_orm(habit)

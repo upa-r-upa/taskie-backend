@@ -11,7 +11,7 @@ from ..dao.routine_dao import RoutineDAO
 from ..dao.routine_log_dao import RoutineLogDAO
 
 from app.database.db import tx_manager
-from app.schemas.response import Response
+
 from app.schemas.routine import (
     RoutineCreateInput,
     RoutinePublic,
@@ -28,7 +28,7 @@ router = APIRouter(
 
 @router.post(
     "",
-    response_model=Response[RoutinePublic],
+    response_model=RoutinePublic,
     status_code=status.HTTP_201_CREATED,
     operation_id="createRoutine",
 )
@@ -40,21 +40,19 @@ def create_routine(
     with tx_manager:
         routine = repository.create_routine(data)
 
-    return Response(data=routine)
+    return routine
 
 
 @router.get(
     "/{routine_id}",
-    response_model=Response[RoutinePublic],
+    response_model=RoutinePublic,
     status_code=status.HTTP_200_OK,
     operation_id="getRoutine",
 )
 def get_routine(routine_id: int, dao: RoutineDAO = Depends(get_routine_dao)):
     routine = dao.get_routine_with_elements_by_id(routine_id)
 
-    response = Response(
-        data=RoutinePublic.from_routine(routine, routine.routine_elements)
-    )
+    response = RoutinePublic.from_routine(routine, routine.routine_elements)
 
     return response
 
@@ -96,7 +94,7 @@ def put_routine_log(
 
 @router.put(
     "/{routine_id}",
-    response_model=Response[RoutinePublic],
+    response_model=RoutinePublic,
     status_code=status.HTTP_200_OK,
     operation_id="updateRoutine",
 )
@@ -111,6 +109,4 @@ def update_routine(
             routine_id=routine_id, routine=data
         )
 
-    return Response(
-        data=RoutinePublic.from_routine(routine, routine.routine_elements)
-    )
+    return RoutinePublic.from_routine(routine, routine.routine_elements)

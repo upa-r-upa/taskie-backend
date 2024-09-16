@@ -6,7 +6,7 @@ from ..dao import get_user_dao
 from ..dao.user_dao import UserDAO
 from app.database.db import tx_manager
 from app.models.models import User
-from app.schemas.response import Response
+
 from app.schemas.user import UserData, UserUpdateInput
 
 router = APIRouter(
@@ -18,17 +18,17 @@ router = APIRouter(
 
 @router.get(
     "/me",
-    response_model=Response[UserData],
+    response_model=UserData,
     status_code=status.HTTP_200_OK,
     operation_id="getMe",
 )
 def get_me(user: User = Depends(get_current_user)):
-    return Response(data=UserData.from_orm(user))
+    return UserData.from_orm(user)
 
 
 @router.put(
     "/me",
-    response_model=Response[UserData],
+    response_model=UserData,
     status_code=status.HTTP_200_OK,
     operation_id="updateMe",
 )
@@ -41,4 +41,4 @@ def update_me(
     with tx_manager:
         user = user_dao.update_me(data)
 
-    return Response(data=UserData.from_orm(user))
+    return UserData.from_orm(user)

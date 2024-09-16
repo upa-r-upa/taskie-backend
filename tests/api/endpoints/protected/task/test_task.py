@@ -20,7 +20,7 @@ def test_get_all_daily_task_empty(
 
     assert response.status_code == 200
 
-    response_data = response.json().get("data")
+    response_data = response.json()
     routine_list = response_data.get("routine_list")
     todo_list = response_data.get("todo_list")
     habit_list = response_data.get("habit_list")
@@ -47,7 +47,7 @@ def test_get_all_daily_task_no_match_log(
 
     assert response.status_code == 200
 
-    response_data = response.json().get("data")
+    response_data = response.json()
     routine_list = response_data.get("routine_list")
     todo_list = response_data.get("todo_list")
     habit_list = response_data.get("habit_list")
@@ -77,7 +77,7 @@ def test_get_all_daily_task(
 
     assert response.status_code == 200
 
-    response_data = response.json().get("data")
+    response_data = response.json()
     routine_list = response_data.get("routine_list")
     todo_list = response_data.get("todo_list")
     habit_list = response_data.get("habit_list")

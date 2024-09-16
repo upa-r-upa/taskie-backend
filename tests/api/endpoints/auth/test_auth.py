@@ -35,12 +35,12 @@ def test_login(client: TestClient, user_data: UserBase, add_user: User):
     )
 
     response = client.post("/auth/login", json=data)
-    response_json_user = response.json().get("data").get("user")
+    response_json_user = response.json().get("user")
 
     assert response.status_code == 200
 
     assert response.cookies.get("refresh_token") is not None
-    assert response.json().get("data").get("access_token")
+    assert response.json().get("access_token")
 
     assert response_json_user.get("username") == user_data.username
     assert response_json_user.get("email") == user_data.email
@@ -71,10 +71,10 @@ def test_refresh(
         "/auth/refresh", cookies={"refresh_token": refresh_token}
     )
 
-    response_json_user = response.json().get("data").get("user")
+    response_json_user = response.json().get("user")
 
     assert response.status_code == 200
-    assert response.json().get("data").get("access_token")
+    assert response.json().get("access_token")
 
     assert response_json_user.get("username") == user_data.username
     assert response_json_user.get("email") == user_data.email
