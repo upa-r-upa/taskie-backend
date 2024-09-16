@@ -11,7 +11,7 @@ from fastapi import (
 from ..dao import get_auth_dao
 from ..dao.auth_dao import AuthDAO
 from app.database.db import tx_manager
-from app.schemas.response import Response
+
 from app.schemas.auth import (
     LoginInput,
     LoginOutput,
@@ -42,7 +42,7 @@ def signup(
 
 @router.post(
     "/login",
-    response_model=Response[LoginOutput],
+    response_model=LoginOutput,
     status_code=status.HTTP_200_OK,
     operation_id="login",
 )
@@ -66,10 +66,9 @@ def login(
             samesite="lax",
         )
 
-    return Response(
-        data=LoginOutput(
-            access_token=access_token, user=UserData.from_orm(user)
-        ),
+    return LoginOutput(
+        access_token=access_token,
+        user=UserData.from_orm(user),
     )
 
 
@@ -96,7 +95,7 @@ def logout(
 
 @router.post(
     "/refresh",
-    response_model=Response[RefreshOutput],
+    response_model=RefreshOutput,
     status_code=status.HTTP_200_OK,
     operation_id="refreshToken",
 )
@@ -129,8 +128,7 @@ async def refresh(
         )
         raise e
 
-    return Response(
-        data=RefreshOutput(
-            access_token=access_token, user=UserData.from_orm(user)
-        ),
+    return RefreshOutput(
+        access_token=access_token,
+        user=UserData.from_orm(user),
     )

@@ -26,7 +26,7 @@ def test_create_routine(
         headers=access_token_headers,
     )
 
-    response_data = RoutinePublic(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json())
 
     assert response.status_code == 201
 
@@ -60,7 +60,7 @@ def test_get_routine_valid_id(
         headers=access_token_headers,
     )
 
-    response_data = RoutinePublic(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json())
 
     assert response.status_code == 200
 
@@ -119,7 +119,7 @@ def test_update_routine_full_update(
         json=update_routine_all_data.dict(),
     )
 
-    response_data = RoutinePublic(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json())
 
     assert response.status_code == 200
 
@@ -154,7 +154,7 @@ def test_update_routine_only_elements_data(
         json=update_routine_only_elements_data.dict(),
     )
 
-    response_data = RoutinePublic(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json())
 
     assert response.status_code == 200
 
@@ -195,7 +195,7 @@ def test_update_routine_only_routine_data(
         json=update_routine_only_routine_data.dict(),
     )
 
-    response_data = RoutinePublic(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json())
 
     assert response.status_code == 200
 
@@ -228,7 +228,7 @@ def test_update_routine_empty_routine_elements(
         json=update_routine_empty_routine_elements.dict(),
     )
 
-    response_data = RoutinePublic(**response.json().get("data"))
+    response_data = RoutinePublic(**response.json())
 
     assert response.status_code == 200
 

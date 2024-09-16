@@ -9,7 +9,7 @@ from app.core.utils import validate_date_format
 from ..dao import get_todo_dao
 from ..dao.todo_dao import TodoDAO
 from app.database.db import tx_manager
-from app.schemas.response import Response
+
 from app.schemas.todo import (
     TodoBase,
     TodoPublic,
@@ -26,7 +26,7 @@ router = APIRouter(
 
 @router.get(
     "/{todo_id}",
-    response_model=Response[TodoPublic],
+    response_model=TodoPublic,
     status_code=status.HTTP_200_OK,
     operation_id="getTodo",
 )
@@ -36,12 +36,12 @@ def get_todo(
 ):
     todo = dao.get_todo_by_id(todo_id=todo_id)
 
-    return Response(data=TodoPublic.from_orm(todo))
+    return TodoPublic.from_orm(todo)
 
 
 @router.post(
     "",
-    response_model=Response[TodoPublic],
+    response_model=TodoPublic,
     status_code=status.HTTP_201_CREATED,
     operation_id="createTodo",
 )
@@ -58,7 +58,7 @@ def create_todo(
             order=data.order,
         )
 
-    return Response(data=TodoPublic.from_orm(todo))
+    return TodoPublic.from_orm(todo)
 
 
 @router.put(
@@ -82,7 +82,7 @@ def update_todo_list_order(
 
 @router.put(
     "/{todo_id}",
-    response_model=Response[TodoPublic],
+    response_model=TodoPublic,
     status_code=status.HTTP_200_OK,
     operation_id="updateTodo",
 )
@@ -100,7 +100,7 @@ def update_todo(
             content=data.content,
         )
 
-    return Response(data=TodoPublic.from_orm(todo))
+    return TodoPublic.from_orm(todo)
 
 
 @router.delete(
@@ -124,7 +124,7 @@ def delete_todo(
 
 @router.get(
     "",
-    response_model=Response[List[TodoPublic]],
+    response_model=List[TodoPublic],
     status_code=status.HTTP_200_OK,
     operation_id="getTodoList",
 )
@@ -155,6 +155,4 @@ def get_todo_list(
         end_date=end_date,
     )
 
-    return Response(
-        data=[TodoPublic.from_orm(todo) for todo in todo_list],
-    )
+    return [TodoPublic.from_orm(todo) for todo in todo_list]

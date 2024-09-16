@@ -16,7 +16,7 @@ def test_get_me(
     response = client.get("/users/me", headers=access_token_headers)
 
     assert response.status_code == 200
-    assert response.json().get("data") == excepted_output.dict()
+    assert response.json() == excepted_output.dict()
 
 
 def test_update_me(
@@ -44,7 +44,7 @@ def test_update_me(
     )
 
     assert response.status_code == 200
-    assert response.json().get("data") == excepted_output.dict()
+    assert response.json() == excepted_output.dict()
 
     user = session.query(User).filter_by(username=data.username).first()
 

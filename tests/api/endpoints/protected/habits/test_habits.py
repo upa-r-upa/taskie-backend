@@ -23,7 +23,7 @@ def test_create_habit(
         headers=access_token_headers,
     )
 
-    response_data = HabitPublic(**response.json().get("data"))
+    response_data = HabitPublic(**response.json())
 
     assert response.status_code == 201
 
@@ -54,7 +54,7 @@ def test_get_habits(
     )
 
     response_data: List[HabitWithLog] = [
-        HabitWithLog(**habit) for habit in response.json().get("data")
+        HabitWithLog(**habit) for habit in response.json()
     ]
 
     assert response.status_code == 200
@@ -89,7 +89,7 @@ def test_get_habits_valid_last_id(
     )
 
     response_data: List[HabitWithLog] = [
-        HabitWithLog(**habit) for habit in response.json().get("data")
+        HabitWithLog(**habit) for habit in response.json()
     ]
 
     assert response.status_code == 200
@@ -131,7 +131,7 @@ def test_get_habits_empty_log_date(
     )
 
     response_data: List[HabitWithLog] = [
-        HabitWithLog(**habit) for habit in response.json().get("data")
+        HabitWithLog(**habit) for habit in response.json()
     ]
 
     assert response.status_code == 200
@@ -166,7 +166,7 @@ def test_get_habits_deactivated_habits(
     )
 
     response_data: List[HabitWithLog] = [
-        HabitWithLog(**habit) for habit in response.json().get("data")
+        HabitWithLog(**habit) for habit in response.json()
     ]
 
     assert response.status_code == 200
