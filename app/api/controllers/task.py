@@ -1,10 +1,11 @@
+from datetime import date
 from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
 from ..repositories import get_task_repository
 from ..repositories.task_repository import TaskRepository
 
-from app.schemas.task import TaskGetInput, TaskPublic
+from app.schemas.task import TaskPublic
 
 
 router = APIRouter(
@@ -21,9 +22,9 @@ router = APIRouter(
     operation_id="getAllDailyTask",
 )
 def get_today_all_task(
-    params: TaskGetInput = Depends(),
+    date: date,
     task_repository: TaskRepository = Depends(get_task_repository),
 ):
-    all_task = task_repository.get_all_task_by_date(date=params.date)
+    all_task = task_repository.get_all_task_by_date(date)
 
     return all_task

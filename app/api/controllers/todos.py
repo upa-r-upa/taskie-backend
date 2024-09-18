@@ -1,17 +1,16 @@
 from contextlib import contextmanager
-import datetime
+from datetime import date, datetime, timedelta
 
 from typing import List
 from fastapi import APIRouter, Depends, status
 
 from app.core.auth import get_current_user
-from app.core.utils import validate_date_format
 from ..dao import get_todo_dao
 from ..dao.todo_dao import TodoDAO
 from app.database.db import tx_manager
 
 from app.schemas.todo import (
-    TodoBase,
+    TodoCreateInput,
     TodoPublic,
     TodoOrderUpdateInput,
     TodoUpdateInput,
@@ -46,7 +45,7 @@ def get_todo(
     operation_id="createTodo",
 )
 def create_todo(
-    data: TodoBase,
+    data: TodoCreateInput,
     dao: TodoDAO = Depends(get_todo_dao),
     tx_manager: contextmanager = Depends(tx_manager),
 ):
@@ -133,20 +132,15 @@ def get_todo_list(
     limit: int = 30,
     offset: int = 0,
     completed: bool = False,
-    start_date: str = None,
-    end_date: str = None,
+    start_date: date | None = None,
+    end_date: date | None = None,
     todo_dao: TodoDAO = Depends(get_todo_dao),
 ):
-    start_date = validate_date_format(start_date)
-    end_date = validate_date_format(end_date)
-
     if start_date and not end_date:
-        end_date = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
+        end_date = datetime.now(datetime.UTC).date()
 
     if end_date and not start_date:
-        start_date = (
-            datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=30)
-        ).strftime("%Y-%m-%d")
+        start_date = (datetime.now(datetime.UTC) - timedelta(days=30)).date
 
     todo_list = todo_dao.get_todo_list(
         completed=completed,

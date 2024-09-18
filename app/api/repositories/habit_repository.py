@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from typing import Optional
 from sqlalchemy import desc, func
 from pytest import Session
@@ -50,7 +50,7 @@ class HabitRepository(ProtectedBaseRepository):
     def get_habit_logs_by_date(
         self,
         habit_ids: list[str],
-        date: datetime,
+        date: date,
     ):
         logs = (
             self.db.query(HabitLog)
@@ -88,20 +88,18 @@ class HabitRepository(ProtectedBaseRepository):
     def get_habits_with_date_logs(
         self,
         limit: int,
-        log_target_date: str,
+        log_target_date: date,
         last_id: int = None,
         activated: bool = True,
     ) -> list[HabitWithLog]:
-        target_date = datetime.strptime(log_target_date, "%Y-%m-%d")
-
         habits = self.get_habits(
-            limit, target_date.weekday(), last_id, activated
+            limit, log_target_date.weekday(), last_id, activated
         )
         habit_ids = [habit.id for habit in habits]
-        habit_logs = self.get_habit_logs_by_date(habit_ids, target_date)
+        habit_logs = self.get_habit_logs_by_date(habit_ids, log_target_date)
 
         result_habits = self._combine_habits_and_logs(
-            habits, habit_logs, target_date.weekday()
+            habits, habit_logs, log_target_date.weekday()
         )
 
         return result_habits
@@ -129,15 +127,13 @@ class HabitRepository(ProtectedBaseRepository):
 
         return habits
 
-    def get_habits_with_log_by_date(self, date: str) -> list[HabitWithLog]:
-        date_obj = datetime.strptime(date, "%Y-%m-%d")
-
-        habits = self.get_habits_by_weekday(date_obj.weekday())
+    def get_habits_with_log_by_date(self, target: date) -> list[HabitWithLog]:
+        habits = self.get_habits_by_weekday(target.weekday())
         habit_ids = [habit.id for habit in habits]
 
-        habits_logs = self.get_habit_logs_by_date(habit_ids, date_obj)
+        habits_logs = self.get_habit_logs_by_date(habit_ids, target)
         habit_with_log = self._combine_habits_and_logs(
-            habits, habits_logs, date_obj.weekday()
+            habits, habits_logs, target.weekday()
         )
         return habit_with_log
 
