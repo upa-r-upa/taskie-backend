@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime, timezone
 from operator import and_
 from typing import List
 from fastapi import HTTPException, status
@@ -30,7 +30,7 @@ class TodoDAO(ProtectedBaseDAO):
         self,
         title: str,
         order: int,
-        target_date: str,
+        target_date: datetime,
         content: str = None,
     ) -> Todo:
         todo = Todo(
@@ -38,18 +38,29 @@ class TodoDAO(ProtectedBaseDAO):
             content=content,
             order=order,
             user_id=self.user_id,
-            target_date=datetime.strptime(target_date, "%Y-%m-%d"),
+            target_date=target_date,
         )
 
         self.db.add(todo)
 
         return todo
 
+    def check_completed_updated(
+        self, completed: bool, completed_at: datetime | None
+    ) -> bool:
+        if (completed and not completed_at) or (
+            not completed and completed_at
+        ):
+            return True
+
+        return False
+
     def update_todo(
         self,
         todo_id: int,
         title: str,
-        target_date: str,
+        target_date: datetime,
+        completed: bool,
         content: str = None,
     ) -> Todo:
         todo = self.get_todo_by_id(todo_id=todo_id)
@@ -60,9 +71,15 @@ class TodoDAO(ProtectedBaseDAO):
                 detail=DATA_DOES_NOT_EXIST,
             )
 
+        if self.check_completed_updated(completed, todo.completed_at):
+            if completed:
+                todo.completed_at = datetime.now(timezone.utc)
+            else:
+                todo.completed_at = None
+
         todo.title = title
         todo.content = content
-        todo.target_date = datetime.strptime(target_date, "%Y-%m-%d")
+        todo.target_date = target_date
 
         return todo
 
@@ -92,16 +109,10 @@ class TodoDAO(ProtectedBaseDAO):
         limit: int,
         offset: int,
         completed: bool = False,
-        start_date: str = None,
-        end_date: str = None,
+        start_date: date = None,
+        end_date: date = None,
     ) -> List[Todo]:
         query = self.db.query(Todo).filter(Todo.user_id == self.user_id)
-        start_date = (
-            datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
-        )
-        end_date = (
-            datetime.strptime(end_date, "%Y-%m-%d") if end_date else None
-        )
 
         if completed:
             query = query.filter(Todo.completed_at.is_not(None))
@@ -111,8 +122,8 @@ class TodoDAO(ProtectedBaseDAO):
         if start_date and end_date:
             query = query.filter(
                 and_(
-                    Todo.target_date >= start_date,
-                    Todo.target_date <= end_date,
+                    func.date(Todo.target_date) >= start_date,
+                    func.date(Todo.target_date) <= end_date,
                 )
             )
 
@@ -127,7 +138,7 @@ class TodoDAO(ProtectedBaseDAO):
 
     def get_todo_list_by_date(
         self,
-        date: str,
+        date: date,
     ) -> List[Todo]:
         todo = (
             self.db.query(Todo)

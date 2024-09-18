@@ -5,8 +5,6 @@ from sqlalchemy.orm import Session
 from app.models.models import Todo
 from app.schemas.todo import (
     TodoPublic,
-    TodoBase,
-    TodoListGetInput,
     TodoOrderUpdateInput,
 )
 
@@ -31,12 +29,16 @@ def test_get_todo(
 def test_create_todo(
     client: TestClient,
     session: Session,
-    todo: TodoBase,
     access_token_headers: dict[str, str],
 ):
     response = client.post(
         "/todos",
-        json=todo.dict(),
+        json=dict(
+            title="Test",
+            content="",
+            target_date="2024-11-11T12:30:00",
+            order=0,
+        ),
         headers=access_token_headers,
     )
 
@@ -44,8 +46,8 @@ def test_create_todo(
 
     assert response.status_code == 201
 
-    assert response_data.title == todo.title
-    assert response_data.content == todo.content
+    assert response_data.title == "Test"
+    assert response_data.content == ""
     assert response_data.target_date.strftime("%Y-%m-%d") is not None
 
     assert session.query(Todo).filter(Todo.id == response_data.id).first()
@@ -60,7 +62,8 @@ def test_update_todo(
     request_data = dict(
         title="Updated title",
         content="Updated content",
-        target_date="2024-07-24",
+        target_date="2024-07-24T11:04:00",
+        completed=True,
     )
 
     response = client.put(
@@ -74,10 +77,8 @@ def test_update_todo(
     assert response.status_code == 200
     assert response_data.title == request_data["title"]
     assert response_data.content == request_data["content"]
-    assert (
-        response_data.target_date.strftime("%Y-%m-%d")
-        == request_data["target_date"]
-    )
+    assert response_data.target_date.strftime("%Y-%m-%d") == "2024-07-24"
+    assert response_data.completed_at is not None
 
     assert (
         session.query(Todo)
@@ -86,7 +87,7 @@ def test_update_todo(
         .filter(Todo.content == request_data["content"])
         .first()
         .target_date.strftime("%Y-%m-%d")
-        == request_data["target_date"]
+        == "2024-07-24"
     )
 
 
@@ -150,11 +151,11 @@ def test_get_todo_list__valid_page_and_offset__1_page(
     access_token_headers: dict[str, str],
     add_todo_list_with_date: List[Todo],
 ):
-    params = TodoListGetInput(limit=3, offset=0, completed=False)
+    params = dict(limit=3, offset=0, completed=False)
 
     response = client.get(
         "/todos",
-        params=params.dict(),
+        params=params,
         headers=access_token_headers,
     )
 
@@ -174,11 +175,11 @@ def test_get_todo_list__valid_page_and_offset__2_page(
     access_token_headers: dict[str, str],
     add_todo_list_with_date: List[Todo],
 ):
-    params = TodoListGetInput(limit=3, offset=3, completed=False)
+    params = dict(limit=3, offset=3, completed=False)
 
     response = client.get(
         "/todos",
-        params=params.dict(),
+        params=params,
         headers=access_token_headers,
     )
 
@@ -199,17 +200,17 @@ def test_get_todo_list__valid_date_range(
     add_todo_list_with_date: List[Todo],
 ):
 
-    params = TodoListGetInput(
+    params = dict(
         limit=3,
         offset=0,
         completed=False,
-        start_date="2023-11-04",
-        end_date="2023-11-06",
+        start_date="2024-11-04",
+        end_date="2024-11-06",
     )
 
     response = client.get(
         "/todos",
-        params=params.dict(),
+        params=params,
         headers=access_token_headers,
     )
 
@@ -229,11 +230,11 @@ def test_get_todo_list__complete(
     access_token_headers: dict[str, str],
     add_todo_list_with_date: List[Todo],
 ):
-    params = TodoListGetInput(limit=3, offset=0, completed=True)
+    params = dict(limit=3, offset=0, completed=True)
 
     response = client.get(
         "/todos",
-        params=params.dict(),
+        params=params,
         headers=access_token_headers,
     )
 

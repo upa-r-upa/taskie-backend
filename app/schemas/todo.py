@@ -1,27 +1,26 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 from datetime import datetime
-
-from app.schemas.validator import validate_date
 
 
 class TodoBase(BaseModel):
     title: str
     order: int
-    target_date: str
+    target_date: datetime
     content: str = None
 
     class Config:
         orm_mode = True
 
 
+class TodoCreateInput(TodoBase):
+    pass
+
+
 class TodoUpdateInput(BaseModel):
     title: str
-    target_date: str
+    target_date: datetime
+    completed: bool
     content: str = None
-
-    @validator("target_date")
-    def validate_target_date(cls, v):
-        return validate_date(v)
 
 
 class TodoPublic(TodoBase):
@@ -42,13 +41,3 @@ class TodoOrderUpdate(BaseModel):
 
 class TodoOrderUpdateInput(BaseModel):
     todo_list: list[TodoOrderUpdate]
-
-
-class TodoListGetInput(BaseModel):
-    limit: int
-    offset: int
-
-    start_date: str = None
-    end_date: str = None
-
-    completed: bool = False

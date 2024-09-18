@@ -1,3 +1,4 @@
+from datetime import date
 from typing import List
 
 from sqlalchemy import func
@@ -9,7 +10,7 @@ from app.schemas.routine import RoutineLogBase
 
 class RoutineLogDAO(ProtectedBaseDAO):
     def get_routine_logs_by_date(
-        self, routine_id: int, target_date: str
+        self, routine_id: int, target_date: date
     ) -> List[RoutineLog]:
         log = (
             self.db.query(RoutineLog)

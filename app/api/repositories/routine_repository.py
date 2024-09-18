@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from sqlalchemy import asc, desc, func
 from sqlalchemy.orm import Session
 
@@ -64,17 +64,16 @@ class RoutineRepository(ProtectedBaseRepository):
             routine=new_routine, routine_elements=routine_elements
         )
 
-    def get_routine_by_date(self, date: str) -> list[RoutinePublic]:
-        date = datetime.strptime(date, "%Y-%m-%d")
+    def get_routine_by_date(self, target: date) -> list[RoutinePublic]:
         routines = self.routine_dao.get_routines_by_weekday(
-            weekday=date.weekday()
+            weekday=target.weekday()
         )
         routine_ids = [routine.id for routine in routines]
         routine_logs = (
             self.db.query(RoutineLog)
             .filter(
                 RoutineLog.routine_id.in_(routine_ids),
-                func.date(RoutineLog.completed_at) == date.date(),
+                func.date(RoutineLog.completed_at) == target,
             )
             .order_by(
                 desc(RoutineLog.routine_id),
