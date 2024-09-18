@@ -60,7 +60,8 @@ def test_update_todo(
     request_data = dict(
         title="Updated title",
         content="Updated content",
-        target_date="2024-07-24",
+        target_date="2024-07-24T11:04:00",
+        completed=True,
     )
 
     response = client.put(
@@ -74,10 +75,8 @@ def test_update_todo(
     assert response.status_code == 200
     assert response_data.title == request_data["title"]
     assert response_data.content == request_data["content"]
-    assert (
-        response_data.target_date.strftime("%Y-%m-%d")
-        == request_data["target_date"]
-    )
+    assert response_data.target_date.strftime("%Y-%m-%d") == "2024-07-24"
+    assert response_data.completed_at is not None
 
     assert (
         session.query(Todo)

@@ -97,6 +97,7 @@ def update_todo(
             todo_id=todo_id,
             title=data.title,
             target_date=data.target_date,
+            completed=data.completed,
             content=data.content,
         )
 

@@ -45,11 +45,22 @@ class TodoDAO(ProtectedBaseDAO):
 
         return todo
 
+    def check_completed_updated(
+        self, completed: bool, completed_at: datetime | None
+    ) -> bool:
+        if (completed and not completed_at) or (
+            not completed and completed_at
+        ):
+            return True
+
+        return False
+
     def update_todo(
         self,
         todo_id: int,
         title: str,
-        target_date: str,
+        target_date: datetime,
+        completed: bool,
         content: str = None,
     ) -> Todo:
         todo = self.get_todo_by_id(todo_id=todo_id)
@@ -60,9 +71,15 @@ class TodoDAO(ProtectedBaseDAO):
                 detail=DATA_DOES_NOT_EXIST,
             )
 
+        if self.check_completed_updated(completed, todo.completed_at):
+            if completed:
+                todo.completed_at = datetime.now(timezone.utc)
+            else:
+                todo.completed_at = None
+
         todo.title = title
         todo.content = content
-        todo.target_date = datetime.strptime(target_date, "%Y-%m-%d")
+        todo.target_date = target_date
 
         return todo
 
