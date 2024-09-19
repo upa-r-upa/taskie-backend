@@ -1,4 +1,5 @@
-from datetime import UTC, datetime
+from datetime import datetime
+from pytz import timezone
 from typing import List
 from fastapi.testclient import TestClient
 from sqlalchemy import func
@@ -240,7 +241,7 @@ def test_update_routine_empty_routine_elements(
 
 
 def is_timestamp_on_today(timestamp) -> bool:
-    today_date = datetime.now(UTC).date()
+    today_date = datetime.now(timezone("Asia/Seoul")).date()
 
     timestamp_date = func.date(timestamp)
 

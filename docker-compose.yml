@@ -21,6 +21,7 @@ services:
       POSTGRES_USER: testuser
       POSTGRES_PASSWORD: testpass
       POSTGRES_DB: taskie_dev_db
+      TZ: Asia/Seoul
   
 volumes:
   postgres_data:
