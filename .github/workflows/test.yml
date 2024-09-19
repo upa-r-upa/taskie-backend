@@ -16,6 +16,7 @@ jobs:
           POSTGRES_USER: testuser
           POSTGRES_PASSWORD: testpass
           POSTGRES_DB: taskie_test_db
+          TZ: Asia/Seoul
         ports:
           - 5432:5432
 
