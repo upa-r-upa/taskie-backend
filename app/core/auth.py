@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, status
 import jwt
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+from pytz import timezone
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import Annotated, Literal
@@ -39,7 +40,7 @@ def get_password_hash(password):
 
 def create_jwt_token(data: dict, expires_delta: timedelta):
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + expires_delta
+    expire = datetime.now(timezone("Asia/Seoul")) + expires_delta
     to_encode.update({"exp": expire})
 
     encoded_jwt = jwt.encode(

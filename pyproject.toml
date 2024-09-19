@@ -20,6 +20,7 @@ python-dotenv = "^1.0.0"
 psycopg2-binary = "^2.9.9"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 bcrypt = "4.0.1"
+pytz = "^2024.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"

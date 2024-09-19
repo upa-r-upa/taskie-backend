@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
+from pytz import timezone
 
 from typing import List
 from fastapi import APIRouter, Depends, status
@@ -137,10 +138,12 @@ def get_todo_list(
     todo_dao: TodoDAO = Depends(get_todo_dao),
 ):
     if start_date and not end_date:
-        end_date = datetime.now(datetime.UTC).date()
+        end_date = datetime.now(timezone("Asia/Seoul")).date()
 
     if end_date and not start_date:
-        start_date = (datetime.now(datetime.UTC) - timedelta(days=30)).date
+        start_date = (
+            datetime.now(timezone("Asia/Seoul")) - timedelta(days=30)
+        ).date
 
     todo_list = todo_dao.get_todo_list(
         completed=completed,

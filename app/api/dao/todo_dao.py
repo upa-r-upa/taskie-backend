@@ -1,8 +1,9 @@
-from datetime import date, datetime, timezone
+from datetime import date, datetime
+from pytz import timezone
 from operator import and_
 from typing import List
 from fastapi import HTTPException, status
-from sqlalchemy import asc, desc, func
+from sqlalchemy import asc, desc, func, nullsfirst
 from app.api.errors import DATA_DOES_NOT_EXIST
 from app.models.models import Todo
 from app.schemas.todo import TodoOrderUpdate
@@ -73,7 +74,7 @@ class TodoDAO(ProtectedBaseDAO):
 
         if self.check_completed_updated(completed, todo.completed_at):
             if completed:
-                todo.completed_at = datetime.now(timezone.utc)
+                todo.completed_at = datetime.now(timezone("Asia/Seoul"))
             else:
                 todo.completed_at = None
 
@@ -146,7 +147,10 @@ class TodoDAO(ProtectedBaseDAO):
                 Todo.user_id == self.user_id,
                 func.date(Todo.target_date) == date,
             )
-            .order_by(desc(Todo.target_date), asc(Todo.order))
+            .order_by(
+                nullsfirst(desc(Todo.completed_at)),
+                desc(Todo.created_at),
+            )
             .all()
         )
 
