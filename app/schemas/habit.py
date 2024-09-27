@@ -91,7 +91,7 @@ class HabitListGetParams(ListLoadParams):
     activated: bool | None = Query(True)
 
 
-class HabitLog(BaseModel):
+class HabitLogPublic(BaseModel):
     id: int
     completed_at: datetime
 
@@ -101,11 +101,11 @@ class HabitLog(BaseModel):
 
 class HabitWithLog(HabitPublic):
     near_weekday: int
-    log_list: List[HabitLog]
+    log_list: List[HabitLogPublic]
 
     @classmethod
     def from_orm_with_weekday(
-        cls, db_obj: Habit, log_list: list[HabitLog], today_weekday: int
+        cls, db_obj: Habit, log_list: list[HabitLogPublic], today_weekday: int
     ):
         habit = HabitPublic.from_orm(db_obj).dict()
         habit_with_log = HabitWithLog(

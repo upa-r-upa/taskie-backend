@@ -171,6 +171,16 @@ class HabitRepository(ProtectedBaseRepository):
         )
         habit.activated = update_input.activated
 
-        self.db.flush()
-
         return habit
+
+    def achieve_habit(self, habit_id: int) -> HabitLog:
+        habit = self.get_habit_by_id(habit_id)
+
+        if not habit:
+            raise DataNotFoundError()
+
+        log = HabitLog(habit_id=habit_id)
+
+        self.db.add(log)
+
+        return log
