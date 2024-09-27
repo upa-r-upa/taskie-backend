@@ -240,3 +240,24 @@ def test_update_habit(
     assert habit.repeat_days == "01234"
     assert habit.repeat_time_minutes == body["repeat_time_minutes"]
     assert habit.activated == body["activated"]
+
+
+def test_achieve_habit(
+    client: TestClient,
+    session: Session,
+    access_token_headers: dict[str, str],
+    add_habit_list: list[Habit],
+):
+    response = client.post(
+        "/habits/achieve/1",
+        headers=access_token_headers,
+    )
+
+    data = response.json()
+
+    habit = session.query(HabitLog).filter(Habit.id == 1).first()
+
+    assert response.status_code == 200
+    assert data["completed_at"] is not None
+    assert data["id"] == 1
+    assert habit.habit_id == 1

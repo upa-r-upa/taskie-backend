@@ -10,6 +10,7 @@ from ..repositories import get_habit_repository
 from ..repositories.habit_repository import HabitRepository
 from app.schemas.habit import (
     HabitCreateInput,
+    HabitLogPublic,
     HabitPublic,
     HabitListGetParams,
     HabitUpdateInput,
@@ -77,6 +78,31 @@ def delete_habit(
             )
 
     return None
+
+
+@router.post(
+    "/achieve/{habit_id}",
+    response_model=HabitLogPublic,
+    status_code=status.HTTP_200_OK,
+    operation_id="achieveHabit",
+)
+def achieve_habit(
+    habit_id: int,
+    repository: HabitRepository = Depends(get_habit_repository),
+    tx_manager: contextmanager = Depends(tx_manager),
+):
+    with tx_manager:
+        try:
+            log = repository.achieve_habit(
+                habit_id=habit_id,
+            )
+        except DataNotFoundError:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=DATA_DOES_NOT_EXIST,
+            )
+
+    return HabitLogPublic.from_orm(log)
 
 
 @router.put(

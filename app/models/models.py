@@ -80,7 +80,7 @@ class HabitLog(Base):
     __tablename__ = "habit_log"
 
     id = Column(Integer, primary_key=True)
-    completed_at = Column(TIMESTAMP, nullable=False)
+    completed_at = Column(TIMESTAMP, default=func.now(), nullable=False)
 
     habit_id = Column(
         Integer, ForeignKey("habit.id", ondelete="CASCADE"), nullable=False
