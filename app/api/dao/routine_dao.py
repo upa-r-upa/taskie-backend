@@ -24,6 +24,18 @@ class RoutineDAO(ProtectedBaseDAO):
 
         return routine
 
+    def get_routines(self) -> List[Routine]:
+        routines = (
+            self.db.query(Routine)
+            .filter(
+                Routine.user_id == self.user_id,
+            )
+            .order_by(Routine.start_time_minutes)
+            .all()
+        )
+
+        return routines
+
     def get_routines_by_weekday(self, weekday: int) -> List[Routine]:
         routines = (
             self.db.query(Routine)
