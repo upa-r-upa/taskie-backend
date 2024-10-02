@@ -1,8 +1,11 @@
+from datetime import date
 from typing import List
 from fastapi import HTTPException, status
+from sqlalchemy import asc, func
 from app.api.errors import DATA_DOES_NOT_EXIST
+from app.schemas.routine import RoutineItem, RoutinePublic
 from .base import ProtectedBaseDAO
-from app.models.models import Routine
+from app.models.models import Routine, RoutineLog
 
 
 class RoutineDAO(ProtectedBaseDAO):
@@ -34,7 +37,9 @@ class RoutineDAO(ProtectedBaseDAO):
 
         return routines
 
-    def get_routine_with_elements_by_id(self, routine_id: int) -> Routine:
+    def get_routine_with_elements_by_id(
+        self, routine_id: int, date: date
+    ) -> RoutinePublic:
         routine = (
             self.db.query(Routine)
             .filter(
@@ -50,7 +55,38 @@ class RoutineDAO(ProtectedBaseDAO):
                 detail=DATA_DOES_NOT_EXIST,
             )
 
-        return routine
+        routine_logs = (
+            self.db.query(RoutineLog)
+            .filter(
+                RoutineLog.routine_id == routine_id,
+                func.date(RoutineLog.completed_at) == date,
+            )
+            .order_by(
+                asc(RoutineLog.routine_element_id),
+                asc(RoutineLog.completed_at),
+            )
+            .all()
+        )
+
+        routine_with_logs: RoutinePublic = RoutinePublic.from_routine_with_log(
+            routine=routine, routine_items=[]
+        )
+        routine_log_map = dict()
+        for log in routine_logs:
+            routine_log_map[log.routine_element_id] = log
+
+        for element in routine.routine_elements:
+            routine_item = RoutineItem.from_routine_element(element, None)
+
+            if routine_log_map.get(routine_item.id) is not None:
+                log = routine_log_map[element.id]
+                routine_item.completed_at = log.completed_at
+                routine_item.completed_duration_seconds = log.duration_seconds
+                routine_item.is_skipped = log.is_skipped
+
+            routine_with_logs.routine_elements.append(routine_item)
+
+        return routine_with_logs
 
     def update_routine(
         self,

@@ -1,5 +1,7 @@
 from contextlib import contextmanager
+from datetime import datetime
 from fastapi import APIRouter, Depends, status
+from pytz import timezone
 
 from app.core.auth import get_current_user
 
@@ -50,11 +52,11 @@ def create_routine(
     operation_id="getRoutine",
 )
 def get_routine(routine_id: int, dao: RoutineDAO = Depends(get_routine_dao)):
-    routine = dao.get_routine_with_elements_by_id(routine_id)
+    routine = dao.get_routine_with_elements_by_id(
+        routine_id, datetime.now(timezone("Asia/Seoul")).date()
+    )
 
-    response = RoutinePublic.from_routine(routine, routine.routine_elements)
-
-    return response
+    return routine
 
 
 @router.delete(
