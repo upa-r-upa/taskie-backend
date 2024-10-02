@@ -106,9 +106,10 @@ class RoutineRepository(ProtectedBaseRepository):
                 ):
                     log = routine_log_map[routine.id][element.id]
                     routine_item.completed_at = log.completed_at
-                    routine_item.completed_duration_minutes = (
-                        log.duration_minutes
+                    routine_item.completed_duration_seconds = (
+                        log.duration_seconds
                     )
+                    routine_item.is_skipped = log.is_skipped
 
                 routine_with_logs.routine_elements.append(routine_item)
 

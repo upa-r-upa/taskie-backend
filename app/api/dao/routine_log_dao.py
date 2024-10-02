@@ -28,7 +28,7 @@ class RoutineLogDAO(ProtectedBaseDAO):
             routine_log = RoutineLog(
                 routine_id=routine_id,
                 routine_element_id=log.routine_item_id,
-                duration_minutes=log.duration_minutes,
+                duration_seconds=log.duration_seconds,
                 is_skipped=bool(log.is_skipped),
             )
 

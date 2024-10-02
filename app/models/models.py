@@ -152,7 +152,7 @@ class RoutineLog(Base):
 
     id = Column(Integer, primary_key=True)
 
-    duration_minutes = Column(Integer, nullable=False)
+    duration_seconds = Column(Integer, nullable=False)
     completed_at = Column(TIMESTAMP, default=func.now(), nullable=False)
     is_skipped = Column(Boolean, default=False, nullable=False)
 

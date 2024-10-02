@@ -121,6 +121,7 @@ def add_routine(
                 duration_minutes=item.duration_minutes,
                 created_at=item.created_at,
                 updated_at=item.updated_at,
+                is_skipped=False,
             )
             for item in routine_elements
         ],
@@ -134,19 +135,19 @@ def routine_log_data(
     return [
         RoutineLogBase(
             routine_item_id=1,
-            duration_minutes=5,
+            duration_seconds=5*60,
         ),
         RoutineLogBase(
             routine_item_id=2,
-            duration_minutes=30,
+            duration_seconds=30*60,
         ),
         RoutineLogBase(
             routine_item_id=3,
-            duration_minutes=30,
+            duration_seconds=30*60,
         ),
         RoutineLogBase(
             routine_item_id=4,
-            duration_minutes=30,
+            duration_seconds=30*60,
             is_skipped=True,
         ),
     ]

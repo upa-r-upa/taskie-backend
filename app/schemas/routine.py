@@ -67,7 +67,8 @@ class RoutineItem(RoutineItemBase):
     updated_at: datetime
 
     completed_at: datetime | None
-    completed_duration_minutes: int | None
+    completed_duration_seconds: int | None
+    is_skipped: bool
 
     class Config:
         orm_mode = True
@@ -82,6 +83,7 @@ class RoutineItem(RoutineItemBase):
             created_at=element.created_at,
             updated_at=element.updated_at,
             completed_at=completed_at,
+            is_skipped=False,
         )
 
 
@@ -125,6 +127,7 @@ class RoutinePublic(RoutineBase):
                     duration_minutes=item.duration_minutes,
                     created_at=item.created_at,
                     updated_at=item.updated_at,
+                    is_skipped=False,
                 )
                 for item in routine_elements
             ],
@@ -145,7 +148,7 @@ class RoutineUpdateInput(BaseModel):
 
 class RoutineLogBase(BaseModel):
     routine_item_id: int
-    duration_minutes: int
+    duration_seconds: int
     is_skipped: bool = False
 
 
