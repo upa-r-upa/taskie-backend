@@ -1,7 +1,8 @@
+from datetime import datetime
 from typing import List
 import pytest
 from sqlalchemy.orm import Session
-from app.models.models import Routine, RoutineElement, User
+from app.models.models import Routine, RoutineElement, RoutineLog, User
 
 from app.schemas.routine import (
     RoutineCreateInput,
@@ -135,19 +136,235 @@ def routine_log_data(
     return [
         RoutineLogBase(
             routine_item_id=1,
-            duration_seconds=5*60,
+            duration_seconds=5 * 60,
         ),
         RoutineLogBase(
             routine_item_id=2,
-            duration_seconds=30*60,
+            duration_seconds=30 * 60,
         ),
         RoutineLogBase(
             routine_item_id=3,
-            duration_seconds=30*60,
+            duration_seconds=30 * 60,
         ),
         RoutineLogBase(
             routine_item_id=4,
-            duration_seconds=30*60,
+            duration_seconds=30 * 60,
             is_skipped=True,
         ),
     ]
+
+
+@pytest.fixture
+def target_date():
+    return datetime(2024, 7, 24)
+
+
+@pytest.fixture
+def non_target_date():
+    return datetime(2024, 7, 27)
+
+
+@pytest.fixture
+def add_routine_list_with_log(
+    session: Session,
+    add_user: User,
+    target_date: datetime,
+    non_target_date: datetime,
+):
+    routine_list = [
+        Routine(
+            title="test_routine",
+            start_time_minutes=540,
+            repeat_days="0123456",
+            user_id=add_user.id,
+        ),
+        Routine(
+            title="test_routine",
+            start_time_minutes=540,
+            repeat_days="0123456",
+            user_id=add_user.id,
+        ),
+        Routine(
+            title="test_routine",
+            start_time_minutes=540,
+            repeat_days="0123456",
+            user_id=add_user.id,
+        ),
+        Routine(
+            title="test_routine",
+            start_time_minutes=540,
+            repeat_days="0",
+            user_id=add_user.id,
+        ),
+    ]
+
+    session.add_all(routine_list)
+    session.commit()
+
+    routine_element_list = [
+        RoutineElement(
+            routine_id=1,
+            user_id=add_user.id,
+            title="test_routine_element",
+            duration_minutes=10,
+            order=1,
+        ),
+        RoutineElement(
+            routine_id=1,
+            user_id=add_user.id,
+            title="test_routine_element",
+            duration_minutes=10,
+            order=2,
+        ),
+        RoutineElement(
+            routine_id=1,
+            user_id=add_user.id,
+            title="test_routine_element",
+            duration_minutes=10,
+            order=3,
+        ),
+        RoutineElement(
+            routine_id=1,
+            user_id=add_user.id,
+            title="test_routine_element",
+            duration_minutes=10,
+            order=4,
+        ),
+        RoutineElement(
+            routine_id=2,
+            user_id=add_user.id,
+            title="test_routine_element",
+            duration_minutes=10,
+            order=1,
+        ),
+        RoutineElement(
+            routine_id=2,
+            user_id=add_user.id,
+            title="test_routine_element",
+            duration_minutes=10,
+            order=2,
+        ),
+        RoutineElement(
+            routine_id=2,
+            user_id=add_user.id,
+            title="test_routine_element",
+            duration_minutes=10,
+            order=3,
+        ),
+        RoutineElement(
+            routine_id=2,
+            user_id=add_user.id,
+            title="test_routine_element",
+            duration_minutes=10,
+            order=4,
+        ),
+    ]
+
+    session.add_all(routine_element_list)
+    session.commit()
+
+    routine_log_list = [
+        RoutineLog(
+            routine_id=1,
+            routine_element_id=1,
+            completed_at=target_date,
+            duration_seconds=5 * 60,
+        ),
+        RoutineLog(
+            routine_id=1,
+            routine_element_id=2,
+            completed_at=target_date,
+            duration_seconds=5 * 60,
+        ),
+        RoutineLog(
+            routine_id=1,
+            routine_element_id=3,
+            completed_at=target_date,
+            duration_seconds=5 * 60,
+        ),
+        RoutineLog(
+            routine_id=1,
+            routine_element_id=4,
+            completed_at=target_date,
+            duration_seconds=5 * 60,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=1,
+            completed_at=target_date,
+            duration_seconds=5 * 60,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=2,
+            completed_at=target_date,
+            duration_seconds=5 * 60,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=3,
+            completed_at=target_date,
+            duration_seconds=5 * 60,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=4,
+            completed_at=target_date,
+            duration_seconds=5 * 60,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=1,
+            completed_at=target_date,
+            duration_seconds=15 * 60,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=2,
+            completed_at=target_date,
+            duration_seconds=15 * 60,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=3,
+            completed_at=target_date,
+            duration_seconds=15 * 60,
+            is_skipped=True,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=4,
+            completed_at=target_date,
+            duration_seconds=15 * 60,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=1,
+            completed_at=non_target_date,
+            duration_seconds=15 * 60,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=2,
+            completed_at=non_target_date,
+            duration_seconds=15 * 60,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=3,
+            completed_at=non_target_date,
+            duration_seconds=15 * 60,
+            is_skipped=True,
+        ),
+        RoutineLog(
+            routine_id=2,
+            routine_element_id=4,
+            completed_at=non_target_date,
+            duration_seconds=15 * 60,
+        ),
+    ]
+
+    session.add_all(routine_log_list)
+    session.commit()
+
+    return routine_list

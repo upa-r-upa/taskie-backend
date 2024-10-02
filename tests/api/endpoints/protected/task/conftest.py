@@ -204,6 +204,12 @@ def add_routine_list_with_log(
             repeat_days="0123456",
             user_id=add_user.id,
         ),
+        Routine(
+            title="test_routine",
+            start_time_minutes=540,
+            repeat_days="0",
+            user_id=add_user.id,
+        ),
     ]
 
     session.add_all(routine_list)

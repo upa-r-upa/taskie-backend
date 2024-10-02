@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from datetime import datetime
+from typing import List
 from fastapi import APIRouter, Depends, status
 from pytz import timezone
 
@@ -43,6 +44,22 @@ def create_routine(
         routine = repository.create_routine(data)
 
     return routine
+
+
+@router.get(
+    "",
+    response_model=List[RoutinePublic],
+    status_code=status.HTTP_200_OK,
+    operation_id="getRoutineList",
+)
+def get_routine_list(
+    repository: RoutineRepository = Depends(get_routine_repository),
+):
+    routine_list = repository.get_routine_list(
+        datetime.now(timezone("Asia/Seoul")).date()
+    )
+
+    return routine_list
 
 
 @router.get(

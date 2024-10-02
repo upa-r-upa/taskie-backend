@@ -300,3 +300,22 @@ def test_put_routine_log(
         )
         .first()
     )
+
+
+def test_get_routine_list(
+    client: TestClient,
+    access_token_headers: dict[str, str],
+    add_routine_list_with_log: list[RoutinePublic],
+    target_date: datetime,
+):
+    response = client.get(
+        "/routines/",
+        headers=access_token_headers,
+    )
+
+    assert response.status_code == 200
+
+    routine_list = response.json()
+
+    assert len(routine_list) == 4
+    assert len(routine_list[0].get("routine_elements")) == 4

@@ -64,10 +64,9 @@ class RoutineRepository(ProtectedBaseRepository):
             routine=new_routine, routine_elements=routine_elements
         )
 
-    def get_routine_by_date(self, target: date) -> list[RoutinePublic]:
-        routines = self.routine_dao.get_routines_by_weekday(
-            weekday=target.weekday()
-        )
+    def _get_routines_with_logs(
+        self, routines: list[Routine], target: date
+    ) -> list[RoutinePublic]:
         routine_ids = [routine.id for routine in routines]
         routine_logs = (
             self.db.query(RoutineLog)
@@ -82,19 +81,18 @@ class RoutineRepository(ProtectedBaseRepository):
             )
             .all()
         )
-        routine_log_map = dict()
+
+        routine_log_map = {}
         for log in routine_logs:
             if routine_log_map.get(log.routine_id) is None:
-                routine_log_map[log.routine_id] = dict()
+                routine_log_map[log.routine_id] = {}
 
             routine_log_map[log.routine_id][log.routine_element_id] = log
 
         result_routine_list = []
         for routine in routines:
-            routine_with_logs: RoutinePublic = (
-                RoutinePublic.from_routine_with_log(
-                    routine=routine, routine_items=[]
-                )
+            routine_with_logs = RoutinePublic.from_routine_with_log(
+                routine=routine, routine_items=[]
             )
             for element in routine.routine_elements:
                 routine_item = RoutineItem.from_routine_element(element, None)
@@ -116,3 +114,13 @@ class RoutineRepository(ProtectedBaseRepository):
             result_routine_list.append(routine_with_logs)
 
         return result_routine_list
+
+    def get_routine_list(self, target: date) -> list[RoutinePublic]:
+        routines = self.routine_dao.get_routines()
+        return self._get_routines_with_logs(routines, target)
+
+    def get_routine_by_date(self, target: date) -> list[RoutinePublic]:
+        routines = self.routine_dao.get_routines_by_weekday(
+            weekday=target.weekday()
+        )
+        return self._get_routines_with_logs(routines, target)
