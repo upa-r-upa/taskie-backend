@@ -97,7 +97,7 @@ class RoutineRepository(ProtectedBaseRepository):
                 )
             )
             for element in routine.routine_elements:
-                routine_item = RoutineItem.from_routine_element(element, False)
+                routine_item = RoutineItem.from_routine_element(element, None)
 
                 if (
                     routine_log_map.get(routine.id) is not None

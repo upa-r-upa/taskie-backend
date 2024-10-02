@@ -72,7 +72,9 @@ class RoutineItem(RoutineItemBase):
     class Config:
         orm_mode = True
 
-    def from_routine_element(element: RoutineElement, completed_at: datetime):
+    def from_routine_element(
+        element: RoutineElement, completed_at: datetime | None
+    ):
         return RoutineItem(
             id=element.id,
             title=element.title,
