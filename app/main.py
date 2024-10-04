@@ -20,11 +20,15 @@ async def startup_event():
 
 
 # CORS 설정
-origins = ["http://localhost:5173", "https://taskie.upa-r-upa.com", "*"]
+origins = [
+    "http://localhost:5173",
+    "https://taskie.upa-r-upa.com",
+    "https://taskie-client.vercel.app",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
