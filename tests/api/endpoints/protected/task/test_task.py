@@ -104,3 +104,34 @@ def test_get_all_daily_task(
         routine_list[0].get("routine_elements")[0].get("completed_at")
         is not None
     )
+
+
+def test_get_uncompleted_todo_task(
+    client: TestClient,
+    access_token_headers: dict[str, str],
+    previous_target_date: datetime,
+    target_date: datetime,
+    add_todo_list_with_previous_todo: list[Todo],
+):
+    params = dict(date=target_date.strftime("%Y-%m-%d"))
+
+    response = client.get(
+        "/task",
+        params=params,
+        headers=access_token_headers,
+    )
+
+    response_data = response.json()
+    todo_list = response_data.get("todo_list")
+
+    assert response.status_code == 200
+
+    assert len(todo_list) == 6
+
+    assert todo_list[0]["target_date"] == previous_target_date
+    assert todo_list[0]["id"] == 1
+
+    assert todo_list[1]["target_date"] == target_date
+    assert todo_list[1]["id"] == 3
+
+    assert todo_list[-1]["completed_at"] is not None
