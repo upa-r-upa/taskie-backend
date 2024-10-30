@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytest import fixture
 from sqlalchemy.orm import Session
 
@@ -16,6 +16,11 @@ from app.models.models import (
 @fixture
 def target_date():
     return datetime(2024, 7, 24)
+
+
+@fixture
+def previous_target_date(target_date: datetime):
+    return target_date - timedelta(days=7)
 
 
 @fixture
@@ -73,6 +78,83 @@ def add_todo_list(
             title="test_todo_6",
             content="test_todo_6_content",
             order=6,
+            user_id=add_user.id,
+            target_date=target_date,
+        ),
+    ]
+
+    session.add_all(todo_list)
+    session.commit()
+
+    return todo_list
+
+
+@fixture
+def add_todo_list_with_previous_todo(
+    session: Session,
+    add_user: User,
+    target_date: datetime,
+    previous_target_date: datetime,
+    non_target_date: datetime,
+):
+    todo_list = [
+        Todo(
+            title="test_todo_prev_1",
+            content="test_todo_prev_1content",
+            order=1,
+            user_id=add_user.id,
+            target_date=previous_target_date,
+        ),
+        Todo(
+            title="test_todo_prev_2",
+            content="test_todo_prev_2_content",
+            order=2,
+            user_id=add_user.id,
+            target_date=previous_target_date,
+            completed_at=target_date,
+        ),
+        Todo(
+            title="test_todo_1",
+            content="test_todo_1_content",
+            order=3,
+            user_id=add_user.id,
+            target_date=target_date,
+        ),
+        Todo(
+            title="test_todo_2",
+            content="test_todo_2_content",
+            order=4,
+            user_id=add_user.id,
+            target_date=non_target_date,
+            completed_at=non_target_date,
+        ),
+        Todo(
+            title="test_todo_3",
+            content="test_todo_3_content",
+            order=5,
+            user_id=add_user.id,
+            target_date=non_target_date,
+        ),
+        Todo(
+            title="test_todo_4",
+            content="test_todo_4_content",
+            order=6,
+            user_id=add_user.id,
+            target_date=target_date,
+            completed_at=target_date,
+        ),
+        Todo(
+            title="test_todo_5",
+            content="test_todo_5_content",
+            order=7,
+            user_id=add_user.id,
+            target_date=target_date,
+            completed_at=target_date,
+        ),
+        Todo(
+            title="test_todo_6",
+            content="test_todo_6_content",
+            order=8,
             user_id=add_user.id,
             target_date=target_date,
         ),
