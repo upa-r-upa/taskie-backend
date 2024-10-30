@@ -126,7 +126,7 @@ def add_todo_list_with_previous_todo(
             order=4,
             user_id=add_user.id,
             target_date=non_target_date,
-            completed_at=target_date,
+            completed_at=non_target_date,
         ),
         Todo(
             title="test_todo_3",

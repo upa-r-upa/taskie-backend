@@ -1,9 +1,8 @@
 from datetime import date, datetime
 from pytz import timezone
-from operator import and_
 from typing import List
 from fastapi import HTTPException, status
-from sqlalchemy import asc, desc, func, nullsfirst
+from sqlalchemy import asc, desc, and_, func, nullsfirst, or_
 from app.api.errors import DATA_DOES_NOT_EXIST
 from app.models.models import Todo
 from app.schemas.todo import TodoOrderUpdate
@@ -145,11 +144,19 @@ class TodoDAO(ProtectedBaseDAO):
             self.db.query(Todo)
             .filter(
                 Todo.user_id == self.user_id,
-                func.date(Todo.target_date) == date,
+                or_(
+                    func.date(Todo.target_date) == date,
+                    and_(
+                        Todo.target_date <= date, Todo.completed_at.is_(None)
+                    ),
+                    func.date(Todo.completed_at) == date,
+                ),
             )
             .order_by(
                 nullsfirst(desc(Todo.completed_at)),
-                desc(Todo.created_at),
+                desc(Todo.target_date),
+                desc(Todo.updated_at),
+                desc(Todo.completed_at),
             )
             .all()
         )

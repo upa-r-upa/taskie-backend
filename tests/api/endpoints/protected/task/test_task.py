@@ -52,7 +52,7 @@ def test_get_all_daily_task_no_match_log(
     todo_list = response_data.get("todo_list")
     habit_list = response_data.get("habit_list")
 
-    assert todo_list == []
+    assert len(todo_list) == 3
     assert len(habit_list) == 3
     assert len(routine_list) == 3
 
@@ -82,13 +82,8 @@ def test_get_all_daily_task(
     todo_list = response_data.get("todo_list")
     habit_list = response_data.get("habit_list")
 
-    assert len(todo_list) == 4
-    assert (
-        datetime.strptime(
-            todo_list[0].get("target_date"), "%Y-%m-%dT%H:%M:%S"
-        ).date()
-        == target_date.date()
-    )
+    assert len(todo_list) == 5
+
     assert len(habit_list) == 2
     assert target_date.weekday() in habit_list[0].get("repeat_days")
 
@@ -128,10 +123,12 @@ def test_get_uncompleted_todo_task(
 
     assert len(todo_list) == 6
 
-    assert todo_list[0]["target_date"] == previous_target_date
-    assert todo_list[0]["id"] == 1
+    assert todo_list[0]["target_date"].startswith(
+        target_date.strftime("%Y-%m-%d")
+    )
+    assert todo_list[0]["completed_at"] is None
 
-    assert todo_list[1]["target_date"] == target_date
-    assert todo_list[1]["id"] == 3
-
-    assert todo_list[-1]["completed_at"] is not None
+    assert todo_list[2]["target_date"].startswith(
+        previous_target_date.strftime("%Y-%m-%d")
+    )
+    assert todo_list[2]["completed_at"] is None
