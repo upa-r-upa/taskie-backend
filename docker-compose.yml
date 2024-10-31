@@ -1,15 +1,17 @@
+version: "3.8"
+
 services:
   taskie-backend:
     image: taskie-backend
     ports:
       - "8000:8000"
     environment:
-      JWT_SECRET_KEY: "secret_key"
-      TSK_DB_URL: "postgresql://testuser:testpass@postgres:5432/taskie_dev_db"
+      JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
+      TSK_DB_URL: "${TSK_DB_URL}"
     depends_on:
       - postgres
     restart: unless-stopped
-    
+
   postgres:
     image: postgres:16
     restart: always
@@ -18,10 +20,10 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: testuser
-      POSTGRES_PASSWORD: testpass
-      POSTGRES_DB: taskie_dev_db
-      TZ: Asia/Seoul
-  
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      TZ: "${TZ}"
+
 volumes:
   postgres_data:
