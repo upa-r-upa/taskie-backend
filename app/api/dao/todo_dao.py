@@ -151,9 +151,8 @@ class TodoDAO(ProtectedBaseDAO):
             )
             .order_by(
                 nullsfirst(desc(Todo.completed_at)),
-                desc(Todo.target_date),
+                asc(Todo.target_date),
                 desc(Todo.updated_at),
-                desc(Todo.completed_at),
             )
             .all()
         )
