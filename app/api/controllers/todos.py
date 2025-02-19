@@ -137,14 +137,6 @@ def get_todo_list(
     end_date: date | None = None,
     todo_dao: TodoDAO = Depends(get_todo_dao),
 ):
-    if start_date and not end_date:
-        end_date = datetime.now(timezone("Asia/Seoul")).date()
-
-    if end_date and not start_date:
-        start_date = (
-            datetime.now(timezone("Asia/Seoul")) - timedelta(days=30)
-        ).date
-
     todo_list = todo_dao.get_todo_list(
         completed=completed,
         limit=limit,

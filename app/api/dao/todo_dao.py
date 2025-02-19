@@ -119,22 +119,19 @@ class TodoDAO(ProtectedBaseDAO):
         else:
             query = query.filter(Todo.completed_at.is_(None))
 
-        if start_date and end_date:
-            query = query.filter(
-                and_(
-                    func.date(Todo.target_date) >= start_date,
-                    func.date(Todo.target_date) <= end_date,
-                )
+        if start_date:
+            query = query.filter(func.date(Todo.target_date) >= start_date)
+        if end_date:
+            query = query.filter(func.date(Todo.target_date) <= end_date)
+
+        if completed:
+            query = query.order_by(desc(Todo.completed_at))
+        else:
+            query = query.order_by(
+                asc(Todo.target_date), asc(Todo.order), desc(Todo.updated_at)
             )
 
-        todo = (
-            query.order_by(desc(Todo.target_date), asc(Todo.order))
-            .limit(limit)
-            .offset(offset)
-            .all()
-        )
-
-        return todo
+        return query.limit(limit).offset(offset).all()
 
     def get_todo_list_by_date(
         self,
