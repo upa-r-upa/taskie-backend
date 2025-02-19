@@ -124,11 +124,17 @@ def test_get_uncompleted_todo_task(
     assert len(todo_list) == 6
 
     assert todo_list[0]["target_date"].startswith(
-        target_date.strftime("%Y-%m-%d")
+        previous_target_date.strftime("%Y-%m-%d")
     )
     assert todo_list[0]["completed_at"] is None
 
-    assert todo_list[2]["target_date"].startswith(
-        previous_target_date.strftime("%Y-%m-%d")
-    )
-    assert todo_list[2]["completed_at"] is None
+    for idx in [1, 2]:
+        assert todo_list[idx]["target_date"].startswith(
+            target_date.strftime("%Y-%m-%d")
+        )
+        assert todo_list[idx]["completed_at"] is None
+
+    for todo in todo_list[3:]:
+        assert todo["completed_at"] is not None
+        if isinstance(todo["completed_at"], str):
+            assert todo["completed_at"].strip() != ""

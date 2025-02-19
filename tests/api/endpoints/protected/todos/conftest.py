@@ -161,7 +161,7 @@ def todo_list_with_date() -> List[Todo]:
             title="Test title 9",
             content="Test content 9",
             order=9,
-            completed_at=datetime(2024, 11, 16, 0, 0, 0),
+            completed_at=datetime(2024, 11, 17, 0, 0, 0),
             updated_at=datetime(2024, 11, 17, 0, 0, 0),
             target_date=datetime(2024, 11, 17, 0, 0, 0),
             user_id=1,

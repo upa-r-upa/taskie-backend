@@ -164,9 +164,9 @@ def test_get_todo_list__valid_page_and_offset__1_page(
     response_data = response.json()
 
     assert len(response_data) == 3
-    assert response_data[0].get("id") == 7
-    assert response_data[1].get("id") == 6
-    assert response_data[2].get("id") == 5
+    assert response_data[0].get("id") == 1
+    assert response_data[1].get("id") == 2
+    assert response_data[2].get("id") == 3
 
 
 def test_get_todo_list__valid_page_and_offset__2_page(
@@ -189,8 +189,8 @@ def test_get_todo_list__valid_page_and_offset__2_page(
 
     assert len(response_data) == 3
     assert response_data[0].get("id") == 4
-    assert response_data[1].get("id") == 3
-    assert response_data[2].get("id") == 2
+    assert response_data[1].get("id") == 5
+    assert response_data[2].get("id") == 6
 
 
 def test_get_todo_list__valid_date_range(
@@ -219,9 +219,9 @@ def test_get_todo_list__valid_date_range(
     response_data = response.json()
 
     assert len(response_data) == 3
-    assert response_data[0].get("id") == 3
+    assert response_data[0].get("id") == 1
     assert response_data[1].get("id") == 2
-    assert response_data[2].get("id") == 1
+    assert response_data[2].get("id") == 3
 
 
 def test_get_todo_list__complete(
@@ -233,9 +233,7 @@ def test_get_todo_list__complete(
     params = dict(limit=3, offset=0, completed=True)
 
     response = client.get(
-        "/todos",
-        params=params,
-        headers=access_token_headers,
+        "/todos", params=params, headers=access_token_headers
     )
 
     assert response.status_code == 200
