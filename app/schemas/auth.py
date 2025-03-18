@@ -10,6 +10,9 @@ from app.api.errors import (
 )
 from app.schemas.user import UserData
 
+USERNAME_PATTERN = r"^[A-Za-z0-9]+$"
+PASSWORD_PATTERN = r"^.+$"
+
 
 class SignupInput(BaseModel):
     username: str
@@ -30,7 +33,7 @@ class SignupInput(BaseModel):
             raise ValueError(VALUE_TOO_SHORT)
         elif len(v) > 20:
             raise ValueError(VALUE_TOO_LONG)
-        elif not re.match("^[A-Za-z][A-Za-z0-9]*$", v):
+        elif not re.match(USERNAME_PATTERN, v):
             raise ValueError(VALUE_MUST_BE_ALPHANUM)
         return v
 
@@ -40,7 +43,7 @@ class SignupInput(BaseModel):
             raise ValueError(VALUE_TOO_SHORT)
         elif len(v) > 20:
             raise ValueError(VALUE_TOO_LONG)
-        elif not re.match("^[A-Za-z][A-Za-z0-9]*$", v):
+        elif not re.match(PASSWORD_PATTERN, v):
             raise ValueError(VALUE_MUST_BE_ALPHANUM)
         return v
 
