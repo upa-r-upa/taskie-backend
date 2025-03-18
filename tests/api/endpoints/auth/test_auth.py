@@ -28,6 +28,60 @@ def test_signup(client: TestClient, session: Session, user_data: UserBase):
     assert user.nickname == data.nickname
 
 
+def test_signup_starting_with_number(client: TestClient, session: Session):
+    data = SignupInput(
+        username="123user",
+        password="123P@ss!",
+        password_confirm="123P@ss!",
+        email="number.start@example.com",
+        nickname="123닉네임",
+    )
+
+    response = client.post("/auth/signup", json=data.dict())
+
+    assert response.status_code == 201
+
+    user = session.query(User).filter_by(username=data.username).first()
+
+    assert user.username == data.username
+    assert user.email == data.email
+    assert user.nickname == data.nickname
+
+
+def test_signup_with_special_password(client: TestClient, session: Session):
+    data = SignupInput(
+        username="testuser",
+        password="P@ssw0rd!",
+        password_confirm="P@ssw0rd!",
+        email="special.chars@example.com",
+        nickname="닉네임_!@#$%",
+    )
+
+    response = client.post("/auth/signup", json=data.dict())
+
+    assert response.status_code == 201
+
+    user = session.query(User).filter_by(username=data.username).first()
+
+    assert user.username == data.username
+    assert user.email == data.email
+    assert user.nickname == data.nickname
+
+
+def test_signup_with_special_character_in_username_fails(client: TestClient):
+    data = dict(
+        username="test!user",
+        password="password123",
+        password_confirm="password123",
+        email="test.special@example.com",
+        nickname="테스트유저",
+    )
+
+    response = client.post("/auth/signup", json=data)
+
+    assert response.status_code == 422
+
+
 def test_login(client: TestClient, user_data: UserBase, add_user: User):
     data = dict(
         username=add_user.username,
