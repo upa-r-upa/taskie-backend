@@ -13,9 +13,9 @@ from .base import ProtectedBaseDAO
 
 class UserDAO(ProtectedBaseDAO):
     def update_me(self, data: UserUpdateInput) -> User:
-        user = self.db.query(User).filter_by(id=self.user_id).first()
+        user = self.get_me()
 
-        if data.username != self.username:
+        if data.username != user.username:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=USERNAME_CANNOT_BE_CHANGED,
@@ -34,3 +34,6 @@ class UserDAO(ProtectedBaseDAO):
             user.nickname = data.nickname
 
         return user
+    
+    def get_me(self) -> User:
+        return self.db.query(User).filter_by(id=self.user_id).first()

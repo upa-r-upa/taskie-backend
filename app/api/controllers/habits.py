@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.errors import DATA_DOES_NOT_EXIST
-from app.core.auth import get_current_user
+from app.core.auth import verify_access_token
 from app.database.db import tx_manager
 from app.exceptions.exceptions import DataNotFoundError
 from ..repositories import get_habit_repository
@@ -17,9 +17,10 @@ from app.schemas.habit import (
     HabitWithLog,
 )
 
-
 router = APIRouter(
-    prefix="/habits", tags=["habits"], dependencies=[Depends(get_current_user)]
+    prefix="/habits",
+    tags=["habits"],
+    dependencies=[Depends(verify_access_token)],
 )
 
 

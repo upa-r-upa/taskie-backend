@@ -3,14 +3,12 @@ import jwt
 from datetime import datetime, timedelta
 from pytz import timezone
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
 from typing import Annotated, Literal
 from jwt.exceptions import InvalidTokenError
-from passlib.context import CryptContext
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from passlib.context import CryptContext
 
 from app.api.errors import EXPIRED_TOKEN, INVALID_CREDENTIAL
-from app.database.db import get_db
 from app.models.models import User
 
 from .config import (
@@ -20,22 +18,21 @@ from .config import (
     JWT_REFRESH_TOKEN_EXPIRES,
 )
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security_scheme = HTTPBearer()
 
 
 class TokenData(BaseModel):
-    username: str | None = None
+    id: int | None = None
     type: Annotated[Literal["refresh", "access"], None] = None
 
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password):
+def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_jwt_token(data: dict, expires_delta: timedelta):
@@ -50,34 +47,18 @@ def create_jwt_token(data: dict, expires_delta: timedelta):
     return encoded_jwt
 
 
-def create_refresh_token(username: str):
+def create_refresh_token(id: int):
     return create_jwt_token(
-        data=TokenData(username=username, type="refresh").dict(),
+        data=TokenData(id=id, type="refresh").dict(),
         expires_delta=JWT_REFRESH_TOKEN_EXPIRES,
     )
 
 
-def create_access_token(username: str):
+def create_access_token(id: int):
     return create_jwt_token(
-        data=TokenData(username=username, type="access").dict(),
+        data=TokenData(id=id, type="access").dict(),
         expires_delta=JWT_ACCESS_TOKEN_EXPIRES,
     )
-
-
-def authenticate_user(db: Session, username: str, password: str):
-    user = get_user(db, username)
-
-    if not user:
-        return False
-    if not verify_password(password, user.password):
-        return False
-    return user
-
-
-def get_user(db: Session, username: str) -> User | None:
-    user = db.query(User).filter(User.username == username).first()
-
-    return user
 
 
 credentials_exception = HTTPException(
@@ -87,39 +68,33 @@ credentials_exception = HTTPException(
 )
 
 
-def refresh_token_decode(refresh_token: str, db: Session) -> User:
+def refresh_token_decode(refresh_token: str) -> User:
     try:
         payload = jwt.decode(
             refresh_token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM]
         )
-        username: str | None = payload.get("username")
+        id: int | None = payload.get("id")
         type: str | None = payload.get("type")
 
-        if username is None or type != "refresh":
+        if id is None or type != "refresh":
             raise credentials_exception
 
     except InvalidTokenError:
         raise credentials_exception
 
-    user = get_user(db, username=username)
-
-    if user is None:
-        raise credentials_exception
-
-    return user
+    return id
 
 
-def get_current_user(
+def verify_access_token(
     credentials: HTTPAuthorizationCredentials = Depends(security_scheme),
-    db: Session = Depends(get_db),
-) -> User:
+) -> int:
     try:
         token = credentials.credentials
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        username: str | None = payload.get("username")
+        id: int | None = payload.get("id")
         type: str | None = payload.get("type")
 
-        if username is None or type != "access":
+        if id is None or type != "access":
             raise credentials_exception
 
     except jwt.ExpiredSignatureError:
@@ -130,10 +105,5 @@ def get_current_user(
         )
     except InvalidTokenError:
         raise credentials_exception
-
-    user = get_user(db=db, username=username)
-
-    if user is None:
-        raise credentials_exception
-
-    return user
+    
+    return id

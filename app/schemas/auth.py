@@ -69,7 +69,6 @@ class LoginOutput(BaseModel):
 
 class RefreshOutput(BaseModel):
     access_token: str
-    user: UserData
 
 
 class UserBase(BaseModel):

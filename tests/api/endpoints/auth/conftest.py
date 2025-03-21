@@ -5,5 +5,5 @@ from app.models.models import User
 
 
 @pytest.fixture
-def refresh_token(user_data: User) -> str:
-    return create_refresh_token(user_data.username)
+def refresh_token(add_user: User) -> str:
+    return create_refresh_token(add_user.id)

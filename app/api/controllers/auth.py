@@ -62,7 +62,7 @@ def login(
             value=refresh_token,
             httponly=True,
             max_age=60 * 60 * 24 * 7,
-            # secure=True,
+            secure=True,
             samesite="lax",
         )
 
@@ -86,7 +86,7 @@ def logout(
         value="",
         httponly=True,
         max_age=0,
-        # secure=True,
+        secure=True,
         samesite="lax",
     )
 
@@ -116,19 +116,18 @@ async def refresh(
         )
 
     try:
-        access_token, user = auth_dao.refresh(refresh_token=refresh_token)
+        access_token = auth_dao.refresh(refresh_token=refresh_token)
     except HTTPException as e:
         response.set_cookie(
             key="refresh_token",
             value="",
             httponly=True,
             max_age=0,
-            # secure=True,
+            secure=True,
             samesite="lax",
         )
         raise e
 
     return RefreshOutput(
-        access_token=access_token,
-        user=UserData.from_orm(user),
+        access_token=access_token
     )

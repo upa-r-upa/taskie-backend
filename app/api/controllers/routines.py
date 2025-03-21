@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 from pytz import timezone
 
-from app.core.auth import get_current_user
+from app.core.auth import verify_access_token
 
 from ..dao import get_routine_dao, get_routine_log_dao
 from ..repositories import get_routine_repository
@@ -25,7 +25,7 @@ from app.schemas.routine import (
 router = APIRouter(
     prefix="/routines",
     tags=["routines"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(verify_access_token)],
 )
 
 

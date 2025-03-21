@@ -1,7 +1,7 @@
 from datetime import date
 from fastapi import APIRouter, Depends, status
 
-from app.core.auth import get_current_user
+from app.core.auth import verify_access_token
 from ..repositories import get_task_repository
 from ..repositories.task_repository import TaskRepository
 
@@ -11,7 +11,7 @@ from app.schemas.task import TaskPublic
 router = APIRouter(
     prefix="/task",
     tags=["task"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(verify_access_token)],
 )
 
 
