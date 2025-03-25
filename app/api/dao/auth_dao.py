@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 from app.api.errors import (
     EMAIL_ALREADY_EXISTS,
     INCORRECT_USERNAME_OR_PASSWORD,
+    USER_NOT_FOUND,
     USERNAME_ALREADY_EXISTS,
 )
 from app.core.auth import (
@@ -96,4 +97,18 @@ class AuthDAO(BaseDAO):
         access_token = create_access_token(id)
 
         return access_token
+
+    def refresh_with_user_info(self, refresh_token: str) -> Tuple[str, User]:
+        id: int = refresh_token_decode(refresh_token)
+        access_token = create_access_token(id)
+        
+        user = self.get_user_by_id(id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=USER_NOT_FOUND,
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        return access_token, user
     

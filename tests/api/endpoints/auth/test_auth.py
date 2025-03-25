@@ -129,6 +129,46 @@ def test_refresh(
     assert response.json().get("access_token")
 
 
+def test_refresh_with_user_info(
+    client: TestClient, refresh_token: str, user_data: UserBase, add_user: User
+):
+    response = client.post(
+        "/auth/refresh?include_user_info=true", 
+        cookies={"refresh_token": refresh_token}
+    )
+
+    assert response.status_code == 200
+    response_json = response.json()
+    
+    # 토큰 확인
+    assert response_json.get("access_token")
+    
+    # 사용자 정보 확인
+    assert response_json.get("user") is not None
+    user_info = response_json.get("user")
+    assert user_info.get("username") == add_user.username
+    assert user_info.get("email") == add_user.email
+    assert user_info.get("nickname") == add_user.nickname
+
+
+def test_refresh_without_user_info(
+    client: TestClient, refresh_token: str
+):
+    response = client.post(
+        "/auth/refresh", 
+        cookies={"refresh_token": refresh_token}
+    )
+
+    assert response.status_code == 200
+    response_json = response.json()
+    
+    # 토큰 확인
+    assert response_json.get("access_token")
+    
+    # 사용자 정보 없음 확인
+    assert response_json.get("user") is None
+
+
 def test_invalid_refresh(
     client: TestClient, refresh_token: str
 ):

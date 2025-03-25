@@ -101,6 +101,7 @@ def logout(
 )
 async def refresh(
     response: FastAPIResponse,
+    include_user_info: bool = False,
     refresh_token: Annotated[str | None, Cookie()] = None,
     auth_dao: AuthDAO = Depends(get_auth_dao),
 ):
@@ -116,7 +117,17 @@ async def refresh(
         )
 
     try:
-        access_token = auth_dao.refresh(refresh_token=refresh_token)
+        if include_user_info:
+            access_token, user = auth_dao.refresh_with_user_info(
+                refresh_token=refresh_token
+            )
+            return RefreshOutput(
+                access_token=access_token,
+                user=UserData.from_orm(user)
+            )
+        else:
+            access_token = auth_dao.refresh(refresh_token=refresh_token)
+            return RefreshOutput(access_token=access_token)
     except HTTPException as e:
         response.set_cookie(
             key="refresh_token",
@@ -127,7 +138,3 @@ async def refresh(
             samesite="lax",
         )
         raise e
-
-    return RefreshOutput(
-        access_token=access_token
-    )
