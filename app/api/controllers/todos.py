@@ -5,7 +5,7 @@ from pytz import timezone
 from typing import List
 from fastapi import APIRouter, Depends, status
 
-from app.core.auth import get_current_user
+from app.core.auth import verify_access_token
 from ..dao import get_todo_dao
 from ..dao.todo_dao import TodoDAO
 from app.database.db import tx_manager
@@ -20,7 +20,7 @@ from app.schemas.todo import (
 router = APIRouter(
     prefix="/todos",
     tags=["todos"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(verify_access_token)],
 )
 
 

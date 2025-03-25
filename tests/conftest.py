@@ -1,6 +1,7 @@
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from passlib.context import CryptContext
 
 
 from sqlalchemy import create_engine
@@ -10,13 +11,15 @@ from app.core.config import DATABASE_URI
 from app.schemas.auth import UserBase
 from app.database.db import Base, get_db
 from app.models.models import User
-from app.core.auth import create_access_token, get_password_hash
+from app.core.auth import create_access_token
 from app.main import app as client_app
 
 engine = create_engine(DATABASE_URI, echo=True)
 TestingSessionLocal = sessionmaker(
     bind=engine, autocommit=False, autoflush=False
 )
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 @pytest.fixture(autouse=True)
@@ -68,7 +71,7 @@ def user_data() -> UserBase:
 def add_user(session: Session, user_data: UserBase) -> User:
     user = User(
         username=user_data.username,
-        password=get_password_hash(user_data.password),
+        password=pwd_context.hash(user_data.password),
         email=user_data.email,
         nickname=user_data.nickname,
     )
@@ -80,8 +83,8 @@ def add_user(session: Session, user_data: UserBase) -> User:
 
 
 @pytest.fixture
-def access_token(user_data: UserBase) -> str:
-    return create_access_token(user_data.username)
+def access_token(add_user: User) -> str:
+    return create_access_token(add_user.id)
 
 
 @pytest.fixture

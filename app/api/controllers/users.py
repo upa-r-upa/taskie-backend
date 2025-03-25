@@ -1,18 +1,18 @@
 from contextlib import contextmanager
 from fastapi import APIRouter, Depends, status
 
-from app.core.auth import get_current_user
+from app.core.auth import verify_access_token
+
 from ..dao import get_user_dao
 from ..dao.user_dao import UserDAO
 from app.database.db import tx_manager
-from app.models.models import User
 
 from app.schemas.user import UserData, UserUpdateInput
 
 router = APIRouter(
     prefix="/users",
     tags=["users"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(verify_access_token)],
 )
 
 
@@ -22,8 +22,10 @@ router = APIRouter(
     status_code=status.HTTP_200_OK,
     operation_id="getMe",
 )
-def get_me(user: User = Depends(get_current_user)):
-    return UserData.from_orm(user)
+def get_me(
+    user_dao: UserDAO = Depends(get_user_dao)
+):
+    return UserData.from_orm(user_dao.get_me())
 
 
 @router.put(
@@ -34,7 +36,6 @@ def get_me(user: User = Depends(get_current_user)):
 )
 def update_me(
     data: UserUpdateInput,
-    user=Depends(get_current_user),
     user_dao: UserDAO = Depends(get_user_dao),
     tx_manager: contextmanager = Depends(tx_manager),
 ):

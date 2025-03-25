@@ -4,15 +4,15 @@ from sqlalchemy import desc, func
 from pytest import Session
 
 from app.exceptions.exceptions import DataNotFoundError
-from app.models.models import Habit, HabitLog, User
+from app.models.models import Habit, HabitLog
 from app.schemas.habit import HabitCreateInput, HabitUpdateInput, HabitWithLog
 
 from .base import ProtectedBaseRepository
 
 
 class HabitRepository(ProtectedBaseRepository):
-    def __init__(self, db: Session, user: User):
-        super().__init__(db, user)
+    def __init__(self, db: Session, user_id: int):
+        super().__init__(db, user_id)
 
     def create_habit(self, habit: HabitCreateInput) -> Habit:
         new_habit = Habit(

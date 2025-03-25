@@ -69,7 +69,7 @@ class LoginOutput(BaseModel):
 
 class RefreshOutput(BaseModel):
     access_token: str
-    user: UserData
+    user: UserData | None = None
 
 
 class UserBase(BaseModel):

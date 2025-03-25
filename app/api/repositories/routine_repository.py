@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.api.dao.routine_dao import RoutineDAO
 from app.api.dao.routine_element_dao import RoutineElementDAO
 from app.api.dao.routine_log_dao import RoutineLogDAO
-from app.models.models import Routine, RoutineLog, User
+from app.models.models import Routine, RoutineLog
 from app.schemas.routine import (
     RoutineCreateInput,
     RoutinePublic,
@@ -17,12 +17,12 @@ from .base import ProtectedBaseRepository
 
 
 class RoutineRepository(ProtectedBaseRepository):
-    def __init__(self, db: Session, user: User):
-        super().__init__(db, user)
+    def __init__(self, db: Session, user_id: int):
+        super().__init__(db, user_id)
 
-        self.routine_dao = RoutineDAO(db=db, user=user)
-        self.routine_element_dao = RoutineElementDAO(db=db, user=user)
-        self.routine_log_dao = RoutineLogDAO(db=db, user=user)
+        self.routine_dao = RoutineDAO(db=db, user_id=user_id)
+        self.routine_element_dao = RoutineElementDAO(db=db, user_id=user_id)
+        self.routine_log_dao = RoutineLogDAO(db=db, user_id=user_id)
 
     def update_routine(
         self, routine_id: int, routine: RoutineUpdateInput

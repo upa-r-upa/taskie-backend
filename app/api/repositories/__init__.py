@@ -1,27 +1,26 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from app.core.auth import get_current_user
+from app.core.auth import verify_access_token
 from app.database.db import get_db
-from app.models.models import User
 from .habit_repository import HabitRepository
 from .task_repository import TaskRepository
 from .routine_repository import RoutineRepository
 
 
 def get_routine_repository(
-    db: Session = Depends(get_db), user: User = Depends(get_current_user)
+    db: Session = Depends(get_db), id: int = Depends(verify_access_token)
 ):
-    return RoutineRepository(db=db, user=user)
+    return RoutineRepository(db=db, user_id=id)
 
 
 def get_habit_repository(
-    db: Session = Depends(get_db), user: User = Depends(get_current_user)
+    db: Session = Depends(get_db), id: int = Depends(verify_access_token)
 ):
-    return HabitRepository(db=db, user=user)
+    return HabitRepository(db=db, user_id=id)
 
 
 def get_task_repository(
-    db: Session = Depends(get_db), user: User = Depends(get_current_user)
+    db: Session = Depends(get_db), id: int = Depends(verify_access_token)
 ):
-    return TaskRepository(db=db, user=user)
+    return TaskRepository(db=db, user_id=id)

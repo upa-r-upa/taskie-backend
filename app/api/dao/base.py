@@ -1,7 +1,5 @@
 from sqlalchemy.orm import Session
 
-from app.models.models import User
-
 
 class BaseDAO:
     def __init__(self, db: Session):
@@ -9,8 +7,7 @@ class BaseDAO:
 
 
 class ProtectedBaseDAO(BaseDAO):
-    def __init__(self, db: Session, user: User):
+    def __init__(self, db: Session, user_id: int):
         super().__init__(db)
 
-        self.user_id = user.id
-        self.username = user.username
+        self.user_id = user_id
