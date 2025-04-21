@@ -2,6 +2,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from passlib.context import CryptContext
+import redis
 
 
 from sqlalchemy import create_engine
@@ -11,7 +12,7 @@ from app.core.config import DATABASE_URI
 from app.schemas.auth import UserBase
 from app.database.db import Base, get_db
 from app.models.models import User
-from app.core.auth import create_access_token
+from app.core.auth import create_access_token, create_refresh_token
 from app.main import app as client_app
 
 engine = create_engine(DATABASE_URI, echo=True)
@@ -41,8 +42,17 @@ def session(app: FastAPI):
     session.close()
 
 
+@pytest.fixture
+def redis_client():
+    r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+    r.flushdb()
+    yield r
+    r.flushdb()
+    r.close()
+
+
 @pytest.fixture()
-def client(app: FastAPI, session: Session):
+def client(app: FastAPI, session: Session, redis_client: redis.Redis):
     def get_db_override():
         try:
             yield session
@@ -85,6 +95,11 @@ def add_user(session: Session, user_data: UserBase) -> User:
 @pytest.fixture
 def access_token(add_user: User) -> str:
     return create_access_token(add_user.id)
+
+
+@pytest.fixture
+def refresh_token(add_user: User) -> str:
+    return create_refresh_token(add_user.id)
 
 
 @pytest.fixture
