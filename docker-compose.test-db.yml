@@ -9,6 +9,13 @@ services:
       POSTGRES_PASSWORD: testpass
       POSTGRES_DB: taskie_test_db
       TZ: Asia/Seoul
-      
+
+  redis-test:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - 9379:6379
+    command: redis-server --save 60 1 --loglevel warning
+
 networks:
   taskie-test:
