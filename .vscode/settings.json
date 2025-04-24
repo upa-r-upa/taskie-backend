@@ -1,8 +1,4 @@
 {
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.python",
-        "editor.formatOnSave": true
-    },
     "python.testing.pytestArgs": [
         "tests",
         "-v"
@@ -13,15 +9,16 @@
     "editor.codeActionsOnSave": {
         "source.organizeImports": "explicit"
     },
-    "editor.formatOnSave": true,
     "cSpell.words": [
         "fastapi",
         "pydantic",
         "Taskie"
-    ],
-    "python.formatting.provider": "black",
-    "python.formatting.blackArgs": [
-        "--line-length",
-        "79"
-    ]
+    ],  
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.codeActionsOnSave": {
+          "source.organizeImports.ruff": "explicit"
+        }
+      } 
 }
