@@ -105,5 +105,5 @@ def verify_access_token(
         )
     except InvalidTokenError:
         raise credentials_exception
-    
+
     return id
